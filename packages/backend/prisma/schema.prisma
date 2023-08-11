@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id            String          @id() @default(uuid())
+  name          String
+  client        Client[]
+  group         Group[]
+  task          Task[]
+  configuration Configuration[]
+  user          User[]
+}
+
+model Client {
+  id        String @id() @default(uuid())
+  username  String
+  os        String
+  osVersion String
+  hostname  String
+
+  tenant   Tenant  @relation(fields: [tenantId], references: [id])
+  tenantId String
+  group    Group[]
+}
+
+model Group {
+  id   String @id() @default(uuid())
+  name String
+
+  client        Client[]
+  configuration Configuration[]
+  tenant        Tenant?         @relation(fields: [tenantId], references: [id])
+  tenantId      String?
+}
+
+model Configuration {
+  id   String @id() @default(uuid())
+  name String
+
+  group    Group[]
+  task     Task[]
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
+  tenantId String?
+}
+
+model Task {
+  id      String @id() @default(uuid())
+  name    String
+  content String
+
+  configuration   Configuration? @relation(fields: [configurationId], references: [id])
+  configurationId String?
+  tenant          Tenant?        @relation(fields: [tenantId], references: [id])
+  tenantId        String?
+}
+
+model User {
+  id       String @id() @default(uuid())
+  username String @unique
+  password String
+
+  tenantId   String
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  permission Permission[]
+}
+
+model Permission {
+  scope String @id
+
+  user User[]
+}
