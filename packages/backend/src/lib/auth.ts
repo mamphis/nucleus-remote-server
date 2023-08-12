@@ -33,8 +33,9 @@ interface AuthRequestHandler<
 
 const jwtSecret = process.env.JWT_SECRET ?? 'change-this-immidiately';
 
-const getToken = (user: User): string => {
-    return sign({ username: user.username, tenantId: user.tenantId, permissions: user.permission.map(p => p.scope) }, jwtSecret);
+const getToken = (user: User): { token: string, user: AuthUser } => {
+    const authUser = { username: user.username, tenantId: user.tenantId, permissions: user.permission.map(p => p.scope) };
+    return { token: sign(authUser, jwtSecret), user: authUser };
 }
 
 const auth = (...scopes: string[]): AuthRequestHandler => {

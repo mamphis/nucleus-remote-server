@@ -1,16 +1,30 @@
+<script lang="ts" setup>
+import router from '@/router';
+import userStore from '@/stores/user';
+import { ref } from 'vue';
+
+const password = ref("");
+const username = ref("");
+
+const { login } = userStore();
+</script>
 <template>
-    <form @submit.prevent="ev => console.log(ev)">
+    <form @submit.prevent="login(username, password).then((response) => { router.push('/') })">
         <h1>Login</h1>
         <div class="field">
-            <label for="username">Username</label>
-            <input type="text" name="username" id="username">
+            <label class="label" for="username">Username</label>
+            <div class="control">
+                <input class="input" type="text" name="username" id="username" v-model="username">
+            </div>
         </div>
         <div class="field">
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password">
+            <label class="label" for="password">Password</label>
+            <div class="control">
+                <input class="input" type="password" name="password" id="password" v-model="password">
+            </div>
         </div>
         <div class="field">
-            <button type="submit">Login</button>
+            <button class="button" type="submit">Login</button>
         </div>
     </form>
 </template>

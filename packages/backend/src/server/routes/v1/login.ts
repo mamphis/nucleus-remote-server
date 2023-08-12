@@ -20,8 +20,9 @@ router.post('/', async (req, res, next) => {
             return next(Unauthorized('invalid username or password'));
         }
 
-        const token = getToken(user);
-        return res.json({ token });
+        const { token, user: authUser } = getToken(user);
+
+        return res.json({ token, user: authUser });
     }
 
     return next(BadRequest('please provide username and password.'));

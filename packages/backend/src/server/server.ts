@@ -1,5 +1,6 @@
 import { NotFound, HttpError, InternalServerError } from 'http-errors';
 import express, { Application, NextFunction, Request, Response, json } from "express";
+import cors from 'cors';
 import api from './routes';
 
 export class Server {
@@ -9,6 +10,7 @@ export class Server {
     }
 
     configure() {
+        this.app.use(cors({origin: "*"}))
         this.app.use(json());
 
         this.app.use('/api', api);
