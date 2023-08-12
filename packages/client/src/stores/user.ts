@@ -1,12 +1,8 @@
 import { MutationType, defineStore } from "pinia";
 import { ref } from "vue";
 import { settingsStore } from "./settings";
+import type { AuthUser } from "@/types/user";
 
-type User = {
-    username: string;
-    tenantId: string;
-    permissions: string[];
-}
 
 type ErrorResponse = {
     error: string;
@@ -15,7 +11,7 @@ type ErrorResponse = {
 
 type UserResponse = {
     token: string;
-    user: User;
+    user: AuthUser;
 };
 
 type LoginResponse = UserResponse | ErrorResponse;
@@ -34,7 +30,7 @@ const userStore = defineStore('user', () => {
     const { baseApiUrl } = settingsStore();
 
     const token = ref<string>('');
-    const user = ref<User>();
+    const user = ref<AuthUser>();
 
     const login = async (username: string, password: string): Promise<LoginResponse> => {
         const response = await fetch(`${baseApiUrl}/login`, {
@@ -64,10 +60,16 @@ const userStore = defineStore('user', () => {
 
         return result;
     }
+    const logout = () => {
+        token.value = '';
+        isLoggedIn.value = false;
+        user.value = undefined;
+    }
 
     return {
         isLoggedIn,
         login,
+        logout,
         token,
         user,
     };

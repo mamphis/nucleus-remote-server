@@ -23,33 +23,25 @@ const seed = async (db: PrismaClient) => {
         }
     });
 
-    await db.permission.create({ data: { scope: 'create:tenant' } });
-    await db.permission.create({ data: { scope: 'read:tenant' } });
-    await db.permission.create({ data: { scope: 'update:tenant' } });
+    const addPermission = async (scope: string) => {
+        return Promise.all([
+            await db.permission.create({ data: { scope: `create:${scope}` } }),
+            await db.permission.create({ data: { scope: `read:${scope}` } }),
+            await db.permission.create({ data: { scope: `update:${scope}` } }),
+            await db.permission.create({ data: { scope: `delete:${scope}` } }),
+        ]);
+    }
+    const permissions = await Promise.all([
+        await addPermission('tenant'),
+        await addPermission('user'),
+        await addPermission('tenant-user'),
+        await addPermission('client'),
+        await addPermission('group'),
+        await addPermission('configuration'),
+        await addPermission('task'),
 
-    await db.permission.create({ data: { scope: 'create:user' } });
-    await db.permission.create({ data: { scope: 'read:user' } });
-    await db.permission.create({ data: { scope: 'update:user' } });
-
-    await db.permission.create({ data: { scope: 'create:tenant-user' } });
-    await db.permission.create({ data: { scope: 'read:tenant-user' } });
-    await db.permission.create({ data: { scope: 'update:tenant-user' } });
-
-    await db.permission.create({ data: { scope: 'create:client' } });
-    await db.permission.create({ data: { scope: 'read:client' } });
-    await db.permission.create({ data: { scope: 'update:client' } });
-
-    await db.permission.create({ data: { scope: 'create:group' } });
-    await db.permission.create({ data: { scope: 'read:group' } });
-    await db.permission.create({ data: { scope: 'update:group' } });
-
-    await db.permission.create({ data: { scope: 'create:configuration' } });
-    await db.permission.create({ data: { scope: 'read:configuration' } });
-    await db.permission.create({ data: { scope: 'update:configuration' } });
-
-    await db.permission.create({ data: { scope: 'create:task' } });
-    await db.permission.create({ data: { scope: 'read:task' } });
-    await db.permission.create({ data: { scope: 'update:task' } });
+        await db.permission.create({ data: { scope: 'special:admin' } }),
+    ]);
 
     const admin = await db.user.create({
         data: {
@@ -57,31 +49,8 @@ const seed = async (db: PrismaClient) => {
             password: await hash(password, 10),
             tenantId: tenant.id,
             permission: {
-                connect: [
-                    { scope: 'create:tenant' },
-                    { scope: 'read:tenant' },
-                    { scope: 'update:tenant' },
-                    { scope: 'create:user' },
-                    { scope: 'read:user' },
-                    { scope: 'update:user' },
-                    { scope: 'create:tenant-user' },
-                    { scope: 'read:tenant-user' },
-                    { scope: 'update:tenant-user' },
-                    { scope: 'create:client' },
-                    { scope: 'read:client' },
-                    { scope: 'update:client' },
-                    { scope: 'create:group' },
-                    { scope: 'read:group' },
-                    { scope: 'update:group' },
-                    { scope: 'create:configuration' },
-                    { scope: 'read:configuration' },
-                    { scope: 'update:configuration' },
-                    { scope: 'create:task' },
-                    { scope: 'read:task' },
-                    { scope: 'update:task' },
-                ]
+                connect: permissions.flatMap((elem) => elem),
             }
-
         }
     });
 

@@ -62,6 +62,7 @@ const auth = (...scopes: string[]): AuthRequestHandler => {
             }
 
             if (scopes.every(scope => user.permissions.includes(scope))) {
+                res.locals.user = user;
                 return next();
             } else {
                 return next(Forbidden(`You are missing the following scopes to do that: ${scopes.filter(s => !user.permissions.includes(s)).join()}`));

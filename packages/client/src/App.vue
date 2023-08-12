@@ -3,16 +3,17 @@ import { computed, ref } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 import userStore from './stores/user';
 import { storeToRefs } from 'pinia';
+import { hasPermission } from './lib/permission';
 const burgerActive = ref(false);
 
 const { user, isLoggedIn } = storeToRefs(userStore());
-const hasClient = computed(() => user.value?.permissions.some(p => p.endsWith(':client')));
-const hasConfigruration = computed(() => user.value?.permissions.some(p => p.endsWith(':configuration')));
-const hasGroup = computed(() => user.value?.permissions.some(p => p.endsWith(':group')));
-const hasTask = computed(() => user.value?.permissions.some(p => p.endsWith(':task')));
-const hasTenant = computed(() => user.value?.permissions.some(p => p.endsWith(':tenant')));
-const hasTenantUser = computed(() => user.value?.permissions.some(p => p.endsWith(':tenant-user')));
-const hasUser = computed(() => user.value?.permissions.some(p => p.endsWith(':user')));
+const hasClient = computed(() => hasPermission(user.value, ':client'));
+const hasConfigruration = computed(() => hasPermission(user.value, ':configuration'));
+const hasGroup = computed(() => hasPermission(user.value, ':group'));
+const hasTask = computed(() => hasPermission(user.value, ':task'));
+const hasTenant = computed(() => hasPermission(user.value, ':tenant'));
+const hasTenantUser = computed(() => hasPermission(user.value, ':tenant-user'));
+const hasUser = computed(() => hasPermission(user.value, ':user'));
 
 </script>
 
@@ -34,17 +35,18 @@ const hasUser = computed(() => user.value?.permissions.some(p => p.endsWith(':us
       <div class="navbar-menu" :class="{ 'is-active': burgerActive }">
         <div class="navbar-start">
           <RouterLink class="navbar-item" to="/">Home</RouterLink>
-          <RouterLink class="navbar-item" to="/client" v-if="hasClient">Client</RouterLink>
-          <RouterLink class="navbar-item" to="/configruration" v-if="hasConfigruration">Configruration</RouterLink>
-          <RouterLink class="navbar-item" to="/group" v-if="hasGroup">Group</RouterLink>
-          <RouterLink class="navbar-item" to="/task" v-if="hasTask">Task</RouterLink>
-          <RouterLink class="navbar-item" to="/tenant" v-if="hasTenant">Tenant</RouterLink>
-          <RouterLink class="navbar-item" to="/tenantUser" v-if="hasTenantUser">Tenant User</RouterLink>
-          <RouterLink class="navbar-item" to="/user" v-if="hasUser">User</RouterLink>
+          <RouterLink class="navbar-item" to="/clients" v-if="hasClient">Client</RouterLink>
+          <RouterLink class="navbar-item" to="/configrurations" v-if="hasConfigruration">Configruration</RouterLink>
+          <RouterLink class="navbar-item" to="/groups" v-if="hasGroup">Group</RouterLink>
+          <RouterLink class="navbar-item" to="/tasks" v-if="hasTask">Task</RouterLink>
+          <RouterLink class="navbar-item" to="/tenants" v-if="hasTenant">Tenant</RouterLink>
+          <RouterLink class="navbar-item" to="/tenantUsers" v-if="hasTenantUser">Tenant User</RouterLink>
+          <RouterLink class="navbar-item" to="/users" v-if="hasUser">User</RouterLink>
         </div>
         <div class="navbar-end">
           <div class="navbar-item" v-if="user">{{ user?.username }}</div>
           <RouterLink v-if="!isLoggedIn" class="navbar-item" to="/login">Login</RouterLink>
+          <RouterLink v-if="isLoggedIn" class="navbar-item" to="/logout">Logout</RouterLink>
         </div>
       </div>
     </nav>
