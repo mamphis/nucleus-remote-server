@@ -2,8 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue';
 import UsersView from '@/views/Users/UsersView.vue';
-import NewUserView from '@/views/Users/NewUser.vue';
-import EditUserView from '@/views/Users/EditUser.vue';
+import VerifyView from '@/views/VerifyView.vue';
+import NewUserView from '@/views/Users/NewUserView.vue';
+import EditUserView from '@/views/Users/EditUserView.vue';
 import userStore from '@/stores/user';
 import { hasPermission } from '@/lib/permission';
 
@@ -26,7 +27,7 @@ const router = createRouter({
             redirect(to) {
                 const { logout } = userStore();
                 logout();
-                return 'home';
+                return '/home';
             },
         },
         {
@@ -55,6 +56,11 @@ const router = createRouter({
                 authorized: true,
                 permissions: ['update:user']
             }
+        },
+        {
+            path: '/verify/:onetimePassword',
+            name: 'Verify',
+            component: VerifyView,
         },
     ]
 });

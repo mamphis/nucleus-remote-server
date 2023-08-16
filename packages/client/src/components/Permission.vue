@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { hasPermission } from '@/lib/permission';
+import request from '@/lib/request';
 import type { ApiUser } from '@/types/user';
-import { prependListener } from 'process';
-import { ref, watch, watchEffect } from 'vue';
+import { ref, watch, watchEffect, watchPostEffect } from 'vue';
 
 const props = defineProps<{
     user: ApiUser,
@@ -15,12 +15,27 @@ const read = ref(hasPermission(props.user, `read:${props.permission}`));
 const update = ref(hasPermission(props.user, `update:${props.permission}`));
 const del = ref(hasPermission(props.user, `delete:${props.permission}`));
 
-watchEffect(() => {
+watchPostEffect(() => {
+    console.log('executing effect', props.permission, create.value, update.value, read.value, del.value);
     if (create.value) {
-        update.value = true;
-        read.value = true;
         del.value = true;
     }
+
+    if (del.value) {
+        update.value = true;
+    }
+
+    if (update.value) {
+        read.value = true;
+    }
+
+    request.$patch<void>(`/users/${props.user.id}/permissions`, {
+        permission: props.permission,
+        create: create.value,
+        read: read.value,
+        update: update.value,
+        del: del.value,
+    });
 });
 </script>
 
@@ -37,20 +52,20 @@ watchEffect(() => {
         </div>
         <div class="control">
             <label class="checkbox">
-                <input v-model="read" type="checkbox">
-                Read
+                <input v-model="del" type="checkbox" :disabled="create">
+                Delete
             </label>
         </div>
         <div class="control">
             <label class="checkbox">
-                <input v-model="update" type="checkbox">
+                <input v-model="update" type="checkbox" :disabled="del">
                 Update
             </label>
         </div>
         <div class="control">
             <label class="checkbox">
-                <input v-model="del" type="checkbox">
-                Delete
+                <input v-model="read" type="checkbox" :disabled="update">
+                Read
             </label>
         </div>
     </div>

@@ -3,19 +3,37 @@ import userStore from "@/stores/user";
 
 type RequestMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
-type ErrorResponse = {
+type GeneralErrorResponse = {
+    type: string,
     error: string;
     message: string;
 }
+
+type ValidationErrorResponse = GeneralErrorResponse & {
+    type: 'ValidationError';
+    data: Array<{ validation: string, code: string, path: string[], message: string }>;
+}
+
+type ErrorResponse = ValidationErrorResponse | GeneralErrorResponse;
 
 function isErrorResponse(value: unknown): value is ErrorResponse {
     return !!value &&
         typeof value === 'object' &&
         'error' in value &&
         'message' in value &&
+        'type' in value &&
         typeof value.error === 'string' &&
-        typeof value.message === 'string';
+        typeof value.message === 'string' &&
+        typeof value.type === 'string';
 }
+
+function isValidationError(value: unknown): value is ValidationErrorResponse {
+    return isErrorResponse(value) &&
+        value.type === 'ValidationError' && 
+        'data' in value && 
+        Array.isArray(value.data);
+}
+
 const normalizeApiRoute = (apiRoute: string): string => {
     if (apiRoute.startsWith('/'))
         return apiRoute.substring(1);
@@ -47,6 +65,7 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
         }
 
         return {
+            type: 'Unknown',
             error: 'Internal Server Error',
             message: JSON.stringify(errorResponse),
         };
@@ -66,4 +85,5 @@ export default {
 
 export {
     isErrorResponse,
+    isValidationError,
 }

@@ -33,7 +33,7 @@ const userStore = defineStore('user', () => {
     const user = ref<AuthUser>();
 
     const login = async (username: string, password: string): Promise<LoginResponse> => {
-        const response = await fetch(`${baseApiUrl}/login`, {
+        const response = await fetch(`${baseApiUrl}login`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -66,10 +66,40 @@ const userStore = defineStore('user', () => {
         user.value = undefined;
     }
 
+    const verify = async (onetimePassword: string, password: string) => {
+        const response = await fetch(`${baseApiUrl}verify`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ onetimePassword, password }),
+        });
+
+        if (!response.ok) {
+            const errorResponse = response.json();
+            if (isErrorResponse(errorResponse)) {
+                return errorResponse;
+            }
+
+            return {
+                error: 'Internal Server Error',
+                message: JSON.stringify(errorResponse),
+            };
+        }
+
+        const result = await response.json() as unknown as UserResponse;
+        token.value = result.token;
+        user.value = result.user;
+        isLoggedIn.value = true;
+
+        return result;
+    }
+
     return {
         isLoggedIn,
         login,
         logout,
+        verify,
         token,
         user,
     };

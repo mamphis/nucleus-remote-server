@@ -1,22 +1,13 @@
-import { randomBytes } from 'crypto'
-import { hash } from 'bcrypt';
 import { PrismaClient } from "@prisma/client";
+import { hash } from 'bcrypt';
+import { Logger } from "./lib/logger";
+import { isProduction, randomString } from "./lib/util";
 const needSeed = async (db: PrismaClient): Promise<boolean> => {
     return (await db.tenant.count()) === 0;
 }
 
-const randomString = (length: number) => {
-    const alphabet =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-        "abcdefghijklmnopqrstuvwxyz" +
-        "1234567890" +
-        "!#+.-_";
-
-    return [...randomBytes(length)].map(n => alphabet.at(n % alphabet.length)).join('');
-}
-
 const seed = async (db: PrismaClient) => {
-    const password = randomString(10);
+    const password = isProduction() ? randomString(10) : 'admin';
     const tenant = await db.tenant.create({
         data: {
             name: 'default'
@@ -54,10 +45,10 @@ const seed = async (db: PrismaClient) => {
         }
     });
 
-    console.log(`Created user ${admin.username} with password: ${password}`);
+    Logger.info(`Created user ${admin.username} with password: ${password}`);
 }
 
 export {
     needSeed,
     seed
-}
+};

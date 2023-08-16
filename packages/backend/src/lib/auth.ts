@@ -2,6 +2,8 @@
 import { Unauthorized, BadRequest, Forbidden } from 'http-errors';
 import { Locals, NextFunction, Request, RequestHandler, Response } from "express";
 import { sign, verify, JsonWebTokenError } from 'jsonwebtoken';
+import { isProduction } from './util';
+import { Logger } from './logger';
 interface User {
     username: string;
     tenantId: string;
@@ -30,6 +32,11 @@ interface AuthRequestHandler<
     ReqBody = any,
     ReqQuery = ParsedQs,
 > extends RequestHandler<P, ResBody, ReqBody, ReqQuery, AuthLocals> { }
+
+if (isProduction() && !process.env.JWT_SECRET) {
+    Logger.fatal('Environment Variable "JWT_SECRET" must be set in a production environment!');
+    process.exit(1);
+}
 
 const jwtSecret = process.env.JWT_SECRET ?? 'change-this-immidiately';
 
