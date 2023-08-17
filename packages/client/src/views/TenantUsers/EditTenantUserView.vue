@@ -57,7 +57,7 @@ const permissions = [
                 <h2>Permissions</h2>
                 <div class="columns is-multiline">
                     <div class="column is-narrow" v-for="permission in permissions" :key="permission">
-                        <Permission :user="user" :permission="permission" />
+                        <Permission scope="tenant-user" :user="user" :permission="permission" />
                     </div>
                 </div>
             </div>

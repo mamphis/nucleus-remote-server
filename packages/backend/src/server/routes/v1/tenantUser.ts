@@ -11,7 +11,7 @@ const router = Router();
 const db = new PrismaClient();
 
 // GET localhost:8080/api/v1/users/
-router.get('/', auth('read:user'), async (req, res, next) => {
+router.get('/', auth('read:tenant-user'), async (req, res, next) => {
     res.json(await db.user.findMany({
         where: {
             tenantId: res.locals.user.tenantId,
@@ -26,7 +26,7 @@ router.get('/', auth('read:user'), async (req, res, next) => {
     }));
 });
 
-router.get('/:username', auth('read:user'), async (req, res, next) => {
+router.get('/:username', auth('read:tenant-user'), async (req, res, next) => {
     const user = await db.user.findFirst({
         where: {
             OR: [
@@ -51,7 +51,7 @@ router.get('/:username', auth('read:user'), async (req, res, next) => {
     return res.json(user);
 });
 
-router.post('/', auth('create:user'), async (req, res, next) => {
+router.post('/', auth('create:tenant-user'), async (req, res, next) => {
     const schema = z.object({
         username: z.string(),
         email: z.string().email(),
@@ -93,7 +93,7 @@ router.post('/', auth('create:user'), async (req, res, next) => {
     }
 });
 
-router.patch('/:userId/permissions', auth('update:user'), async (req, res, next) => {
+router.patch('/:userId/permissions', auth('update:tenant-user'), async (req, res, next) => {
     const schema = z.object({
         permission: z.string(),
         create: z.boolean(),
@@ -116,6 +116,16 @@ router.patch('/:userId/permissions', auth('update:user'), async (req, res, next)
         const permissionData = schema.parse(req.body);
         if (['tenant', 'user'].includes(permissionData.permission)) {
             return next(Forbidden('You cannot change the users permission.'));
+        }
+
+        const updater = await db.user.findFirstOrThrow({
+            where: {
+                username: res.locals.user.username,
+            },
+        });
+
+        if (req.params.userId === updater.id) {
+            return next(Forbidden('You cannot update your own permissions.'));
         }
 
         const updatePermission = async (allowed: boolean, scope: string) => {
@@ -181,7 +191,7 @@ router.patch('/:userId/permissions', auth('update:user'), async (req, res, next)
     }
 });
 
-router.patch('/:userId', auth('update:user'), async (req, res, next) => {
+router.patch('/:userId', auth('update:tenant-user'), async (req, res, next) => {
     const schema = z.object({
         email: z.string().email(),
     });

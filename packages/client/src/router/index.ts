@@ -33,7 +33,7 @@ const router = createRouter({
             redirect(to) {
                 const { logout } = userStore();
                 logout();
-                return '/home';
+                return '/';
             },
         },
         {
@@ -94,7 +94,7 @@ const router = createRouter({
                 authorized: true,
                 permissions: ['update:tenant']
             }
-        },,
+        },
         {
             path: '/tenant-users',
             name: 'TenantUsers',

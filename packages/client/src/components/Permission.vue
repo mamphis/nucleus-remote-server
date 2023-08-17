@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { hasPermission } from '@/lib/permission';
-import request from '@/lib/request';
+import request, { isErrorResponse } from '@/lib/request';
 import type { ApiUser } from '@/types/user';
-import { ref, watch, watchEffect, watchPostEffect } from 'vue';
+import { isError } from 'util';
+import { nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
+    scope: 'user' | 'tenant-user'
     user: ApiUser,
     permission: string,
 }>()
@@ -30,15 +32,22 @@ watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate
     }
 
     if (!debounce) {
-        debounce = setTimeout(() => {
-            request.$patch<void>(`/users/${props.user.id}/permissions`, {
+        debounce = setTimeout(async () => {
+            const response = await request.$patch<void>(`/${props.scope}s/${props.user.id}/permissions`, {
                 permission: props.permission,
                 create: create.value,
                 read: read.value,
                 update: update.value,
                 del: del.value,
             });
-            debounce = undefined
+
+            if (isErrorResponse(response)) {
+                create.value = oCreate;
+                read.value = oRead;
+                update.value = oUpdate;
+                del.value = oDelete;
+            }
+            nextTick(() => debounce = undefined);
         }, 10);
     }
 });
