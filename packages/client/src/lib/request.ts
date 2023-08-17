@@ -14,9 +14,10 @@ type ValidationErrorResponse = GeneralErrorResponse & {
     data: Array<{ validation: string, code: string, path: string[], message: string }>;
 }
 
-type ErrorResponse = ValidationErrorResponse | GeneralErrorResponse;
+export type ErrorResponse = ValidationErrorResponse | GeneralErrorResponse;
 
 function isErrorResponse(value: unknown): value is ErrorResponse {
+    console.log(value);
     return !!value &&
         typeof value === 'object' &&
         'error' in value &&

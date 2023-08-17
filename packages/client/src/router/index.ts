@@ -1,10 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue';
-import UsersView from '@/views/Users/UsersView.vue';
 import VerifyView from '@/views/VerifyView.vue';
+import UsersView from '@/views/Users/UsersView.vue';
 import NewUserView from '@/views/Users/NewUserView.vue';
 import EditUserView from '@/views/Users/EditUserView.vue';
+import TenantsView from '@/views/Tenants/TenantsView.vue';
+import NewTenantView from '@/views/Tenants/NewTenantView.vue';
+import EditTenantView from '@/views/Tenants/EditTenantView.vue';
 import userStore from '@/stores/user';
 import { hasPermission } from '@/lib/permission';
 
@@ -61,6 +64,33 @@ const router = createRouter({
             path: '/verify/:onetimePassword',
             name: 'Verify',
             component: VerifyView,
+        },
+        {
+            path: '/tenants',
+            name: 'Tenants',
+            component: TenantsView,
+            meta: {
+                authorized: true,
+                permissions: [':tenant']
+            }
+        },
+        {
+            path: '/new-tenant',
+            name: 'NewTenant',
+            component: NewTenantView,
+            meta: {
+                authorized: true,
+                permissions: ['create:tenant']
+            }
+        },
+        {
+            path: '/tenants/:tenantId',
+            name: 'EditTenant',
+            component: EditTenantView,
+            meta: {
+                authorized: true,
+                permissions: ['update:tenant']
+            }
         },
     ]
 });

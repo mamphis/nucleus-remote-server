@@ -2,3 +2,7 @@ body,
 html {
     overflow-y: hidden !important;
 }
+
+.container {
+    max-width: 90%;
+}

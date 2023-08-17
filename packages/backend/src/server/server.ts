@@ -24,7 +24,7 @@ export class Server {
 
         this.app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
             try {
-                Logger.warn(`Failed Request from ${req.socket.remoteAddress} to ${req.originalUrl}`, JSON.stringify(err));
+                Logger.warn(`Failed Request from ${req.socket.remoteAddress} to ${req.method} ${req.originalUrl}`, JSON.stringify(err));
             } finally { }
 
             if (err instanceof HttpError) {
