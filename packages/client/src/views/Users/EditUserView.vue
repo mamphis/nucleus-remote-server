@@ -25,6 +25,7 @@ const updateUser = async (user: ApiUser) => {
 
     const response = await request.$patch<ApiUser>(`users/${userId}`, {
         tenant: user.tenant.id,
+        email: user.email,
     });
 
     if (isErrorResponse(response)) {
@@ -51,7 +52,7 @@ const permissions = [
         <form @submit.prevent="updateUser(user);" class="column is-full" v-if="!isErrorResponse(user)">
             <div class="field">
                 <label class="label" for="">Username</label>
-                <input type="text" v-model="user.username" disabled>
+                <input type="text" class="input" v-model="user.username" disabled>
             </div>
             <div class="field">
                 <label class="label" for="">Tenant</label>
@@ -63,6 +64,10 @@ const permissions = [
                         </option>
                     </select>
                 </span>
+            </div>
+            <div class="field">
+                <label class="label" for="">E-Mail</label>
+                <input type="email" class="input" v-model="user.email">
             </div>
             <div class="field">
                 <h2>Permissions</h2>

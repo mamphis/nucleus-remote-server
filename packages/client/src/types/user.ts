@@ -4,6 +4,7 @@ export type ApiUser = {
     username: string;
     id: string;
     permission: Array<{ scope: string }>;
+    email: string;
     tenant: ApiTenant;
 };
 

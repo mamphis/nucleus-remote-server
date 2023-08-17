@@ -1,9 +1,11 @@
 
-import { Unauthorized, BadRequest, Forbidden } from 'http-errors';
 import { Locals, NextFunction, Request, RequestHandler, Response } from "express";
-import { sign, verify, JsonWebTokenError } from 'jsonwebtoken';
-import { isProduction } from './util';
+import type * as core from 'express-serve-static-core';
+import { BadRequest, Forbidden, Unauthorized } from 'http-errors';
+import { JsonWebTokenError, sign, verify } from 'jsonwebtoken';
 import { Logger } from './logger';
+import { isProduction } from './util';
+
 interface User {
     username: string;
     tenantId: string;
@@ -20,18 +22,8 @@ interface AuthLocals extends Locals {
     readonly user: AuthUser;
 }
 
-interface ParamsDictionary {
-    [key: string]: string;
-}
-
-interface ParsedQs { [key: string]: undefined | string | string[] | ParsedQs | ParsedQs[] }
-
-interface AuthRequestHandler<
-    P = ParamsDictionary,
-    ResBody = any,
-    ReqBody = any,
-    ReqQuery = ParsedQs,
-> extends RequestHandler<P, ResBody, ReqBody, ReqQuery, AuthLocals> { }
+interface AuthRequestHandler extends 
+    RequestHandler<core.ParamsDictionary, any, any, any, AuthLocals> {}
 
 if (isProduction() && !process.env.JWT_SECRET) {
     Logger.fatal('Environment Variable "JWT_SECRET" must be set in a production environment!');
@@ -44,6 +36,7 @@ const getToken = (user: User): { token: string, user: AuthUser } => {
     const authUser = { username: user.username, tenantId: user.tenantId, permissions: user.permission.map(p => p.scope) };
     return { token: sign(authUser, jwtSecret), user: authUser };
 }
+
 
 const auth = (...scopes: string[]): AuthRequestHandler => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -87,5 +80,5 @@ const auth = (...scopes: string[]): AuthRequestHandler => {
 
 export {
     auth,
-    getToken,
+    getToken
 };

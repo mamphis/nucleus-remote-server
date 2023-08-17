@@ -24,6 +24,7 @@ const users = await request.$get<ApiUser[]>('users');
                 <thead>
                     <tr>
                         <th>Username</th>
+                        <th>E-Mail</th>
                         <th>Tenant</th>
                         <th>Permissions</th>
                     </tr>
@@ -32,6 +33,7 @@ const users = await request.$get<ApiUser[]>('users');
                     <tr v-for="user in users" :key="user.id" class="is-clickable"
                         @click="$router.push(`/users/${user.id}`)">
                         <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
                         <td>{{ user.tenant.name }}</td>
                         <td>{{ user.permission.length }}</td>
                     </tr>

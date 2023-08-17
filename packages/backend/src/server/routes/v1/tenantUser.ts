@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { auth } from "../../../lib/auth";
 import { PrismaClient } from "@prisma/client";
-import { NotFound, UnprocessableEntity } from 'http-errors';
+import { Forbidden, NotFound, UnprocessableEntity } from 'http-errors';
 import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from "@prisma/client/runtime/library";
 import z, { ZodError } from 'zod';
 import { randomString } from "../../../lib/util";
@@ -13,6 +13,9 @@ const db = new PrismaClient();
 // GET localhost:8080/api/v1/users/
 router.get('/', auth('read:user'), async (req, res, next) => {
     res.json(await db.user.findMany({
+        where: {
+            tenantId: res.locals.user.tenantId,
+        },
         select: {
             id: true,
             username: true,
@@ -29,7 +32,8 @@ router.get('/:username', auth('read:user'), async (req, res, next) => {
             OR: [
                 { username: req.params.username },
                 { id: req.params.username },
-            ]
+            ],
+            tenantId: res.locals.user.tenantId,
         },
         select: {
             id: true,
@@ -50,7 +54,6 @@ router.get('/:username', auth('read:user'), async (req, res, next) => {
 router.post('/', auth('create:user'), async (req, res, next) => {
     const schema = z.object({
         username: z.string(),
-        tenant: z.string().uuid(),
         email: z.string().email(),
     });
 
@@ -60,7 +63,7 @@ router.post('/', auth('create:user'), async (req, res, next) => {
 
         const user = await db.user.create({
             data: {
-                tenantId: userData.tenant,
+                tenantId: res.locals.user.tenantId,
                 password: '',
                 username: userData.username,
                 email: userData.email,
@@ -99,8 +102,22 @@ router.patch('/:userId/permissions', auth('update:user'), async (req, res, next)
         del: z.boolean(),
     });
 
+    //Check if user is in the same tenant
+    const user = await db.user.findFirst({ where: { id: req.params.userId } });
+    if (!user) {
+        return next(NotFound('User not found.'))
+    }
+
+    if (user.tenantId !== res.locals.user.tenantId) {
+        return next(Forbidden('You cannot change the users permission.'));
+    }
+
     try {
         const permissionData = schema.parse(req.body);
+        if (['tenant', 'user'].includes(permissionData.permission)) {
+            return next(Forbidden('You cannot change the users permission.'));
+        }
+
         const updatePermission = async (allowed: boolean, scope: string) => {
             if (allowed) {
                 await db.permission.update({
