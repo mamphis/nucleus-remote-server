@@ -2,12 +2,7 @@ import { MutationType, defineStore } from "pinia";
 import { ref } from "vue";
 import { settingsStore } from "./settings";
 import type { AuthUser } from "@/types/user";
-
-
-type ErrorResponse = {
-    error: string;
-    message: string;
-}
+import { isErrorResponse, type ErrorResponse } from "@/lib/request";
 
 type UserResponse = {
     token: string;
@@ -15,15 +10,6 @@ type UserResponse = {
 };
 
 type LoginResponse = UserResponse | ErrorResponse;
-
-function isErrorResponse(value: unknown): value is ErrorResponse {
-    return !!value &&
-        typeof value === 'object' &&
-        'error' in value &&
-        'message' in value &&
-        typeof value.error === 'string' &&
-        typeof value.message === 'string';
-}
 
 const userStore = defineStore('user', () => {
     const isLoggedIn = ref(false);
@@ -42,12 +28,13 @@ const userStore = defineStore('user', () => {
         });
 
         if (!response.ok) {
-            const errorResponse = response.json();
+            const errorResponse = await response.json();
             if (isErrorResponse(errorResponse)) {
                 return errorResponse;
             }
 
             return {
+                type: 'Unknown',
                 error: 'Internal Server Error',
                 message: JSON.stringify(errorResponse),
             };
@@ -76,12 +63,13 @@ const userStore = defineStore('user', () => {
         });
 
         if (!response.ok) {
-            const errorResponse = response.json();
+            const errorResponse = await response.json();
             if (isErrorResponse(errorResponse)) {
                 return errorResponse;
             }
 
             return {
+                type: 'Unknown',
                 error: 'Internal Server Error',
                 message: JSON.stringify(errorResponse),
             };

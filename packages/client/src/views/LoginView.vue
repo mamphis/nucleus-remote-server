@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { isErrorResponse } from '@/lib/request';
 import router from '@/router';
 import userStore from '@/stores/user';
 import { ref } from 'vue';
@@ -6,10 +7,17 @@ import { ref } from 'vue';
 const password = ref("");
 const username = ref("");
 
+const errors = ref<{
+    login: string,
+}>({
+    login: '',
+});
+
 const { login } = userStore();
 </script>
 <template>
-    <form @submit.prevent="login(username, password).then((response) => { router.push('/') })">
+    <form
+        @submit.prevent="login(username, password).then((response) => { if (!isErrorResponse(response)) { router.push('/') } else { errors.login = response.message; } })">
         <h1>Login</h1>
         <div class="field">
             <label class="label" for="username">Username</label>
@@ -24,6 +32,7 @@ const { login } = userStore();
             </div>
         </div>
         <div class="field">
+            <p v-if="!!errors.login" class="help is-danger">{{ errors.login }}</p>
             <button class="button" type="submit">Login</button>
         </div>
     </form>
