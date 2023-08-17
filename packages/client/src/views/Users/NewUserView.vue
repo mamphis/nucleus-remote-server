@@ -27,6 +27,7 @@ const clearError = () => {
     errors.value.username = '';
     errors.value.email = '';
     errors.value.tenant = '';
+    errors.value.general = '';
 }
 
 const checkUsername = async (username: string) => {
