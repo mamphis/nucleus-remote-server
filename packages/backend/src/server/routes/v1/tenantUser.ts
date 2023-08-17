@@ -183,7 +183,6 @@ router.patch('/:userId/permissions', auth('update:user'), async (req, res, next)
 
 router.patch('/:userId', auth('update:user'), async (req, res, next) => {
     const schema = z.object({
-        tenant: z.string().uuid(),
         email: z.string().email(),
     });
 
@@ -194,7 +193,6 @@ router.patch('/:userId', auth('update:user'), async (req, res, next) => {
                 id: req.params.userId,
             },
             data: {
-                tenantId: userData.tenant,
                 email: userData.email,
             },
             select: {

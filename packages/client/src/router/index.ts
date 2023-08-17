@@ -8,6 +8,9 @@ import EditUserView from '@/views/Users/EditUserView.vue';
 import TenantsView from '@/views/Tenants/TenantsView.vue';
 import NewTenantView from '@/views/Tenants/NewTenantView.vue';
 import EditTenantView from '@/views/Tenants/EditTenantView.vue';
+import TenantUsersView from '@/views/TenantUsers/TenantUsersView.vue';
+import NewTenantUserView from '@/views/TenantUsers/NewTenantUserView.vue';
+import EditTenantUserView from '@/views/TenantUsers/EditTenantUserView.vue';
 import userStore from '@/stores/user';
 import { hasPermission } from '@/lib/permission';
 
@@ -90,6 +93,33 @@ const router = createRouter({
             meta: {
                 authorized: true,
                 permissions: ['update:tenant']
+            }
+        },,
+        {
+            path: '/tenant-users',
+            name: 'TenantUsers',
+            component: TenantUsersView,
+            meta: {
+                authorized: true,
+                permissions: [':tenant-user']
+            }
+        },
+        {
+            path: '/new-tenant-user',
+            name: 'NewTenantUser',
+            component: NewTenantUserView,
+            meta: {
+                authorized: true,
+                permissions: ['create:tenant-user']
+            }
+        },
+        {
+            path: '/tenant-users/:userId',
+            name: 'EditTenantUser',
+            component: EditTenantUserView,
+            meta: {
+                authorized: true,
+                permissions: ['update:tenant-user']
             }
         },
     ]

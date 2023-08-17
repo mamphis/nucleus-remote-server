@@ -1,0 +1,1 @@
+- [ ] Add user route POST /checkUsername {username: string} => {ok: boolean}
