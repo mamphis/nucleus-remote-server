@@ -36,7 +36,7 @@ const template = (username: string, otp: string, baseUrl: string) => `
         <tr>
             <td style="width: 30%" />
             <td style="border: none; border-radius: 3px; color: white; cursor: auto; padding: 15px 19px; width: 30%" align="center" valign="middle" bgcolor="#007bff">
-                <a href="${baseUrl}/verify?otp=${encodeURIComponent(otp)}" style="text-decoration: none; line-height: 100%; background: #007bff; color: white; font-family: Ubuntu, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: normal; text-transform: none; margin: 0px" target="_blank" rel="noreferrer">
+                <a href="${baseUrl}/verify/${encodeURIComponent(otp)}" style="text-decoration: none; line-height: 100%; background: #007bff; color: white; font-family: Ubuntu, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: normal; text-transform: none; margin: 0px" target="_blank" rel="noreferrer">
                     Verifizieren
                 </a>
             </td>
@@ -94,7 +94,7 @@ class Mailer {
         });
     }
 
-    async sendRegistrationMail(user: User) {
+    async sendRegistrationMail(user: Pick<User, 'email' | 'onetimePassword' | 'username'>) {
         if (!this.transporter) {
             return;
         }

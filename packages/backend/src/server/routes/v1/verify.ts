@@ -8,7 +8,6 @@ const router = Router();
 const db = new PrismaClient();
 
 router.post('/', async (req, res, next) => {
-    console.log(req.body)
     const { onetimePassword, password } = req.body;
     if (onetimePassword && password) {
         const user = await db.user.findFirst({ where: { onetimePassword }, select: { tenantId: true, username: true, password: true, permission: true } });

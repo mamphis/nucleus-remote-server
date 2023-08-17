@@ -114,8 +114,10 @@ const createNewUser = async () => {
                     </div>
                     <p v-if="!!errors.tenant" class="help is-danger">{{ errors.tenant }}</p>
                 </div>
-                <div class="field is-grouped">
+                <div class="field">
                     <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
+                </div>
+                <div class="field is-grouped">
                     <div class="control">
                         <button type="submit" class="button is-link">Submit</button>
                     </div>

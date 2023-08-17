@@ -10,7 +10,7 @@ import mailer from "../../../lib/mailer";
 const router = Router();
 const db = new PrismaClient();
 
-// GET localhost:8080/api/v1/clients/
+// GET localhost:8080/api/v1/users/
 router.get('/', auth('read:user'), async (req, res, next) => {
     res.json(await db.user.findMany({
         select: {
@@ -63,10 +63,16 @@ router.post('/', auth('create:user'), async (req, res, next) => {
                 username: userData.username,
                 email: userData.email,
                 onetimePassword: onetimePassword,
+            },
+            select: {
+                id: true,
+                username: true,
+                permission: true,
+                tenant: true
             }
         });
 
-        mailer.sendRegistrationMail(user);
+        mailer.sendRegistrationMail(Object.assign({}, userData, { onetimePassword }));
         return res.json(user);
     } catch (e: unknown) {
         if (e instanceof PrismaClientKnownRequestError) {
@@ -143,6 +149,42 @@ router.patch('/:userId/permissions', auth('update:user'), async (req, res, next)
         return res.json(user);
     } catch (e: unknown) {
         if (e instanceof PrismaClientUnknownRequestError || e instanceof PrismaClientKnownRequestError) {
+            return next(UnprocessableEntity(e.message));
+        }
+
+        if (e instanceof ZodError) {
+            return next(e);
+        }
+
+        return next(e);
+    }
+});
+
+router.patch('/:userId', auth('update:user'), async (req, res, next) => {
+    const schema = z.object({
+        tenant: z.string().uuid(),
+    });
+
+    try {
+        const userData = schema.parse(req.body);
+        const user = await db.user.update({
+            where: {
+                id: req.params.userId,
+            },
+            data: {
+                tenantId: userData.tenant,
+            },
+            select: {
+                id: true,
+                username: true,
+                permission: true,
+                tenant: true
+            }
+        });
+
+        return res.json(user);
+    } catch (e: unknown) {
+        if (e instanceof PrismaClientKnownRequestError) {
             return next(UnprocessableEntity(e.message));
         }
 

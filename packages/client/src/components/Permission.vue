@@ -14,36 +14,45 @@ const create = ref(hasPermission(props.user, `create:${props.permission}`));
 const read = ref(hasPermission(props.user, `read:${props.permission}`));
 const update = ref(hasPermission(props.user, `update:${props.permission}`));
 const del = ref(hasPermission(props.user, `delete:${props.permission}`));
+let debounce: number | undefined = undefined;
 
-watchPostEffect(() => {
-    console.log('executing effect', props.permission, create.value, update.value, read.value, del.value);
-    if (create.value) {
+watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate, oRead, oUpdate, oDelete]) => {
+    if (nCreate) {
         del.value = true;
     }
 
-    if (del.value) {
+    if (nDelete) {
         update.value = true;
     }
 
-    if (update.value) {
+    if (nUpdate) {
         read.value = true;
     }
 
-    request.$patch<void>(`/users/${props.user.id}/permissions`, {
-        permission: props.permission,
-        create: create.value,
-        read: read.value,
-        update: update.value,
-        del: del.value,
-    });
+    if (!debounce) {
+        debounce = setTimeout(() => {
+            request.$patch<void>(`/users/${props.user.id}/permissions`, {
+                permission: props.permission,
+                create: create.value,
+                read: read.value,
+                update: update.value,
+                del: del.value,
+            });
+            debounce = undefined
+        }, 10);
+    }
 });
 </script>
-
+<script >
+</script>
 <template>
-    <div class="field">
-        <label class="label">{{ label }}</label>
-    </div>
     <div class="field is-grouped">
+        <div class="control is-expanded">
+            <label class="label">{{ label }}</label>
+        </div>
+        <button class="button is-small is-rounded" @click="read = update = del = create = false">clear</button>
+    </div>
+    <div class="field is-grouped is-grouped-centered">
         <div class="control">
             <label class="checkbox">
                 <input v-model="create" type="checkbox">
