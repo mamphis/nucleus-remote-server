@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { ApiUser } from '@/types/user';
-import request, { isErrorResponse } from '../../lib/request';
 import { hasPermission } from '@/lib/permission';
 import userStore from '@/stores/user';
-
+import type { ApiUser } from '@/types/user';
+import request, { isErrorResponse } from '../../lib/request';
 
 const { user } = userStore();
 const users = await request.$get<ApiUser[]>('users');

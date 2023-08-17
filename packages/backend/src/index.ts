@@ -2,13 +2,13 @@ import { configDotenv } from 'dotenv';
 configDotenv();
 
 import { PrismaClient } from "@prisma/client";
+import { Logger } from './lib/logger';
 import { isProduction } from './lib/util';
 import { needSeed, seed } from "./seed";
-import { Logger } from './lib/logger';
 Logger.info('Production Environment:', isProduction());
 
-import { Server } from './server/server';
 import mailer from './lib/mailer';
+import { Server } from './server/server';
 
 const port = Number(process.env.PORT);
 
@@ -21,7 +21,7 @@ const start = async () => {
         Logger.info('Empty database found. Seeding database.');
         await seed(db);
     }
-    
+
     await mailer.init();
 
     const server = new Server(port);

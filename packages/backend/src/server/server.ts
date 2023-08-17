@@ -1,9 +1,9 @@
-import { NotFound, HttpError, InternalServerError } from 'http-errors';
-import express, { Application, NextFunction, Request, Response, json } from "express";
 import cors from 'cors';
-import api from './routes';
+import express, { Application, NextFunction, Request, Response, json } from "express";
+import { HttpError, InternalServerError, NotFound } from 'http-errors';
 import { ZodError } from 'zod';
 import { Logger } from '../lib/logger';
+import api from './routes';
 
 export class Server {
     private app: Application;

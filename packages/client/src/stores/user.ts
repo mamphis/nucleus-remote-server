@@ -1,8 +1,8 @@
-import { MutationType, defineStore } from "pinia";
+import { isErrorResponse, type ErrorResponse } from "@/lib/request";
+import type { AuthUser } from "@/types/user";
+import { defineStore } from "pinia";
 import { ref } from "vue";
 import { settingsStore } from "./settings";
-import type { AuthUser } from "@/types/user";
-import { isErrorResponse, type ErrorResponse } from "@/lib/request";
 
 type UserResponse = {
     token: string;

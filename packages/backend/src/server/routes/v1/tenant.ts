@@ -1,10 +1,9 @@
-import { Router } from "express";
-import { auth } from "../../../lib/auth";
 import { PrismaClient } from "@prisma/client";
-import z, { ZodError } from 'zod';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Router } from "express";
 import { NotFound, UnprocessableEntity } from 'http-errors';
-import { Logger } from "../../../lib/logger";
+import z, { ZodError } from 'zod';
+import { auth } from "../../../lib/auth";
 
 const router = Router();
 const db = new PrismaClient();

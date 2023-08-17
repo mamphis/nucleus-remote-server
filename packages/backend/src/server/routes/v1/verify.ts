@@ -1,7 +1,7 @@
-import { BadRequest, Unauthorized } from 'http-errors';
-import { Router } from "express";
-import { compare, hash } from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
+import { hash } from 'bcrypt';
+import { Router } from "express";
+import { BadRequest, Unauthorized } from 'http-errors';
 import { getToken } from '../../../lib/auth';
 
 const router = Router();

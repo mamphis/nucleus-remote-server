@@ -22,8 +22,8 @@ interface AuthLocals extends Locals {
     readonly user: AuthUser;
 }
 
-interface AuthRequestHandler extends 
-    RequestHandler<core.ParamsDictionary, any, any, any, AuthLocals> {}
+interface AuthRequestHandler extends
+    RequestHandler<core.ParamsDictionary, any, any, any, AuthLocals> { }
 
 if (isProduction() && !process.env.JWT_SECRET) {
     Logger.fatal('Environment Variable "JWT_SECRET" must be set in a production environment!');

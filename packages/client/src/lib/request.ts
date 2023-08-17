@@ -30,8 +30,8 @@ function isErrorResponse(value: unknown): value is ErrorResponse {
 
 function isValidationError(value: unknown): value is ValidationErrorResponse {
     return isErrorResponse(value) &&
-        value.type === 'ValidationError' && 
-        'data' in value && 
+        value.type === 'ValidationError' &&
+        'data' in value &&
         Array.isArray(value.data);
 }
 

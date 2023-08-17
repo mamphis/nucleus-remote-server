@@ -1,8 +1,6 @@
 import { randomBytes } from "crypto";
-import { Logger } from "./logger";
 
 class Utils {
-    @Logger.enter()
     randomString(length: number) {
         const alphabet =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +

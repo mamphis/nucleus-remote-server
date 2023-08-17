@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
-import userStore from './stores/user';
-import { storeToRefs } from 'pinia';
 import { hasPermission } from './lib/permission';
+import userStore from './stores/user';
 const burgerActive = ref(false);
 
 const { user, isLoggedIn } = storeToRefs(userStore());

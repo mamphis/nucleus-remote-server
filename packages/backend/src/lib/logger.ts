@@ -1,4 +1,4 @@
-import { isProduction, randomString } from "./util";
+import { isProduction } from "./util";
 
 const levels = {
     verbose: '[v]',
@@ -37,7 +37,7 @@ export class Logger {
                 get() {
                     let wrapperFn = (...args: any[]) => {
                         const start = new Date();
-                        let res =  propertyDescriptor.value?.apply(this, args);
+                        let res = propertyDescriptor.value?.apply(this, args);
                         let isPromise = res instanceof Promise;
                         if (isPromise) {
                             // res = await res;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ApiUser } from '@/types/user';
-import request, { isErrorResponse } from '../../lib/request';
 import { hasPermission } from '@/lib/permission';
 import userStore from '@/stores/user';
+import type { ApiUser } from '@/types/user';
+import request, { isErrorResponse } from '../../lib/request';
 
 const { user } = userStore();
 const users = await request.$get<ApiUser[]>('tenant-users');
@@ -14,7 +14,8 @@ const users = await request.$get<ApiUser[]>('tenant-users');
                 <h1>Users</h1>
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
-                <button class="button" v-if="hasPermission(user, 'create:tenant-user')" @click="$router.push('/new-tenant-user')">New
+                <button class="button" v-if="hasPermission(user, 'create:tenant-user')"
+                    @click="$router.push('/new-tenant-user')">New
                     User</button>
             </div>
         </div>

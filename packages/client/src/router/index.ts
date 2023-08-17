@@ -1,18 +1,18 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue';
-import VerifyView from '@/views/VerifyView.vue';
-import UsersView from '@/views/Users/UsersView.vue';
-import NewUserView from '@/views/Users/NewUserView.vue';
-import EditUserView from '@/views/Users/EditUserView.vue';
-import TenantsView from '@/views/Tenants/TenantsView.vue';
-import NewTenantView from '@/views/Tenants/NewTenantView.vue';
-import EditTenantView from '@/views/Tenants/EditTenantView.vue';
-import TenantUsersView from '@/views/TenantUsers/TenantUsersView.vue';
-import NewTenantUserView from '@/views/TenantUsers/NewTenantUserView.vue';
-import EditTenantUserView from '@/views/TenantUsers/EditTenantUserView.vue';
-import userStore from '@/stores/user';
 import { hasPermission } from '@/lib/permission';
+import userStore from '@/stores/user';
+import HomeView from '@/views/HomeView.vue';
+import LoginView from '@/views/LoginView.vue';
+import EditTenantUserView from '@/views/TenantUsers/EditTenantUserView.vue';
+import NewTenantUserView from '@/views/TenantUsers/NewTenantUserView.vue';
+import TenantUsersView from '@/views/TenantUsers/TenantUsersView.vue';
+import EditTenantView from '@/views/Tenants/EditTenantView.vue';
+import NewTenantView from '@/views/Tenants/NewTenantView.vue';
+import TenantsView from '@/views/Tenants/TenantsView.vue';
+import EditUserView from '@/views/Users/EditUserView.vue';
+import NewUserView from '@/views/Users/NewUserView.vue';
+import UsersView from '@/views/Users/UsersView.vue';
+import VerifyView from '@/views/VerifyView.vue';
+import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),

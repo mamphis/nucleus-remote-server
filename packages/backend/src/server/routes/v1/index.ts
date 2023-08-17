@@ -1,10 +1,10 @@
 import { Router } from "express";
-import login from './login';
-import verify from './verify';
 import clients from './client';
-import users from './user';
+import login from './login';
 import tenants from './tenant';
 import tenantUsers from './tenantUser';
+import users from './user';
+import verify from './verify';
 
 const router = Router();
 

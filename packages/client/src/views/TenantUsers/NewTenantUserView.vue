@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ApiUser } from '@/types/user';
-import request, { isErrorResponse, isValidationError } from '../../lib/request';
-import { ref } from 'vue';
 import router from '@/router';
+import type { ApiUser } from '@/types/user';
+import { ref } from 'vue';
+import request, { isErrorResponse, isValidationError } from '../../lib/request';
 
 const username = ref('');
 const email = ref('');

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ApiTenant } from '@/types/tenant';
-import request, { isErrorResponse } from '../../lib/request';
 import { hasPermission } from '@/lib/permission';
 import userStore from '@/stores/user';
+import type { ApiTenant } from '@/types/tenant';
+import request, { isErrorResponse } from '../../lib/request';
 
 
 const { user } = userStore();

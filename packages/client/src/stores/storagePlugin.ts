@@ -6,7 +6,7 @@ export default function piniaStoragePlugin(context: PiniaPluginContext) {
         if (savedState) {
             context.store.$patch(JSON.parse(savedState));
         }
-        
+
         context.store.$subscribe((mutation, state) => {
             console.log(mutation, state);
             localStorage.setItem(mutation.storeId, JSON.stringify(state));

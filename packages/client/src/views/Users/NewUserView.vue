@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ApiUser } from '@/types/user';
-import request, { isErrorResponse, isValidationError } from '../../lib/request';
-import type { ApiTenant } from '@/types/tenant';
-import { ref } from 'vue';
 import router from '@/router';
+import type { ApiTenant } from '@/types/tenant';
+import type { ApiUser } from '@/types/user';
+import { ref } from 'vue';
+import request, { isErrorResponse, isValidationError } from '../../lib/request';
 
 const tenants = await request.$get<ApiTenant[]>('tenants');
 

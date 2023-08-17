@@ -2,7 +2,6 @@
 import { hasPermission } from '@/lib/permission';
 import request, { isErrorResponse } from '@/lib/request';
 import type { ApiUser } from '@/types/user';
-import { isError } from 'util';
 import { nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{

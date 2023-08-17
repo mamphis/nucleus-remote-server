@@ -1,11 +1,11 @@
-import { Router } from "express";
-import { auth } from "../../../lib/auth";
 import { PrismaClient } from "@prisma/client";
-import { Forbidden, NotFound, UnprocessableEntity } from 'http-errors';
 import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from "@prisma/client/runtime/library";
+import { Router } from "express";
+import { Forbidden, NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
-import { randomString } from "../../../lib/util";
+import { auth } from "../../../lib/auth";
 import mailer from "../../../lib/mailer";
+import { randomString } from "../../../lib/util";
 
 const router = Router();
 const db = new PrismaClient();
@@ -101,11 +101,11 @@ router.patch('/:userId/permissions', auth('update:user'), async (req, res, next)
 
     try {
         const updater = await db.user.findFirstOrThrow({
-            where: { 
+            where: {
                 username: res.locals.user.username,
             },
         });
-    
+
         if (req.params.userId === updater.id) {
             return next(Forbidden('You cannot update your own permissions.'));
         }
