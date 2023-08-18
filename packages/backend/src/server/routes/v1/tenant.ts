@@ -3,13 +3,13 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Router } from "express";
 import { NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
-import { auth } from "../../../lib/auth";
+import { AuthResponse, auth } from "../../../lib/auth";
 
 const router = Router();
 const db = new PrismaClient();
 
 // GET localhost:8080/api/v1/tenants/
-router.get('/', auth('read:tenant'), async (req, res, next) => {
+router.get('/', auth('read:tenant'), async (req, res: AuthResponse, next) => {
     if (res.locals.user.permissions.includes('special:admin')) {
         const tenants = await db.tenant.findMany({
             select: {
@@ -41,7 +41,7 @@ router.get('/', auth('read:tenant'), async (req, res, next) => {
     return res.json(tenants);
 });
 
-router.get('/:tenantId', auth('read:tenant'), async (req, res, next) => {
+router.get('/:tenantId', auth('read:tenant'), async (req, res: AuthResponse, next) => {
     const tenant = await db.tenant.findFirst({
         where: { user: { some: { username: res.locals.user.username } }, id: req.params.tenantId }, select: {
             id: true,
@@ -62,7 +62,7 @@ router.get('/:tenantId', auth('read:tenant'), async (req, res, next) => {
     return res.json(tenant);
 });
 
-router.post('/', auth('create:tenant'), async (req, res, next) => {
+router.post('/', auth('create:tenant'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         name: z.string(),
     });
@@ -89,7 +89,7 @@ router.post('/', auth('create:tenant'), async (req, res, next) => {
     }
 })
 
-router.patch('/:tenantId', auth('update:tenant'), async (req, res, next) => {
+router.patch('/:tenantId', auth('update:tenant'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         name: z.string(),
     });

@@ -1,5 +1,5 @@
 
-import { Locals, NextFunction, Request, RequestHandler, Response } from "express";
+import { Locals, NextFunction, Request, RequestHandler, Response, Router } from "express";
 import type * as core from 'express-serve-static-core';
 import { BadRequest, Forbidden, Unauthorized } from 'http-errors';
 import { JsonWebTokenError, sign, verify } from 'jsonwebtoken';
@@ -18,28 +18,32 @@ interface AuthUser {
     permissions: string[];
 }
 
-interface AuthLocals extends Locals {
-    readonly user: AuthUser;
+interface AuthLocals extends Record<string, any> {
+    user: AuthUser;
 }
 
-interface AuthRequestHandler extends
-    RequestHandler<core.ParamsDictionary, any, any, any, AuthLocals> { }
+export interface AuthResponse extends Response {
+    locals: AuthLocals
+}
+
+interface AuthRequest<Route extends string> extends core.Request<core.RouteParameters<Route>, any, any, any, AuthLocals>{
+
+}
 
 if (isProduction() && !process.env.JWT_SECRET) {
     Logger.fatal('Environment Variable "JWT_SECRET" must be set in a production environment!');
     process.exit(1);
 }
 
-const jwtSecret = process.env.JWT_SECRET ?? 'change-this-immidiately';
+const jwtSecret: string = process.env.JWT_SECRET ?? 'change-this-immidiately';
 
 const getToken = (user: User): { token: string, user: AuthUser } => {
     const authUser = { username: user.username, tenantId: user.tenantId, permissions: user.permission.map(p => p.scope) };
     return { token: sign(authUser, jwtSecret), user: authUser };
 }
 
-
-const auth = (...scopes: string[]): AuthRequestHandler => {
-    return (req: Request, res: Response, next: NextFunction) => {
+const auth = <Route extends string>(...scopes: string[]): core.RequestHandler<core.RouteParameters<Route>, any, any, any, AuthLocals> => {
+    return (req: AuthRequest<Route>, res: AuthResponse, next: NextFunction) => {
         const auth = req.headers.authorization;
 
         if (!auth) {
@@ -76,6 +80,7 @@ const auth = (...scopes: string[]): AuthRequestHandler => {
             return next(e);
         }
     };
+
 }
 
 export {

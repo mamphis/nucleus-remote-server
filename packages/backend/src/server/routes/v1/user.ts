@@ -3,7 +3,7 @@ import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from "
 import { Router } from "express";
 import { Forbidden, NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
-import { auth } from "../../../lib/auth";
+import { AuthResponse, auth } from "../../../lib/auth";
 import mailer from "../../../lib/mailer";
 import { randomString } from "../../../lib/util";
 
@@ -11,7 +11,7 @@ const router = Router();
 const db = new PrismaClient();
 
 // GET localhost:8080/api/v1/users/
-router.get('/', auth('read:user'), async (req, res, next) => {
+router.get('/', auth('read:user'), async (req, res: AuthResponse, next) => {
     res.json(await db.user.findMany({
         select: {
             id: true,
@@ -23,7 +23,7 @@ router.get('/', auth('read:user'), async (req, res, next) => {
     }));
 });
 
-router.get('/:username', auth('read:user'), async (req, res, next) => {
+router.get('/:username', auth('read:user'), async (req, res: AuthResponse, next) => {
     const user = await db.user.findFirst({
         where: {
             OR: [
@@ -47,7 +47,7 @@ router.get('/:username', auth('read:user'), async (req, res, next) => {
     return res.json(user);
 });
 
-router.post('/', auth('create:user'), async (req, res, next) => {
+router.post('/', auth('create:user'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         username: z.string(),
         tenant: z.string().uuid(),
@@ -90,7 +90,7 @@ router.post('/', auth('create:user'), async (req, res, next) => {
     }
 });
 
-router.patch('/:userId/permissions', auth('update:user'), async (req, res, next) => {
+router.patch('/:userId/permissions', auth('update:user'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         permission: z.string(),
         create: z.boolean(),
@@ -174,7 +174,7 @@ router.patch('/:userId/permissions', auth('update:user'), async (req, res, next)
     }
 });
 
-router.patch('/:userId', auth('update:user'), async (req, res, next) => {
+router.patch('/:userId', auth('update:user'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         tenant: z.string().uuid(),
         email: z.string().email(),
