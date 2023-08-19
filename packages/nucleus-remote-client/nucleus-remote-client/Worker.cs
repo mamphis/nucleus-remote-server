@@ -1,0 +1,32 @@
+using Microsoft.Extensions.Options;
+using nucleus_remote_client.Client;
+
+namespace nucleus_remote_client
+{
+    public class Worker : BackgroundService
+    {
+        private readonly ILogger<Worker> _logger;
+        private readonly HostSettings _hostSettings;
+
+        public Worker(ILogger<Worker> logger, IOptions<HostSettings> hostSettings)
+        {
+            _logger = logger;
+            _hostSettings = hostSettings.Value;
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            var pinger = new SendPing();
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                }
+
+                await pinger.ExecuteAsync(_hostSettings);
+                await Task.Delay(5000, stoppingToken);
+            }
+        }
+    }
+}
