@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
+import { ZodError, z } from "zod";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const router = Router();
 const db = new PrismaClient();
@@ -12,4 +14,51 @@ router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
     res.json(clients);
 });
 
+router.put(`/`, async (req, res, next) => {
+    const schema = z.object({
+        username: z.string(),
+        os: z.string(),
+        hostname: z.string(),
+        appVersion: z.string(),
+        tenantId: z.string().uuid(),
+        id: z.string().uuid(),
+    });
+
+    try {
+        const clientData = schema.parse(req.body);
+
+        const client = await db.client.upsert({
+            where: {
+                id: clientData.id,
+                tenantId: clientData.tenantId,
+            },
+            create: {
+                ...clientData,
+                lastPing: new Date(),
+            },
+            update: {
+                ...clientData,
+                lastPing: new Date(),
+            }
+        });
+
+        return res.json(client);
+    } catch (e: unknown) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            return next(UnprocessableEntity(e.message));
+        }
+
+        if (e instanceof ZodError) {
+            return next(e);
+        }
+
+        return next(e);
+    }
+});
+
+
 export default router;
+
+function UnprocessableEntity(message: string): any {
+    throw new Error("Function not implemented.");
+}

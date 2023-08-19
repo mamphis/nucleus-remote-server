@@ -18,6 +18,7 @@ import GroupsView from '@/views/Groups/GroupsView.vue';
 import EditConfigurationView from '@/views/Configurations/EditConfigurationView.vue';
 import NewConfigurationView from '@/views/Configurations/NewConfigurationView.vue';
 import ConfigurationsView from '@/views/Configurations/ConfigurationsView.vue';
+import ClientsView from '@/views/Clients/ClientsView.vue'
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -181,6 +182,15 @@ const router = createRouter({
             meta: {
                 authorized: true,
                 permissions: ['update:configuration']
+            }
+        },
+        {
+            path: '/clients',
+            name: 'Clients',
+            component: ClientsView,
+            meta: {
+                authorized: true,
+                permissions: ['read:client']
             }
         },
     ]
