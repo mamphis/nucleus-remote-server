@@ -8,7 +8,7 @@ const burgerActive = ref(false);
 
 const { user, isLoggedIn } = storeToRefs(userStore());
 const hasClient = computed(() => hasPermission(user.value, ':client'));
-const hasConfigruration = computed(() => hasPermission(user.value, ':configuration'));
+const hasConfiguration = computed(() => hasPermission(user.value, ':configuration'));
 const hasGroup = computed(() => hasPermission(user.value, ':group'));
 const hasTask = computed(() => hasPermission(user.value, ':task'));
 const hasTenant = computed(() => hasPermission(user.value, ':tenant'));
@@ -36,7 +36,7 @@ const hasUser = computed(() => hasPermission(user.value, ':user'));
         <div class="navbar-start">
           <RouterLink class="navbar-item" to="/">Home</RouterLink>
           <RouterLink class="navbar-item" to="/clients" v-if="hasClient">Client</RouterLink>
-          <RouterLink class="navbar-item" to="/configrurations" v-if="hasConfigruration">Configruration</RouterLink>
+          <RouterLink class="navbar-item" to="/configurations" v-if="hasConfiguration">Configuration</RouterLink>
           <RouterLink class="navbar-item" to="/groups" v-if="hasGroup">Group</RouterLink>
           <RouterLink class="navbar-item" to="/tasks" v-if="hasTask">Task</RouterLink>
           <RouterLink class="navbar-item" to="/tenant-users" v-if="hasTenantUser">Tenant User</RouterLink>

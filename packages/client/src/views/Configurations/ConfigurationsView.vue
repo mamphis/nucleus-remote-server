@@ -1,0 +1,42 @@
+<script setup lang="ts">
+import { hasPermission } from '@/lib/permission';
+import userStore from '@/stores/user';
+import type { ApiConfiguration } from '@/types/configuration';
+import request, { isErrorResponse } from '../../lib/request';
+
+
+const { user } = userStore();
+const configurations = await request.$get<ApiConfiguration[]>('configurations');
+</script>
+<template>
+    <div class="columns is-flex-grow-1 is-multiline">
+        <div class="column is-full columns is-align-items-center">
+            <div class="column is-half">
+                <h1>Configurations</h1>
+            </div>
+            <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
+                <button class="button" v-if="hasPermission(user, 'create:configuration')" @click="$router.push('/new-configuration')">New
+                    Configuration</button>
+            </div>
+        </div>
+        <div class="column is-full">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Groups</th>
+                        <th>Tasks</th>
+                    </tr>
+                </thead>
+                <tbody v-if="!isErrorResponse(configurations)">
+                    <tr v-for="configuration in configurations" :key="configuration.id" class="is-clickable"
+                        @click="$router.push(`/configurations/${configuration.id}`)">
+                        <td>{{ configuration.name }}</td>
+                        <td>{{ configuration.group.length }}</td>
+                        <td>{{ configuration.task.length }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</template>

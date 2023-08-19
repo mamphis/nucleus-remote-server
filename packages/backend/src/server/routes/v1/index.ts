@@ -1,5 +1,6 @@
 import { Router } from "express";
 import clients from './client';
+import configurations from './configuration';
 import groups from './group';
 import login from './login';
 import tenants from './tenant';
@@ -16,5 +17,6 @@ router.use('/users', users);
 router.use('/tenants', tenants);
 router.use('/tenant-users', tenantUsers);
 router.use('/groups', groups);
+router.use('/configurations', configurations);
 
 export default router;

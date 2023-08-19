@@ -15,6 +15,9 @@ import VerifyView from '@/views/VerifyView.vue';
 import EditGroupView from '@/views/Groups/EditGroupView.vue';
 import NewGroupView from '@/views/Groups/NewGroupView.vue';
 import GroupsView from '@/views/Groups/GroupsView.vue';
+import EditConfigurationView from '@/views/Configurations/EditConfigurationView.vue';
+import NewConfigurationView from '@/views/Configurations/NewConfigurationView.vue';
+import ConfigurationsView from '@/views/Configurations/ConfigurationsView.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -151,6 +154,33 @@ const router = createRouter({
             meta: {
                 authorized: true,
                 permissions: ['update:group']
+            }
+        },
+        {
+            path: '/configurations',
+            name: 'Configurations',
+            component: ConfigurationsView,
+            meta: {
+                authorized: true,
+                permissions: [':configuration']
+            }
+        },
+        {
+            path: '/new-configuration',
+            name: 'NewConfiguration',
+            component: NewConfigurationView,
+            meta: {
+                authorized: true,
+                permissions: ['create:configuration']
+            }
+        },
+        {
+            path: '/configurations/:configurationId',
+            name: 'EditConfiguration',
+            component: EditConfigurationView,
+            meta: {
+                authorized: true,
+                permissions: ['update:configuration']
             }
         },
     ]
