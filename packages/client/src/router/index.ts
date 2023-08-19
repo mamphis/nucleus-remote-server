@@ -12,6 +12,10 @@ import EditUserView from '@/views/Users/EditUserView.vue';
 import NewUserView from '@/views/Users/NewUserView.vue';
 import UsersView from '@/views/Users/UsersView.vue';
 import VerifyView from '@/views/VerifyView.vue';
+import EditGroupView from '@/views/Groups/EditGroupView.vue';
+import NewGroupView from '@/views/Groups/NewGroupView.vue';
+import GroupsView from '@/views/Groups/GroupsView.vue';
+
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -120,6 +124,33 @@ const router = createRouter({
             meta: {
                 authorized: true,
                 permissions: ['update:tenant-user']
+            }
+        },
+        {
+            path: '/groups',
+            name: 'Groups',
+            component: GroupsView,
+            meta: {
+                authorized: true,
+                permissions: [':group']
+            }
+        },
+        {
+            path: '/new-group',
+            name: 'NewGroup',
+            component: NewGroupView,
+            meta: {
+                authorized: true,
+                permissions: ['create:group']
+            }
+        },
+        {
+            path: '/groups/:groupId',
+            name: 'EditGroup',
+            component: EditGroupView,
+            meta: {
+                authorized: true,
+                permissions: ['update:group']
             }
         },
     ]
