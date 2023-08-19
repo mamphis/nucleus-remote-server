@@ -21,7 +21,7 @@ router.get('/', auth('read:group'), async (req, res: AuthResponse, next) => {
 });
 
 router.get('/:groupId', auth('read:group'), async (req, res: AuthResponse, next) => {
-    const group =  await db.group.findFirst({
+    const group = await db.group.findFirst({
         where: { tenantId: res.locals.user.tenantId, id: req.params.groupId }, select: {
             id: true,
             name: true,
@@ -68,6 +68,11 @@ router.post('/', auth('create:group'), async (req, res: AuthResponse, next) => {
 router.patch('/:groupId', auth('update:group'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         name: z.string(),
+        configuration: z.array(
+            z.object({
+                id: z.string(),
+            }),
+        ),
     });
 
     try {
@@ -80,6 +85,9 @@ router.patch('/:groupId', auth('update:group'), async (req, res: AuthResponse, n
             },
             data: {
                 name: groupData.name,
+                configuration: {
+                    set: groupData.configuration,
+                },
             }
         });
 
