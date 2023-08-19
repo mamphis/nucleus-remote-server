@@ -91,7 +91,7 @@ const removeSelectedGroup = (group?: { id: string }) => {
                     </p>
                     <div class="panel-block">
                         <div class="field has-addons is-flex-grow-1">
-                            <p class="control is-expanded" v-if="!isErrorResponse(groups)">
+                            <p class="control is-expanded">
                                 <Dropdown :options="remainingGroups" @selected="(selected) => addSelectedGroup(selected)">
                                 </Dropdown>
                             </p>
@@ -106,7 +106,7 @@ const removeSelectedGroup = (group?: { id: string }) => {
                         <div class="control is-expanded">
                             {{ group?.name }}
                         </div>
-                        <button class="button is-danger is-small" @click="removeSelectedGroup(group)">
+                        <button class="button is-danger is-small" tabindex="-1" @mousedown="removeSelectedGroup(group)">
                             x
                         </button>
                     </a>
@@ -127,3 +127,9 @@ const removeSelectedGroup = (group?: { id: string }) => {
         </form>
     </div>
 </template>
+
+<style>
+button:focus {
+    color: yellowgreen;
+}
+</style>

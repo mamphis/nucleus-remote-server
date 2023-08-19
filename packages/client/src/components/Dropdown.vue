@@ -2,13 +2,13 @@
     <div class="dropdown" v-if="options">
 
         <!-- Dropdown Input -->
-        <input class="dropdown-input input" :name="name" @focus="showOptions()" @blur="exit()" @keyup="keyMonitor"
-            v-model="searchFilter" :disabled="disabled" :placeholder="placeholder" autocomplete="off"/>
+        <input class="dropdown-input input" :name="name" @focus="showOptions(true)" @input="showOptions(false)" @blur="exit()"
+            @keyup="keyMonitor" v-model="searchFilter" :disabled="disabled" :placeholder="placeholder" autocomplete="off" />
 
         <!-- Dropdown Menu -->
         <div class="dropdown-content" v-show="optionsShown">
             <div class="dropdown-item" @mousedown="selectOption(option)" v-for="(option, index) in filteredOptions"
-                :key="index">
+                :key="index" :class="{ preselected: index == preselectedItemIndex }">
                 {{ option.name || option.id || '-' }}
             </div>
         </div>
@@ -65,6 +65,7 @@ const emits = defineEmits<{
 const selected = ref<KeyValuePair>();
 const optionsShown = ref(false);
 const searchFilter = ref('');
+const preselectedItemIndex = ref(0);
 
 emits('selected', selected.value);
 
@@ -81,31 +82,39 @@ const filteredOptions = computed(() => {
 
 
 function selectOption(option: KeyValuePair) {
+    console.log('dropdown', 'select', option)
     selected.value = option;
+    emits('selected', option);
     optionsShown.value = false;
-    searchFilter.value = selected.value.name;
-    emits('selected', selected.value);
+    searchFilter.value = '';
 }
-function showOptions() {
+
+function showOptions(clearInput: boolean) {
     if (!props.disabled) {
-        searchFilter.value = '';
+        if (clearInput) {
+            searchFilter.value = '';
+        }
         optionsShown.value = true;
+        preselectedItemIndex.value = 0;
     }
 }
+
 function exit() {
-    if (!selected.value) {
-        selected.value = undefined;
-        searchFilter.value = '';
-    } else {
-        searchFilter.value = selected.value.name;
-    }
-    emits('selected', selected.value);
     optionsShown.value = false;
 }
+
 // Selecting when pressing Enter
 function keyMonitor(event: KeyboardEvent) {
-    if (event.key === "Enter" && filteredOptions.value[0]) {
-        selectOption(filteredOptions.value[0]);
+    if (event.key === "Enter" && filteredOptions.value[preselectedItemIndex.value]) {
+        selectOption(filteredOptions.value[preselectedItemIndex.value]);
+    }
+
+    if (event.key === 'ArrowDown') {
+        preselectedItemIndex.value = (preselectedItemIndex.value + 1) % Math.min(props.maxItem, filteredOptions.value.length);
+    }
+
+    if (event.key === 'ArrowUp') {
+        preselectedItemIndex.value = (preselectedItemIndex.value + filteredOptions.value.length - 1) % Math.min(props.maxItem, filteredOptions.value.length);
     }
 }
 
@@ -113,7 +122,7 @@ watch(filteredOptions, (options) => {
     if (options.length === 0) {
         selected.value = undefined;
     } else {
-        selected.value = options[0];
+        selected.value = options[preselectedItemIndex.value];
     }
     emits('filter', searchFilter.value);
 })
@@ -141,26 +150,25 @@ watch(filteredOptions, (options) => {
     position: absolute;
     background-color: #fff;
     min-width: 248px;
-    max-width: 248px;
-    max-height: 248px;
     border: 1px solid #e7ecf5;
     box-shadow: 0px -8px 34px 0px rgba(0, 0, 0, 0.05);
     overflow: auto;
     z-index: 1;
+    width: 100%;
+    height: fit-content;
+}
 
-    .dropdown-item {
-        color: black;
-        font-size: .7em;
-        line-height: 1em;
-        padding: 8px;
-        text-decoration: none;
-        display: block;
-        cursor: pointer;
+.dropdown-content .dropdown-item {
+    color: black;
+    padding: 8px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
 
-        &:hover {
-            background-color: #e7ecf5;
-        }
-    }
+.dropdown-item:hover,
+.dropdown-item.preselected {
+    background-color: #e7ecf5;
 }
 
 .dropdown:hover .dropdowncontent {

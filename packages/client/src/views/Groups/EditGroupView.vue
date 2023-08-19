@@ -104,7 +104,7 @@ const removeSelectedConfiguration = (configuration?: { id: string }) => {
                         <div class="control is-expanded">
                             {{ configuration?.name }}
                         </div>
-                        <button class="button is-danger is-small" @click="removeSelectedConfiguration(configuration)">
+                        <button class="button is-danger is-small" @mousedown="removeSelectedConfiguration(configuration)">
                             x
                         </button>
                     </a>
