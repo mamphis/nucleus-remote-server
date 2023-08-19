@@ -37,6 +37,18 @@ router.get('/:configurationId', auth('read:configuration'), async (req, res: Aut
     return res.json(configuration);
 });
 
+router.get('/:configurationId/groups', auth('read:configuration', 'read:group'), async (req, res: AuthResponse, next) => {
+    const groups = await db.group.findMany({
+        where: { tenantId: res.locals.user.tenantId, configuration: { some: { id: req.params.configurationId } } }, select: {
+            id: true,
+            name: true,
+            client: true,
+            configuration: true,
+        }
+    });
+    return res.json(groups);
+});
+
 router.post('/', auth('create:configuration'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         name: z.string(),
@@ -68,6 +80,11 @@ router.post('/', auth('create:configuration'), async (req, res: AuthResponse, ne
 router.patch('/:configurationId', auth('update:configuration'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         name: z.string(),
+        group: z.array(
+            z.object({
+                id: z.string(),
+            }),
+        ),
     });
 
     try {
@@ -80,6 +97,9 @@ router.patch('/:configurationId', auth('update:configuration'), async (req, res:
             },
             data: {
                 name: configurationData.name,
+                group: {
+                    set: configurationData.group
+                }
             }
         });
 

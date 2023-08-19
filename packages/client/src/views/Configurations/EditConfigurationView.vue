@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import router from '@/router';
+import Dropdown from '@/components/Dropdown.vue';
 import type { ApiConfiguration } from '@/types/configuration';
-import { ref } from 'vue';
-import request, { isErrorResponse, isValidationError } from '../../lib/request';
+import { computed, ref } from 'vue';
+import request, { assertNotErrorResponse, isErrorResponse, isValidationError } from '@/lib/request';
+import type { ApiGroup } from '@/types/group';
 
 const { configurationId } = router.currentRoute.value.params;
-const configuration = await request.$get<ApiConfiguration>(`configurations/${configurationId}`);
+const cfg = await request.$get<ApiConfiguration>(`configurations/${configurationId}`);
+const groups = await request.$get<ApiGroup[]>(`groups`);
+
+assertNotErrorResponse<ApiConfiguration>(cfg);
+assertNotErrorResponse<ApiGroup[]>(groups);
+const configuration = ref(cfg);
+
+const remainingGroups = computed(() => {
+    return groups.filter(g => !configuration.value.group.some(cg => cg.id == g.id));
+});
 
 const errors = ref<{
     name: string,
@@ -20,9 +31,12 @@ const clearError = () => {
     errors.value.general = '';
 }
 
-const updateConfiguration = async (configuration: ApiConfiguration) => {
-    if (configuration.name) {
-        const response = await request.$patch<ApiConfiguration>(`configurations/${configurationId}`, { name: configuration.name });
+const updateConfiguration = async () => {
+    if (configuration.value.name) {
+        const response = await request.$patch<ApiConfiguration>(`configurations/${configurationId}`,
+            {
+                ...configuration.value
+            });
 
         clearError();
         if (isValidationError(response)) {
@@ -38,6 +52,20 @@ const updateConfiguration = async (configuration: ApiConfiguration) => {
         }
     }
 }
+
+const addSelectedGroup = (group?: { id: string }) => {
+    const groupToAdd = groups.find(g => g.id === group?.id);
+
+    if (groupToAdd) {
+        configuration.value.group.push(groupToAdd)
+    }
+}
+
+const removeSelectedGroup = (group?: { id: string }) => {
+    if (group) {
+        configuration.value.group = configuration.value.group.filter(g => g.id !== group.id);
+    }
+}
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline">
@@ -46,8 +74,7 @@ const updateConfiguration = async (configuration: ApiConfiguration) => {
                 <h1>Edit configuration</h1>
             </div>
         </div>
-        <form @submit.prevent="updateConfiguration(configuration)" class="column is-full"
-            v-if="!isErrorResponse(configuration)">
+        <form @submit.prevent="updateConfiguration()" class="column is-full">
             <div class="field">
                 <label class="label">Name</label>
                 <div class="control">
@@ -55,6 +82,35 @@ const updateConfiguration = async (configuration: ApiConfiguration) => {
                         v-model="configuration.name" required>
                 </div>
                 <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
+            </div>
+
+            <div class="field">
+                <nav class="panel">
+                    <p class="panel-heading">
+                        Groups
+                    </p>
+                    <div class="panel-block">
+                        <div class="field has-addons is-flex-grow-1">
+                            <p class="control is-expanded" v-if="!isErrorResponse(groups)">
+                                <Dropdown :options="remainingGroups" @selected="(selected) => addSelectedGroup(selected)">
+                                </Dropdown>
+                            </p>
+                            <div class="control">
+                                <a class="button is-info">
+                                    Add Group
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="panel-block" v-for="group in configuration.group" :key="group.id">
+                        <div class="control is-expanded">
+                            {{ group?.name }}
+                        </div>
+                        <button class="button is-danger is-small" @click="removeSelectedGroup(group)">
+                            x
+                        </button>
+                    </a>
+                </nav>
             </div>
 
             <div class="field">

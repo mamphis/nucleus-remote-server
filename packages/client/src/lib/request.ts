@@ -27,6 +27,16 @@ function isErrorResponse(value: unknown): value is ErrorResponse {
         typeof value.type === 'string';
 }
 
+function assertNotErrorResponse<T>(value: unknown): asserts value is T {
+    if (!value) {
+        throw new Error('value is undefined.');
+    }
+
+    if (isErrorResponse(value)) {
+        throw new Error('value is an error response: ' + value.message);
+    }
+}
+
 function isValidationError(value: unknown): value is ValidationErrorResponse {
     return isErrorResponse(value) &&
         value.type === 'ValidationError' &&
@@ -86,4 +96,5 @@ export default {
 export {
     isErrorResponse,
     isValidationError,
+    assertNotErrorResponse,
 }
