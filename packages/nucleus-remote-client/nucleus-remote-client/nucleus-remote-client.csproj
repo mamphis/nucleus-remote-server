@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-nucleus_remote_client-af61bf69-f050-44cb-95ee-5b67e60a870a</UserSecretsId>
     <RootNamespace>nucleus_remote_client</RootNamespace>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
