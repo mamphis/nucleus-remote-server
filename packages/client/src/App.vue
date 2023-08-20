@@ -38,7 +38,6 @@ const hasUser = computed(() => hasPermission(user.value, ':user'));
           <RouterLink class="navbar-item" to="/clients" v-if="hasClient">Client</RouterLink>
           <RouterLink class="navbar-item" to="/configurations" v-if="hasConfiguration">Configuration</RouterLink>
           <RouterLink class="navbar-item" to="/groups" v-if="hasGroup">Group</RouterLink>
-          <RouterLink class="navbar-item" to="/tasks" v-if="hasTask">Task</RouterLink>
           <RouterLink class="navbar-item" to="/tenant-users" v-if="hasTenantUser">Tenant User</RouterLink>
           <RouterLink class="navbar-item" to="/tenants" v-if="hasTenant">Tenant</RouterLink>
           <RouterLink class="navbar-item" to="/users" v-if="hasUser">User</RouterLink>

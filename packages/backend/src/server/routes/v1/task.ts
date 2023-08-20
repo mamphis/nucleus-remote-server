@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
+import { NotFound } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const router = Router();
@@ -14,35 +15,40 @@ router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
     res.json(clients);
 });
 
-router.put(`/`, async (req, res, next) => {
+router.get('/:taskId', auth('read:task'), async (req, res, next) => {
+    const task = await db.client.findFirst({
+        where: {
+            id: req.params.taskId,
+            tenantId: res.locals.user.tenantId,
+        }
+    });
+
+    if (!task) {
+        return next(NotFound('task was not found'));
+    }
+
+    return res.json(task);
+})
+
+router.post(`/`, auth('create:task'), async (req, res, next) => {
     const schema = z.object({
-        username: z.string(),
-        os: z.string(),
-        hostname: z.string(),
-        appVersion: z.string(),
-        tenantId: z.string().uuid(),
-        id: z.string().uuid(),
+        name: z.string(),
+        type: z.string(),
+        configurationId: z.string().uuid(),
     });
 
     try {
-        const clientData = schema.parse(req.body);
+        const taskData = schema.parse(req.body);
 
-        const client = await db.client.upsert({
-            where: {
-                id: clientData.id,
-                tenantId: clientData.tenantId,
+        const task = await db.task.create({
+            data: {
+                ...taskData,
+                tenantId: res.locals.user.tenantId,
+                content: '',
             },
-            create: {
-                ...clientData,
-                lastPing: new Date(),
-            },
-            update: {
-                ...clientData,
-                lastPing: new Date(),
-            }
         });
 
-        return res.json(client);
+        return res.json(task);
     } catch (e: unknown) {
         if (e instanceof PrismaClientKnownRequestError) {
             return next(UnprocessableEntity(e.message));
