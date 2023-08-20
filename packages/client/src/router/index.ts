@@ -19,6 +19,8 @@ import EditConfigurationView from '@/views/Configurations/EditConfigurationView.
 import NewConfigurationView from '@/views/Configurations/NewConfigurationView.vue';
 import ConfigurationsView from '@/views/Configurations/ConfigurationsView.vue';
 import ClientsView from '@/views/Clients/ClientsView.vue'
+import NewTaskView from '@/views/Tasks/NewTaskView.vue';
+import EditTaskView from '@/views/Tasks/EditTaskView.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -191,6 +193,24 @@ const router = createRouter({
             meta: {
                 authorized: true,
                 permissions: ['read:client']
+            }
+        },
+        {
+            path: '/new-task/:configurationId',
+            name: 'NewTask',
+            component: NewTaskView,
+            meta: {
+                authorized: true,
+                permissions: ['create:task'],
+            }
+        },
+        {
+            path: '/tasks/:taskId',
+            name: 'EditTask',
+            component: EditTaskView,
+            meta: {
+                authorized: true,
+                permissions: ['update:task'],
             }
         },
     ]

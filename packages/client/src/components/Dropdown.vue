@@ -2,7 +2,7 @@
     <div class="dropdown" v-if="options">
 
         <!-- Dropdown Input -->
-        <input class="dropdown-input input" :name="name" @focus="showOptions(true)" @input="showOptions(false)" @blur="exit()"
+        <input class="dropdown-input input" :class="$props.inputClass" :name="name" @focus="showOptions(true)" @input="showOptions(false)" @blur="exit()"
             @keyup="keyMonitor" v-model="searchFilter" :disabled="disabled" :placeholder="placeholder" autocomplete="off" />
 
         <!-- Dropdown Menu -->
@@ -54,6 +54,9 @@ const props = defineProps(
             required: false,
             default: 6,
             note: 'Max items showing'
+        },
+        inputClass: {
+            type: String
         }
     });
 

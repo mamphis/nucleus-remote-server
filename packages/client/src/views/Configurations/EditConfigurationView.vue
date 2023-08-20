@@ -66,6 +66,10 @@ const removeSelectedGroup = (group?: { id: string }) => {
         configuration.value.group = configuration.value.group.filter(g => g.id !== group.id);
     }
 }
+
+const removeSelectedTask = (task?: { id: string }) => {
+
+}
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline">
@@ -92,14 +96,10 @@ const removeSelectedGroup = (group?: { id: string }) => {
                     <div class="panel-block">
                         <div class="field has-addons is-flex-grow-1">
                             <p class="control is-expanded">
-                                <Dropdown :options="remainingGroups" @selected="(selected) => addSelectedGroup(selected)">
+                                <Dropdown inputClass="is-small" :options="remainingGroups"
+                                    @selected="(selected) => addSelectedGroup(selected)">
                                 </Dropdown>
                             </p>
-                            <div class="control">
-                                <a class="button is-info">
-                                    Add Group
-                                </a>
-                            </div>
                         </div>
                     </div>
                     <a class="panel-block" v-for="group in configuration.group" :key="group.id">
@@ -107,6 +107,26 @@ const removeSelectedGroup = (group?: { id: string }) => {
                             {{ group?.name }}
                         </div>
                         <button class="button is-danger is-small" tabindex="-1" @mousedown="removeSelectedGroup(group)">
+                            x
+                        </button>
+                    </a>
+                </nav>
+            </div>
+            <div class="field">
+                <nav class="panel">
+                    <div class="panel-heading is-flex is-align-items-center is-justify-content-space-between">
+                        Tasks
+                        <div class="control">
+                            <a class="button is-info is-small" @click="$router.push(`/new-task/${configuration.id}`)">
+                                Add Task
+                            </a>
+                        </div>
+                    </div>
+                    <a class="panel-block" v-for="task in configuration.task" :key="task.id">
+                        <div class="control is-expanded">
+                            {{ task?.name }}
+                        </div>
+                        <button class="button is-danger is-small" tabindex="-1" @mousedown="removeSelectedTask(task)">
                             x
                         </button>
                     </a>

@@ -90,14 +90,9 @@ const removeSelectedConfiguration = (configuration?: { id: string }) => {
                     <div class="panel-block">
                         <div class="field has-addons is-flex-grow-1">
                             <p class="control is-expanded">
-                                <Dropdown :options="remainingConfiurations" @selected="(selected) => addSelectedConfiguration(selected)">
+                                <Dropdown inputClass="is-small" :options="remainingConfiurations" @selected="(selected) => addSelectedConfiguration(selected)">
                                 </Dropdown>
                             </p>
-                            <div class="control">
-                                <a class="button is-info">
-                                    Add Group
-                                </a>
-                            </div>
                         </div>
                     </div>
                     <a class="panel-block" v-for="configuration in group.configuration" :key="configuration.id">
