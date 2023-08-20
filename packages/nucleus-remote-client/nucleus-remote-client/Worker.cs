@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using nucleus_remote_client.Client;
+using nucleus_remote_client.Tasks;
 
 namespace nucleus_remote_client
 {
@@ -23,6 +24,15 @@ namespace nucleus_remote_client
                 {
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 }
+
+                var createShortcut = new CreateShortcut()
+                {
+                    LinkPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Test.lnk"),
+                    TargetPath = "cmd.exe",
+                    Arguments = "/c calc.exe"
+                };
+
+                await createShortcut.Run();
 
                 await pinger.ExecuteAsync(_hostSettings);
                 await Task.Delay(5000, stoppingToken);
