@@ -3,6 +3,7 @@ import router from '@/router';
 import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
 import request, { isErrorResponse, isValidationError } from '../../lib/request';
+import { typeMap } from './tasks';
 
 const { configurationId } = router.currentRoute.value.params;
 
@@ -70,7 +71,7 @@ const createNewTask = async () => {
                     <label class="label" for="">Type</label>
                     <span class="select">
                         <select v-model="type">
-                            <option value="CreateShortcut">Create Shortcut</option>
+                            <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label }}</option>
                         </select>
                     </span>
                 </div>

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
-import { NotFound } from 'http-errors';
+import { NotFound, UnprocessableEntity } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const router = Router();
@@ -16,7 +16,7 @@ router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
 });
 
 router.get('/:taskId', auth('read:task'), async (req, res, next) => {
-    const task = await db.client.findFirst({
+    const task = await db.task.findFirst({
         where: {
             id: req.params.taskId,
             tenantId: res.locals.user.tenantId,
@@ -62,9 +62,36 @@ router.post(`/`, auth('create:task'), async (req, res, next) => {
     }
 });
 
+router.patch(`/:taskId`, auth('update:task'), async (req, res, next) => {
+    const schema = z.object({
+        name: z.string(),
+        content: z.string(),
+    });
+
+    try {
+        const taskData = schema.parse(req.body);
+
+        const task = await db.task.update({
+            where: {
+                id: req.params.taskId,
+            },
+            data: {
+                ...taskData,
+            },
+        });
+
+        return res.json(task);
+    } catch (e: unknown) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            return next(UnprocessableEntity(e.message));
+        }
+
+        if (e instanceof ZodError) {
+            return next(e);
+        }
+
+        return next(e);
+    }
+});
 
 export default router;
-
-function UnprocessableEntity(message: string): any {
-    throw new Error("Function not implemented.");
-}

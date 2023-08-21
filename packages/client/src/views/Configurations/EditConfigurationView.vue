@@ -122,7 +122,7 @@ const removeSelectedTask = (task?: { id: string }) => {
                             </a>
                         </div>
                     </div>
-                    <a class="panel-block" v-for="task in configuration.task" :key="task.id">
+                    <a class="panel-block" v-for="task in configuration.task" :key="task.id" @click="$router.push(`/tasks/${task.id}`)">
                         <div class="control is-expanded">
                             {{ task?.name }}
                         </div>

@@ -1,15 +1,18 @@
 <script setup lang="ts">
+import request, { assertNotErrorResponse, isErrorResponse, isValidationError } from '@/lib/request';
 import router from '@/router';
 import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
-import request, { isErrorResponse, isValidationError } from '@/lib/request';
-import CreateShortcutTaskView from './CreateShortcutTaskView.vue';
+import { typeMap } from './tasks';
 
 const { taskId } = router.currentRoute.value.params;
 
-const name = ref('');
-const type = ref('');
-const content = ref('');
+const task = await request.$get<ApiTask>(`tasks/${taskId}`);
+assertNotErrorResponse<ApiTask>(task);
+
+const name = ref(task.name);
+const type = ref(task.type);
+const content = ref(task.content);
 
 const errors = ref<{
     name: string,
@@ -75,12 +78,12 @@ const createNewTask = async () => {
                     <label class="label" for="">Type</label>
                     <span class="select">
                         <select v-model="type" disabled>
-                            <option value="CreateShortcut">Create Shortcut</option>
+                            <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label }}</option>
                         </select>
                     </span>
                 </div>
 
-                <component :is="CreateShortcutTaskView" v-model="content"></component>
+                <component :is="typeMap[type].component" v-model="content"></component>
                 <div class="field">
                     <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
                 </div>

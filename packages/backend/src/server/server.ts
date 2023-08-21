@@ -4,6 +4,7 @@ import { HttpError, InternalServerError, NotFound } from 'http-errors';
 import { ZodError } from 'zod';
 import { Logger } from '../lib/logger';
 import api from './routes';
+import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 export class Server {
     private app: Application;
@@ -24,7 +25,7 @@ export class Server {
 
         this.app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
             try {
-                Logger.warn(`Failed Request from ${req.socket.remoteAddress} to ${req.method} ${req.originalUrl}`, JSON.stringify(err));
+                Logger.warn(`Failed Request from ${req.socket.remoteAddress} to ${req.method} ${req.originalUrl}`, JSON.stringify(err), (err as any)?.message);
             } finally { }
 
             if (err instanceof HttpError) {
@@ -35,8 +36,12 @@ export class Server {
                 return res.status(400).json({ type: 'ValidationError', error: err.name, data: err.errors, message: err.message });
             }
 
+            if (err instanceof PrismaClientValidationError) {
+                return res.status(400).json({ type: 'ValidationError', error: err.name, message: `Invalid database operation.` });
+            }   
+        
             const internalServerError = InternalServerError();
-            return res.status(500).json({ type: 'UnknownError', error: internalServerError.status, message: internalServerError.message });
+            return res.status(500).json({ type: 'UnknownError', error: internalServerError.status, message: (err as any)?.message ?? internalServerError.message });
         })
     }
 
