@@ -20,6 +20,20 @@ export class Server {
         this.app.use(cors({ origin: "*" }))
         this.app.use(json());
 
+        this.app.use((_req, res, next) => {
+            res.set('Cache-Control', 'no-store');
+            next();
+        });
+
+        this.app.use((req, res, next) => {
+            const start = new Date().getTime();
+            next();
+            res.on('finish', () => {
+                Logger.debug(`Request from ${req.socket.remoteAddress} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, `${new Date().getTime() - start}ms`);
+            });
+
+        });
+
         this.app.use('/api', api);
 
         this.app.use((req, _res, next) => {
@@ -45,7 +59,7 @@ export class Server {
 
             const internalServerError = InternalServerError();
             return res.status(500).json({ type: 'UnknownError', error: internalServerError.status, message: (err as any)?.message ?? internalServerError.message });
-        })
+        });
     }
 
     @Logger.enter()

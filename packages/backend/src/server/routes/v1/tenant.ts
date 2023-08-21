@@ -42,6 +42,25 @@ router.get('/', auth('read:tenant'), async (req, res: AuthResponse, next) => {
 });
 
 router.get('/:tenantId', auth('read:tenant'), async (req, res: AuthResponse, next) => {
+    if (res.locals.user.permissions.includes('special:admin')) {
+        const tenants = await db.tenant.findFirst({
+            where:{
+                id: req.params.tenantId,
+            },
+            select: {
+                id: true,
+                name: true,
+                user: {
+                    select: {
+                        username: true,
+                        id: true,
+                    }
+                }
+            }
+        });
+        return res.json(tenants);
+    }
+    
     const tenant = await db.tenant.findFirst({
         where: { user: { some: { username: res.locals.user.username } }, id: req.params.tenantId }, select: {
             id: true,
