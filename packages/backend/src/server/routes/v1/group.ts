@@ -73,6 +73,11 @@ router.patch('/:groupId', auth('update:group'), async (req, res: AuthResponse, n
                 id: z.string(),
             }),
         ),
+        client: z.array(
+            z.object({
+                id: z.string(),
+            }),
+        ),
     });
 
     try {
@@ -88,6 +93,9 @@ router.patch('/:groupId', auth('update:group'), async (req, res: AuthResponse, n
                 configuration: {
                     set: groupData.configuration,
                 },
+                client: {
+                    set: groupData.client,
+                }
             }
         });
 

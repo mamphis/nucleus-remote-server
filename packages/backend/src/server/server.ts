@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express, { Application, NextFunction, Request, Response, json } from "express";
+import { Server as HttpServer } from 'http';
 import { HttpError, InternalServerError, NotFound } from 'http-errors';
 import { ZodError } from 'zod';
 import { Logger } from '../lib/logger';
@@ -8,6 +9,8 @@ import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 export class Server {
     private app: Application;
+    private server?: HttpServer;
+
     constructor(private readonly port: number) {
         this.app = express();
     }
@@ -38,8 +41,8 @@ export class Server {
 
             if (err instanceof PrismaClientValidationError) {
                 return res.status(400).json({ type: 'ValidationError', error: err.name, message: `Invalid database operation.` });
-            }   
-        
+            }
+
             const internalServerError = InternalServerError();
             return res.status(500).json({ type: 'UnknownError', error: internalServerError.status, message: (err as any)?.message ?? internalServerError.message });
         })
@@ -48,8 +51,22 @@ export class Server {
     @Logger.enter()
     async start() {
         return new Promise<void>(res => {
-            this.app.listen(this.port, () => {
+            this.server = this.app.listen(this.port, () => {
                 Logger.info(`Server started listening on port ${this.port}`);
+                res();
+            });
+        });
+    }
+
+    @Logger.enter()
+    async stop() {
+        return new Promise<void>((res, rej) => {
+            this.server?.closeAllConnections();
+            this.server?.close((err) => {
+                if (err) {
+                    return rej(err);
+                }
+
                 res();
             });
         });

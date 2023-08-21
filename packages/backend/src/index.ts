@@ -26,7 +26,12 @@ const start = async () => {
 
     const server = new Server(port);
     server.configure();
-    server.start();
+    await server.start().catch(e => {
+        if (e.code === 'EADDRINUSE') {
+            Logger.fatal('Cannot start server because the port is already in use: ' + port);
+            process.exit();
+        }
+    });
 }
 
 start();
