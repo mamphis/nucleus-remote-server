@@ -83,7 +83,7 @@ nav>a:last-child {
 }
 
 nav a.router-link-active {
-  text-decoration: underline;
+  font-weight: 600;
 }
 
 nav a.nav-end {

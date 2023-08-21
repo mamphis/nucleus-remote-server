@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import request, { isErrorResponse } from '@/lib/request';
-import { formatDate } from '@/lib/utils';
-import type {ApiClient} from '@/types/client';
+import { formatDate,humanizeDate } from '@/lib/utils';
+import type { ApiClient } from '@/types/client';
 
 const clients = await request.$get<ApiClient[]>('clients');
 </script>
@@ -30,7 +30,7 @@ const clients = await request.$get<ApiClient[]>('clients');
                         <td>{{ client.hostname }}</td>
                         <td>{{ client.os }}</td>
                         <td>{{ client.appVersion }}</td>
-                        <td>{{ formatDate(client.lastPing) }}</td>
+                        <td>{{ formatDate(client.lastPing) }} ({{ humanizeDate(client.lastPing) }})</td>
                     </tr>
                 </tbody>
             </table>
