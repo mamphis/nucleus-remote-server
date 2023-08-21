@@ -117,7 +117,7 @@ const removeSelectedClient = (client?: { id: string }) => {
                         </div>
                     </div>
                     <a class="panel-block" v-for="configuration in group.configuration" :key="configuration.id">
-                        <div class="control is-expanded">
+                        <div class="control is-expanded" @click="$router.push(`/configurations/${configuration.id}`)">
                             {{ configuration?.name }}
                         </div>
                         <button class="button is-danger is-small" @mousedown="removeSelectedConfiguration(configuration)">
@@ -141,7 +141,7 @@ const removeSelectedClient = (client?: { id: string }) => {
                         </div>
                     </div>
                     <a class="panel-block" v-for="client in group.client" :key="client.id">
-                        <div class="control is-expanded">
+                        <div class="control is-expanded" @click="$router.push(`/clients/${client.id}`)">
                             {{ client.username }} - {{ client.hostname }}
                         </div>
                         <button class="button is-danger is-small" @mousedown="removeSelectedClient(client)">

@@ -103,7 +103,7 @@ const removeSelectedTask = (task?: { id: string }) => {
                         </div>
                     </div>
                     <a class="panel-block" v-for="group in configuration.group" :key="group.id">
-                        <div class="control is-expanded">
+                        <div class="control is-expanded" @click="$router.push(`/groups/${group.id}`)">
                             {{ group?.name }}
                         </div>
                         <button class="button is-danger is-small" tabindex="-1" @mousedown="removeSelectedGroup(group)">

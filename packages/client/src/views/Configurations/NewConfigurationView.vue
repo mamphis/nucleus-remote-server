@@ -37,7 +37,7 @@ const createNewConfiguration = async () => {
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
         } else {
-            router.push(`/configurations/${response.id}`);
+            router.replace(`/configurations/${response.id}`);
         }
     }
 }

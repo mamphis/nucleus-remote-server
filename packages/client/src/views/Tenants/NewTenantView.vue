@@ -37,7 +37,7 @@ const createNewTenant = async () => {
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
         } else {
-            router.push(`/tenants/${response.id}`);
+            router.replace(`/tenants/${response.id}`);
         }
     }
 }

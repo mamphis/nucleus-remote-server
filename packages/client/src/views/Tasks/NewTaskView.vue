@@ -45,7 +45,7 @@ const createNewTask = async () => {
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
         } else {
-            router.push(`/tasks/${response.id}`);
+            router.replace(`/tasks/${response.id}`);
         }
     }
 }

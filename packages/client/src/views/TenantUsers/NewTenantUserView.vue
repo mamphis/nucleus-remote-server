@@ -59,7 +59,7 @@ const createNewUser = async () => {
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
         } else {
-            router.push(`/tenant-users/${response.id}`);
+            router.replace(`/tenant-users/${response.id}`);
         }
     }
 }

@@ -37,7 +37,7 @@ const createNewGroup = async () => {
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
         } else {
-            router.push(`/groups/${response.id}`);
+            router.replace(`/groups/${response.id}`);
         }
     }
 }
