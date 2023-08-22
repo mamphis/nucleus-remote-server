@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
+import { UnprocessableEntity } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const router = Router();
@@ -56,9 +57,24 @@ router.put(`/`, async (req, res, next) => {
     }
 });
 
+router.get('/:clientId/tasks', async (req, res, next) => {
+    const tasks = await db.task.findMany({
+        where: {
+            configuration: {
+                group: {
+                    some: {
+                        client: {
+                            some: {
+                                id: req.params.clientId,
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    return res.json(tasks);
+});
 
 export default router;
-
-function UnprocessableEntity(message: string): any {
-    throw new Error("Function not implemented.");
-}
