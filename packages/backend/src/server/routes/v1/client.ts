@@ -15,6 +15,12 @@ router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
     res.json(clients);
 });
 
+router.get('/:clientId', auth('read:client'), async (req, res: AuthResponse, next) => {
+    const clients = await db.client.findFirst({ where: { id: req.params.clientId, tenantId: res.locals.user.tenantId } });
+
+    res.json(clients);
+});
+
 router.put(`/`, async (req, res, next) => {
     const schema = z.object({
         username: z.string(),
