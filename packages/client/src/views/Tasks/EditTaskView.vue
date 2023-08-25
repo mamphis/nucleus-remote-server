@@ -74,13 +74,13 @@ const deleteTask = async () => {
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Edit Task</h1>
+                <h1>{{ $t('editTask.editTask') }}</h1>
             </div>
         </div>
         <div class="column is-full columns">
             <form @submit.prevent="createNewTask()" class="column is-half">
                 <div class="field">
-                    <label class="label">Name</label>
+                    <label class="label">{{ $t('field.name') }}</label>
                     <div class="control">
                         <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" placeholder="Name"
                             v-model="name" required>
@@ -88,7 +88,7 @@ const deleteTask = async () => {
                     <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
                 </div>
                 <div class="field">
-                    <label class="label" for="">Type</label>
+                    <label class="label" for="">{{ $t('field.type') }}</label>
                     <span class="select">
                         <select v-model="type" disabled>
                             <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label }}</option>
@@ -102,16 +102,18 @@ const deleteTask = async () => {
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:task')">Submit</button>
+                        <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:task')">{{
+                            $t('button.submit') }}</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                        }}</button>
                     </div>
                     <div class="control">
-                        <button type="button" class="button is-danger is-light" @click="deleteTask()" v-if="hasPermission(undefined, 'delete:task')">Delete</button>
+                        <button type="button" class="button is-danger is-light" @click="deleteTask()"
+                            v-if="hasPermission(undefined, 'delete:task')">{{ $t('button.delete') }}</button>
                     </div>
                 </div>
             </form>
         </div>
-    </div>
-</template>
+</div></template>

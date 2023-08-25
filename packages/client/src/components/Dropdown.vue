@@ -16,6 +16,7 @@
 </template>
   
 <script lang="ts" setup>
+import { $t } from '@/lib/locale/locale';
 import { computed, ref, watch } from 'vue';
 
 type KeyValuePair = {
@@ -40,7 +41,7 @@ const props = defineProps(
         placeholder: {
             type: String,
             required: false,
-            default: 'Please select an option',
+            default: $t('dropdown.defaultPlaceholder'),
             note: 'Placeholder of dropdown'
         },
         disabled: {

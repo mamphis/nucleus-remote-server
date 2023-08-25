@@ -1,5 +1,6 @@
 import { settingsStore } from "@/stores/settings";
 import userStore from "@/stores/user";
+import { $t } from "./locale/locale";
 
 type RequestMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -29,11 +30,11 @@ function isErrorResponse(value: unknown): value is ErrorResponse {
 
 function assertNotErrorResponse<T>(value: unknown): asserts value is T {
     if (!value) {
-        throw new Error('value is undefined.');
+        throw new Error($t('request.valueUndefined'));
     }
 
     if (isErrorResponse(value)) {
-        throw new Error('value is an error response: ' + value.message);
+        throw new Error($t('request.errorResponse', value.message));
     }
 }
 

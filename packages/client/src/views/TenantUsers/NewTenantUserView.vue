@@ -68,13 +68,13 @@ const createNewUser = async () => {
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Create New User</h1>
+                <h1>{{ $t('newUser.createNewUser') }}</h1>
             </div>
         </div>
         <div class="column is-full columns">
             <form @submit.prevent="createNewUser()" class="column is-half">
                 <div class="field">
-                    <label class="label">Username</label>
+                    <label class="label">{{ $t('field.username') }}</label>
                     <div class="control">
                         <input :class="{ 'is-danger': !!errors.username }" class="input" type="text" placeholder="Username"
                             v-model="username" @blur="checkUsername(username)" required>
@@ -82,7 +82,7 @@ const createNewUser = async () => {
                     <p v-if="!!errors.username" class="help is-danger">{{ errors.username }}</p>
                 </div>
                 <div class="field">
-                    <label class="label">E-Mail</label>
+                    <label class="label">{{ $t('field.eMail') }}</label>
                     <div class="control">
                         <input :class="{ 'is-danger': !!errors.email }" class="input" type="email" placeholder="E-Mail"
                             v-model="email" required>
@@ -94,10 +94,10 @@ const createNewUser = async () => {
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link">Submit</button>
+                        <button type="submit" class="button is-link">{{ $t('button.submit') }}</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel') }}</button>
                     </div>
                 </div>
             </form>

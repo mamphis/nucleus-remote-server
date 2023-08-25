@@ -3,6 +3,6 @@
 
 <template>
   <main>
-    <h1>Nucleus Remote Server</h1>
+    <h1>{{ $t('home.title') }}</h1>
   </main>
 </template>

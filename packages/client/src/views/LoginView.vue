@@ -18,22 +18,22 @@ const { login } = userStore();
 <template>
     <form
         @submit.prevent="login(username, password).then((response) => { if (!isErrorResponse(response)) { router.push('/') } else { errors.login = response.message; } })">
-        <h1>Login</h1>
+        <h1>{{ $t('login.login') }}</h1>
         <div class="field">
-            <label class="label" for="username">Username</label>
+            <label class="label" for="username">{{ $t('field.username') }}</label>
             <div class="control">
                 <input class="input" type="text" name="username" id="username" v-model="username">
             </div>
         </div>
         <div class="field">
-            <label class="label" for="password">Password</label>
+            <label class="label" for="password">{{ $t('field.password') }}</label>
             <div class="control">
                 <input class="input" type="password" name="password" id="password" v-model="password">
             </div>
         </div>
         <div class="field">
             <p v-if="!!errors.login" class="help is-danger">{{ errors.login }}</p>
-            <button class="button" type="submit">Login</button>
+            <button class="button" type="submit">{{ $t('login.login') }}</button>
         </div>
     </form>
 </template>
