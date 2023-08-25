@@ -34,18 +34,18 @@ const hasUser = computed(() => hasPermission(user.value, ':user'));
       </div>
       <div class="navbar-menu" :class="{ 'is-active': burgerActive }">
         <div class="navbar-start">
-          <RouterLink class="navbar-item" to="/">Home</RouterLink>
-          <RouterLink class="navbar-item" to="/clients" v-if="hasClient">Client</RouterLink>
-          <RouterLink class="navbar-item" to="/configurations" v-if="hasConfiguration">Configuration</RouterLink>
-          <RouterLink class="navbar-item" to="/groups" v-if="hasGroup">Group</RouterLink>
-          <RouterLink class="navbar-item" to="/tenant-users" v-if="hasTenantUser">Tenant User</RouterLink>
-          <RouterLink class="navbar-item" to="/tenants" v-if="hasTenant">Tenant</RouterLink>
-          <RouterLink class="navbar-item" to="/users" v-if="hasUser">User</RouterLink>
+          <RouterLink class="navbar-item" to="/">{{ $t('navbar.home') }}</RouterLink>
+          <RouterLink class="navbar-item" to="/clients" v-if="hasClient">{{ $t('navbar.client') }}</RouterLink>
+          <RouterLink class="navbar-item" to="/configurations" v-if="hasConfiguration">{{ $t('navbar.configuration') }}</RouterLink>
+          <RouterLink class="navbar-item" to="/groups" v-if="hasGroup">{{ $t('navbar.group') }}</RouterLink>
+          <RouterLink class="navbar-item" to="/tenant-users" v-if="hasTenantUser">{{ $t('navbar.tenantUser') }}</RouterLink>
+          <RouterLink class="navbar-item" to="/tenants" v-if="hasTenant">{{ $t('navbar.tenant') }}</RouterLink>
+          <RouterLink class="navbar-item" to="/users" v-if="hasUser">{{ $t('navbar.user') }}</RouterLink>
         </div>
         <div class="navbar-end">
           <div class="navbar-item" v-if="user">{{ user?.username }}</div>
-          <RouterLink v-if="!isLoggedIn" class="navbar-item" to="/login">Login</RouterLink>
-          <RouterLink v-if="isLoggedIn" class="navbar-item" to="/logout">Logout</RouterLink>
+          <RouterLink v-if="!isLoggedIn" class="navbar-item" to="/login">{{ $t('navbar.login') }}</RouterLink>
+          <RouterLink v-if="isLoggedIn" class="navbar-item" to="/logout">{{ $t('navbar.logout') }}</RouterLink>
         </div>
       </div>
     </nav>

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { $t } from '@/lib/locale/locale';
 import { ref, watch } from 'vue';
 
 
@@ -8,13 +9,13 @@ const emits = defineEmits(['update:modelValue'])
 const model = ref(props.modelValue);
 
 const paths: Record<string, string> = {
-    Desktop: 'Desktop',
-    MyDocument: 'My Document',
-    MyMusic: 'My Music',
-    MyPictures: 'My Pictures',
-    MyVideos: 'My Videos',
-    StartMenu: 'Start Menu',
-    Startup: 'Startup',
+    Desktop: $t('specialFolder.Desktop'),
+    MyDocument: $t('specialFolder.MyDocument'),
+    MyMusic: $t('specialFolder.MyMusic'),
+    MyPictures: $t('specialFolder.MyPictures'),
+    MyVideos: $t('specialFolder.MyVideos'),
+    StartMenu: $t('specialFolder.StartMenu'),
+    Startup: $t('specialFolder.Startup'),
 }
 
 watch(model, (value) => { emits('update:modelValue', value) });

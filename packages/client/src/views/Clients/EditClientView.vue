@@ -43,26 +43,26 @@ const deleteClient = async () => {
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full">
-            <h1>Edit Client</h1>
+            <h1>{{ $t('editClient.editClient') }}</h1>
         </div>
         <div class="column is-half">
             <div class="field">
-                <label class="label" for="">Username</label>
+                <label class="label" for="">{{ $t('field.username') }}</label>
                 <input type="text" class="input" v-model="client.username" disabled>
             </div>
 
             <div class="field">
-                <label class="label" for="">Host Name</label>
+                <label class="label" for="">{{ $t('field.hostname') }}</label>
                 <input type="text" class="input" v-model="client.hostname" disabled>
             </div>
 
             <div class="field">
-                <label class="label" for="">OS Version</label>
+                <label class="label" for="">{{ $t('field.osVersion') }}</label>
                 <input type="text" class="input" v-model="client.os" disabled>
             </div>
 
             <div class="field">
-                <label class="label" for="">App Version</label>
+                <label class="label" for="">{{ $t('field.appVersion') }}</label>
                 <input type="text" class="input" v-model="client.appVersion" disabled>
             </div>
         </div>
@@ -70,11 +70,11 @@ const deleteClient = async () => {
             <div class="field">
                 <nav class="panel">
                     <div class="panel-heading is-flex is-align-items-center is-justify-content-space-between">
-                        Tasks
+                        {{ $t('field.tasks') }}
                     </div>
                     <a class="panel-block" v-for="task in tasks" :key="task.id" @click="$router.push(`/tasks/${task.id}`)">
                         <div class="control is-expanded">
-                            (Configuration: {{ task.configuration.name }}) {{ task.name }}
+                            {{ $t('editClient.taskList', task.configuration.name, task.name) }}
                         </div>
                     </a>
                 </nav>
@@ -86,9 +86,9 @@ const deleteClient = async () => {
                 <table class="table is-striped">
                     <thead>
                         <tr>
-                            <th>Level</th>
-                            <th>Message</th>
-                            <th>Timestamp</th>
+                            <th>{{ $t('field.level') }}</th>
+                            <th>{{ $t('field.message') }}</th>
+                            <th>{{ $t('field.timestamp') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -108,11 +108,12 @@ const deleteClient = async () => {
         <div class="column is-full">
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                    <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                    }}</button>
                 </div>
                 <div class="control">
                     <button type="button" class="button is-danger is-light" @click="deleteClient()"
-                        v-if="hasPermission(undefined, 'delete:client')">Delete</button>
+                        v-if="hasPermission(undefined, 'delete:client')">{{ $t('button.delete') }}</button>
                 </div>
             </div>
         </div>

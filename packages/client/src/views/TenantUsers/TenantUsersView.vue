@@ -11,22 +11,22 @@ const users = await request.$get<ApiUser[]>('tenant-users');
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Users</h1>
+                <h1>{{ $t('users.users') }}</h1>
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
                 <button class="button" v-if="hasPermission(user, 'create:tenant-user')"
-                    @click="$router.push('/new-tenant-user')">New
-                    User</button>
+                    @click="$router.push('/new-tenant-user')">
+                    {{ $t('users.newUser') }}</button>
             </div>
         </div>
         <div class="column is-full">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Username</th>
-                        <th>E-Mail</th>
-                        <th>Tenant</th>
-                        <th>Permissions</th>
+                        <th>{{ $t('field.username') }}</th>
+                        <th>{{ $t('field.eMail') }}</th>
+                        <th>{{ $t('field.tenant') }}</th>
+                        <th>{{ $t('field.permissionCount') }}</th>
                     </tr>
                 </thead>
                 <tbody v-if="!isErrorResponse(users)">

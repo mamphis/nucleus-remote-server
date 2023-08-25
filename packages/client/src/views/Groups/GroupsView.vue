@@ -12,20 +12,20 @@ const groups = await request.$get<ApiGroup[]>('groups');
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Groups</h1>
+                <h1>{{ $t('groups.groups') }}</h1>
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
-                <button class="button" v-if="hasPermission(user, 'create:group')" @click="$router.push('/new-group')">New
-                    Group</button>
+                <button class="button" v-if="hasPermission(user, 'create:group')" @click="$router.push('/new-group')">
+                    {{ $t('groups.newGroup') }}</button>
             </div>
         </div>
         <div class="column is-full">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Clients</th>
-                        <th>Configurations</th>
+                        <th>{{ $t('field.name') }}</th>
+                        <th>{{ $t('field.clientCount') }}</th>
+                        <th>{{ $t('field.configurationCount') }}</th>
                     </tr>
                 </thead>
                 <tbody v-if="!isErrorResponse(groups)">

@@ -64,10 +64,10 @@ const createNewTenant = async () => {
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link">Submit</button>
+                        <button type="submit" class="button is-link">{{ $t('button.submit') }}</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel') }}</button>
                     </div>
                 </div>
             </form>

@@ -80,7 +80,7 @@ const deleteConfiguration = async () => {
     if (!isErrorResponse(response)) {
         router.back();
     }
-    
+
     if (isErrorResponse(response)) {
         errors.value.general = response.message;
     }
@@ -90,14 +90,14 @@ const deleteConfiguration = async () => {
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Edit configuration</h1>
+                <h1>{{ $t('editConfiguration.editConfiguration') }}</h1>
             </div>
         </div>
         <form @submit.prevent="updateConfiguration()" class="column is-full">
             <div class="field">
-                <label class="label">Name</label>
+                <label class="label">{{ $t('field.name') }}</label>
                 <div class="control">
-                    <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" placeholder="Name"
+                    <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" :placeholder="$t('field.name')"
                         v-model="configuration.name" required>
                 </div>
                 <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
@@ -106,7 +106,7 @@ const deleteConfiguration = async () => {
             <div class="field">
                 <nav class="panel">
                     <p class="panel-heading">
-                        Groups
+                        {{ $t('field.groups') }}
                     </p>
                     <div class="panel-block">
                         <div class="field has-addons is-flex-grow-1">
@@ -130,14 +130,15 @@ const deleteConfiguration = async () => {
             <div class="field">
                 <nav class="panel">
                     <div class="panel-heading is-flex is-align-items-center is-justify-content-space-between">
-                        Tasks
+                        {{ $t('field.tasks') }}
                         <div class="control">
                             <a class="button is-info is-small" @click="$router.push(`/new-task/${configuration.id}`)">
-                                Add Task
+                                {{ $t('editConfiguration.newTask') }}
                             </a>
                         </div>
                     </div>
-                    <a class="panel-block" v-for="task in configuration.task" :key="task.id" @click.self="$router.push(`/tasks/${task.id}`)">
+                    <a class="panel-block" v-for="task in configuration.task" :key="task.id"
+                        @click.self="$router.push(`/tasks/${task.id}`)">
                         <div class="control is-expanded">
                             {{ task?.name }}
                         </div>
@@ -153,13 +154,16 @@ const deleteConfiguration = async () => {
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:configuration')">Submit</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:configuration')">{{
+                        $t('button.submit') }}</button>
                 </div>
                 <div class="control">
-                    <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                    <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                    }}</button>
                 </div>
                 <div class="control">
-                    <button type="button" class="button is-danger is-light" @click="deleteConfiguration()" v-if="hasPermission(undefined, 'delete:configuration')">Delete</button>
+                    <button type="button" class="button is-danger is-light" @click="deleteConfiguration()"
+                        v-if="hasPermission(undefined, 'delete:configuration')">{{ $t('button.delete') }}</button>
                 </div>
             </div>
         </form>
@@ -169,5 +173,4 @@ const deleteConfiguration = async () => {
 <style>
 button:focus {
     color: yellowgreen;
-}
-</style>
+}</style>

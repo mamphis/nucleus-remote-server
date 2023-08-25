@@ -25,13 +25,13 @@ watch(content, (newValue) => {
 
 <template>
     <div class="field">
-        <label class="label" for="">Path</label>
+        <label class="label" for="">{{ $t('deleteTask.path') }}</label>
         <input class="input" v-model="content.Path" required />
     </div>
     <div class="field">
         <label class="checkbox" for="">
             <input class="checkbox" type="checkbox" v-model="content.Recursive" />
-            Recursive
+            {{ $t('deleteTask.recursive') }}
         </label>
     </div>
 </template>

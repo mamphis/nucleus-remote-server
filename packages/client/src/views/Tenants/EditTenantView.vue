@@ -74,13 +74,13 @@ const deleteTenant = async () => {
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:tenant')">Submit</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:tenant')">{{ $t('button.submit') }}</button>
                 </div>
                 <div class="control">
-                    <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                    <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel') }}</button>
                 </div>
                 <div class="control">
-                    <button type="button" class="button is-danger is-light" @click="deleteTenant()" v-if="hasPermission(undefined, 'delete:tenant')">Delete</button>
+                    <button type="button" class="button is-danger is-light" @click="deleteTenant()" v-if="hasPermission(undefined, 'delete:tenant')">{{ $t('button.delete') }}</button>
                 </div>
             </div>
         </form>

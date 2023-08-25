@@ -55,19 +55,19 @@ const permissions = [
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full">
-            <h1>Edit User</h1>
+            <h1>{{ $t('editUser.editUser') }}</h1>
         </div>
         <form @submit.prevent="updateUser(user);" class="column is-full" v-if="!isErrorResponse(user)">
             <div class="field">
-                <label class="label" for="">Username</label>
+                <label class="label" for="">{{ $t('field.username') }}</label>
                 <input type="text" class="input" v-model="user.username" disabled>
             </div>
             <div class="field">
-                <label class="label" for="">E-Mail</label>
+                <label class="label" for="">{{ $t('field.eMail') }}</label>
                 <input type="email" class="input" v-model="user.email">
             </div>
             <div class="field">
-                <h2>Permissions</h2>
+                <h2>{{ $t('field.permissions') }}</h2>
                 <div class="columns is-multiline">
                     <div class="column is-narrow" v-for="permission in permissions" :key="permission">
                         <Permission scope="tenant-user" :user="user" :permission="permission" />
@@ -79,13 +79,16 @@ const permissions = [
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:tenant-user')">Submit</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:tenant-user')">{{
+                        $t('button.submit') }}</button>
                 </div>
                 <div class="control">
-                    <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                    <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                    }}</button>
                 </div>
                 <div class="control">
-                    <button type="button" class="button is-danger is-light" @click="deleteTenantUser()" v-if="hasPermission(undefined, 'delete:tenant-user')">Delete</button>
+                    <button type="button" class="button is-danger is-light" @click="deleteTenantUser()"
+                        v-if="hasPermission(undefined, 'delete:tenant-user')">{{ $t('button.delete') }}</button>
                 </div>
             </div>
         </form>
@@ -95,5 +98,4 @@ const permissions = [
 <style scoped>
 .column {
     margin-right: 50px;
-}
-</style>
+}</style>
