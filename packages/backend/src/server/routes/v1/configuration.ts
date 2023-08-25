@@ -85,6 +85,11 @@ router.patch('/:configurationId', auth('update:configuration'), async (req, res:
                 id: z.string(),
             }),
         ),
+        task: z.array(
+            z.object({
+                id: z.string(),
+            }),
+        ),
     });
 
     try {
@@ -99,6 +104,9 @@ router.patch('/:configurationId', auth('update:configuration'), async (req, res:
                 name: configurationData.name,
                 group: {
                     set: configurationData.group
+                },
+                task: {
+                    set: configurationData.task,
                 }
             }
         });

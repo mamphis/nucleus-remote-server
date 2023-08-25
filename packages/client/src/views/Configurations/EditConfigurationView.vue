@@ -68,7 +68,9 @@ const removeSelectedGroup = (group?: { id: string }) => {
 }
 
 const removeSelectedTask = (task?: { id: string }) => {
-
+    if (task) {
+        configuration.value.task = configuration.value.task.filter(t => t.id !== task.id);
+    }
 }
 </script>
 <template>
@@ -122,11 +124,11 @@ const removeSelectedTask = (task?: { id: string }) => {
                             </a>
                         </div>
                     </div>
-                    <a class="panel-block" v-for="task in configuration.task" :key="task.id" @click="$router.push(`/tasks/${task.id}`)">
+                    <a class="panel-block" v-for="task in configuration.task" :key="task.id" @click.self="$router.push(`/tasks/${task.id}`)">
                         <div class="control is-expanded">
                             {{ task?.name }}
                         </div>
-                        <button class="button is-danger is-small" tabindex="-1" @mousedown="removeSelectedTask(task)">
+                        <button class="button is-danger is-small" tabindex="-1" @mousedown.stop="removeSelectedTask(task)">
                             x
                         </button>
                     </a>

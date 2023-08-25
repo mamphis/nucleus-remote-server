@@ -127,7 +127,8 @@ router.get('/:clientId/logs', auth('read:client'), async (req, res, next) => {
             },
             orderBy: {
                 timestamp: 'desc'
-            }
+            },
+            take: 20
         });
 
         return res.json(clientLog);
