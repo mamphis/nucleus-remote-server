@@ -41,6 +41,7 @@ const updateTenant = async (tenant: ApiTenant) => {
 }
 
 const deleteTenant = async () => {
+    clearError();
     const response = await request.$delete(`tenants/${tenantId}`);
     if (!isErrorResponse(response)) {
         router.back();

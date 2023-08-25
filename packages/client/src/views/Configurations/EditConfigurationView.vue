@@ -75,6 +75,7 @@ const removeSelectedTask = (task?: { id: string }) => {
 }
 
 const deleteConfiguration = async () => {
+    clearError();
     const response = await request.$delete(`configurations/${configurationId}`);
     if (!isErrorResponse(response)) {
         router.back();

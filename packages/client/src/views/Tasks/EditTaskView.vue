@@ -59,6 +59,7 @@ const createNewTask = async () => {
 }
 
 const deleteTask = async () => {
+    clearError();
     const response = await request.$delete(`tasks/${taskId}`);
     if (!isErrorResponse(response)) {
         router.back();
