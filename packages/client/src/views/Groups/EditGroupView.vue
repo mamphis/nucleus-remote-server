@@ -88,6 +88,7 @@ const removeSelectedClient = (client?: { id: string }) => {
 } 
 
 const deleteGroup = async () => {
+    clearError();
     const response = await request.$delete(`groups/${groupId}`);
     if (!isErrorResponse(response)) {
         router.back();

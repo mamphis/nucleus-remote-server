@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Permission from '@/components/Permission.vue';
+import { hasPermission } from '@/lib/permission';
 import request, { assertNotErrorResponse, isErrorResponse } from '@/lib/request';
 import { formatDate } from '@/lib/utils';
 import router from '@/router';
@@ -16,6 +17,27 @@ assertNotErrorResponse<ApiClient>(client);
 assertNotErrorResponse<ApiTask[]>(tasks);
 assertNotErrorResponse<ApiClientLog[]>(logs);
 
+const errors = ref<{
+    general: string,
+}>({
+    general: '',
+});
+
+const clearError = () => {
+    errors.value.general = '';
+}
+
+const deleteClient = async () => {
+    clearError();
+    const response = await request.$delete(`configurations/${clientId}`);
+    if (!isErrorResponse(response)) {
+        router.back();
+    }
+
+    if (isErrorResponse(response)) {
+        errors.value.general = response.message;
+    }
+}
 </script>
 
 <template>
@@ -33,12 +55,12 @@ assertNotErrorResponse<ApiClientLog[]>(logs);
                 <label class="label" for="">Host Name</label>
                 <input type="text" class="input" v-model="client.hostname" disabled>
             </div>
-            
+
             <div class="field">
                 <label class="label" for="">OS Version</label>
                 <input type="text" class="input" v-model="client.os" disabled>
             </div>
-            
+
             <div class="field">
                 <label class="label" for="">App Version</label>
                 <input type="text" class="input" v-model="client.appVersion" disabled>
@@ -50,47 +72,51 @@ assertNotErrorResponse<ApiClientLog[]>(logs);
                     <div class="panel-heading is-flex is-align-items-center is-justify-content-space-between">
                         Tasks
                     </div>
-                    <a class="panel-block" v-for="task in tasks" :key="task.id"
-                        @click="$router.push(`/tasks/${task.id}`)">
+                    <a class="panel-block" v-for="task in tasks" :key="task.id" @click="$router.push(`/tasks/${task.id}`)">
                         <div class="control is-expanded">
-                            (Configuration: {{ task.configuration.name }}) {{ task.name }} 
+                            (Configuration: {{ task.configuration.name }}) {{ task.name }}
                         </div>
                     </a>
                 </nav>
             </div>
         </div>
-        
+
         <div class="column is-full">
             <div class="field is-grouped">
-               <table class="table is-striped">
-                <thead>
-                    <tr>
-                        <th>Level</th>
-                        <th>Message</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="log in logs" :key="log.id">
-                        <td>{{ log.level }}</td>
-                        <td>{{ log.message }}</td>
-                        <td>{{ formatDate(log.timestamp) }}</td>
-                    </tr>
-                </tbody>
-               </table>
+                <table class="table is-striped">
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Message</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="log in logs" :key="log.id">
+                            <td>{{ log.level }}</td>
+                            <td>{{ log.message }}</td>
+                            <td>{{ formatDate(log.timestamp) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
+        <div class="field">
+            <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
+        </div>
         <div class="column is-full">
             <div class="field is-grouped">
                 <div class="control">
                     <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                </div>
+                <div class="control">
+                    <button type="button" class="button is-danger is-light" @click="deleteClient()"
+                        v-if="hasPermission(undefined, 'delete:client')">Delete</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

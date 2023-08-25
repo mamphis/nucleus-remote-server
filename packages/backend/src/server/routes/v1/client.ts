@@ -104,6 +104,7 @@ router.get('/:clientId/tasks', async (req, res, next) => {
 router.post('/:clientId/logs', async (req, res, next) => {
     const schema = z.object({
         message: z.string(),
+        level: z.string(),
     });
 
     try {

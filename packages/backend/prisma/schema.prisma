@@ -28,7 +28,7 @@ model Client {
   hostname   String
   lastPing   DateTime
 
-  tenant    Tenant      @relation(fields: [tenantId], references: [id])
+  tenant    Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tenantId  String
   group     Group[]
   clientLog ClientLog[]
@@ -40,7 +40,7 @@ model Group {
 
   client        Client[]
   configuration Configuration[]
-  tenant        Tenant?         @relation(fields: [tenantId], references: [id])
+  tenant        Tenant?         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tenantId      String?
 }
 
@@ -50,7 +50,7 @@ model Configuration {
 
   group    Group[]
   task     Task[]
-  tenant   Tenant? @relation(fields: [tenantId], references: [id])
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tenantId String?
 }
 
@@ -60,9 +60,9 @@ model Task {
   type    String
   content String
 
-  configuration   Configuration? @relation(fields: [configurationId], references: [id])
+  configuration   Configuration? @relation(fields: [configurationId], references: [id], onDelete: Cascade)
   configurationId String?
-  tenant          Tenant?        @relation(fields: [tenantId], references: [id])
+  tenant          Tenant?        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tenantId        String?
 }
 
@@ -74,7 +74,7 @@ model User {
   onetimePassword String @default("")
 
   tenantId   String
-  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  tenant     Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   permission Permission[]
 }
 
@@ -90,6 +90,6 @@ model ClientLog {
   message   String
   timestamp DateTime @default(now())
 
-  client   Client @relation(fields: [clientId], references: [id])
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId String
 }

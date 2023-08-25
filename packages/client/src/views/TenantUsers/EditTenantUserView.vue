@@ -32,6 +32,7 @@ const updateUser = async (user: ApiUser) => {
 }
 
 const deleteTenantUser = async () => {
+    clearError();
     const response = await request.$delete(`tenant-users/${userId}`);
     if (!isErrorResponse(response)) {
         router.back();
