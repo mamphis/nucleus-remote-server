@@ -58,10 +58,10 @@ const createNewTask = async () => {
 }
 </script>
 <template>
-    <div class="columns is-flex-grow-1 is-multiline">
+    <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Create New Task</h1>
+                <h1>Edit Task</h1>
             </div>
         </div>
         <div class="column is-full columns">

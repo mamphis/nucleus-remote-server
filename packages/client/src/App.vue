@@ -59,7 +59,7 @@ const hasUser = computed(() => hasPermission(user.value, ':user'));
 
 <style scoped>
 header {
-  min-height: 64px;
+  min-height: var(--header-height);
   display: flex;
   align-items: center;
 }
@@ -91,7 +91,9 @@ nav a.nav-end {
 }
 
 .content {
-  height: 100%;
+  height: calc(100% - var(--header-height));
   display: flex;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 </style>

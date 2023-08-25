@@ -1,9 +1,17 @@
 body,
 html {
-    overflow-y: hidden !important;
     height: 100%;
 }
 
 .container {
     max-width: 90%;
+    height: 100%;
+}
+
+.is-h-100 {
+    height: 100%;
+}
+
+:root {
+    --header-height: 64px;
 }

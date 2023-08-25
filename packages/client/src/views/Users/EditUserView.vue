@@ -45,7 +45,7 @@ const permissions = [
 </script>
 
 <template>
-    <div class="columns is-multiline">
+    <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full">
             <h1>Edit User</h1>
         </div>
