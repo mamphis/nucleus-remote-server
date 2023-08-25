@@ -86,7 +86,7 @@ router.delete('/:id', auth('delete:tenant'), async (req, res: AuthResponse, next
         where: {
             id: req.params.id,
         }
-    });
+    }).catch(() => {});;
 
     res.status(201).end();
 });

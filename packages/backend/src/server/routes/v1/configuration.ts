@@ -43,7 +43,7 @@ router.delete('/:id', auth('delete:configuration'), async (req, res: AuthRespons
             id: req.params.id,
             tenantId: res.locals.user.tenantId,
         }
-    });
+    }).catch(() => {});;
 
     res.status(201).end();
 });

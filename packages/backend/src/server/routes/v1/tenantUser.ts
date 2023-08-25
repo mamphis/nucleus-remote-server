@@ -57,7 +57,7 @@ router.delete('/:id', auth('delete:user'), async (req, res: AuthResponse, next) 
             id: req.params.id,
             tenantId: res.locals.user.tenantId,
         }
-    });
+    }).catch(() => {});;
 
     res.status(201).end();
 });
