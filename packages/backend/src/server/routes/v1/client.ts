@@ -77,6 +77,13 @@ router.get('/:clientId/tasks', async (req, res, next) => {
                     }
                 }
             }
+        },
+        select: {
+            configuration: true,
+            id: true,
+            name: true,
+            type: true,
+            content: true,
         }
     });
 
