@@ -29,7 +29,7 @@ const clearError = () => {
 
 const deleteClient = async () => {
     clearError();
-    const response = await request.$delete(`configurations/${clientId}`);
+    const response = await request.$delete(`clients/${clientId}`);
     if (!isErrorResponse(response)) {
         router.back();
     }
