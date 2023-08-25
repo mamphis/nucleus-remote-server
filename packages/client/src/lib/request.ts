@@ -69,6 +69,7 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
 
     const response = await fetch(new URL(normalizeApiRoute(apiRoute), baseApiUrl), requestInit);
     if (!response.ok) {
+
         const errorResponse = await response.json();
         if (isErrorResponse(errorResponse)) {
             return errorResponse;
@@ -81,6 +82,10 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
         };
     }
 
+    if (response.status === 201) {
+        return undefined as T;
+    }
+    
     const result = response.json();
     return result as T;
 };
@@ -90,7 +95,7 @@ export default {
     $post: <T>(apiRoute: string, body: any) => request<T>('POST', apiRoute, body),
     $patch: <T>(apiRoute: string, body: any) => request<T>('PATCH', apiRoute, body),
     $put: <T>(apiRoute: string, body: any) => request<T>('PUT', apiRoute, body),
-    $delete: <T>(apiRoute: string) => request<T>('DELETE', apiRoute),
+    $delete: (apiRoute: string) => request<undefined>('DELETE', apiRoute),
 };
 
 export {

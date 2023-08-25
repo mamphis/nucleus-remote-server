@@ -37,6 +37,17 @@ router.get('/:configurationId', auth('read:configuration'), async (req, res: Aut
     return res.json(configuration);
 });
 
+router.delete('/:id', auth('delete:configuration'), async (req, res: AuthResponse, next) => {
+    await db.configuration.delete({
+        where: {
+            id: req.params.id,
+            tenantId: res.locals.user.tenantId,
+        }
+    });
+
+    res.status(201).end();
+});
+
 router.get('/:configurationId/groups', auth('read:configuration', 'read:group'), async (req, res: AuthResponse, next) => {
     const groups = await db.group.findMany({
         where: { tenantId: res.locals.user.tenantId, configuration: { some: { id: req.params.configurationId } } }, select: {

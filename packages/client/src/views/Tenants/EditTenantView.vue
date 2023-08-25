@@ -3,6 +3,7 @@ import router from '@/router';
 import type { ApiTenant } from '@/types/tenant';
 import { ref } from 'vue';
 import request, { isErrorResponse, isValidationError } from '../../lib/request';
+import { hasPermission } from '@/lib/permission';
 
 const { tenantId } = router.currentRoute.value.params;
 const tenant = await request.$get<ApiTenant>(`tenants/${tenantId}`);
@@ -38,6 +39,17 @@ const updateTenant = async (tenant: ApiTenant) => {
         }
     }
 }
+
+const deleteTenant = async () => {
+    const response = await request.$delete(`tenants/${tenantId}`);
+    if (!isErrorResponse(response)) {
+        router.back();
+    }
+    
+    if (isErrorResponse(response)) {
+        errors.value.general = response.message;
+    }
+}
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
@@ -61,10 +73,13 @@ const updateTenant = async (tenant: ApiTenant) => {
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link">Submit</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:tenant')">Submit</button>
                 </div>
                 <div class="control">
                     <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                </div>
+                <div class="control">
+                    <button type="button" class="button is-danger is-light" @click="deleteTenant()" v-if="hasPermission(undefined, 'delete:tenant')">Delete</button>
                 </div>
             </div>
         </form>

@@ -71,7 +71,7 @@ const router = createRouter({
             component: EditUserView,
             meta: {
                 authorized: true,
-                permissions: ['update:user']
+                permissions: ['read:user']
             }
         },
         {
@@ -103,7 +103,7 @@ const router = createRouter({
             component: EditTenantView,
             meta: {
                 authorized: true,
-                permissions: ['update:tenant']
+                permissions: ['read:tenant']
             }
         },
         {
@@ -130,7 +130,7 @@ const router = createRouter({
             component: EditTenantUserView,
             meta: {
                 authorized: true,
-                permissions: ['update:tenant-user']
+                permissions: ['read:tenant-user']
             }
         },
         {
@@ -157,7 +157,7 @@ const router = createRouter({
             component: EditGroupView,
             meta: {
                 authorized: true,
-                permissions: ['update:group']
+                permissions: ['read:group']
             }
         },
         {
@@ -184,7 +184,7 @@ const router = createRouter({
             component: EditConfigurationView,
             meta: {
                 authorized: true,
-                permissions: ['update:configuration']
+                permissions: ['read:configuration']
             }
         },
         {
@@ -220,7 +220,7 @@ const router = createRouter({
             component: EditTaskView,
             meta: {
                 authorized: true,
-                permissions: ['update:task'],
+                permissions: ['read:task'],
             }
         },
     ]

@@ -37,6 +37,17 @@ router.get('/:groupId', auth('read:group'), async (req, res: AuthResponse, next)
     return res.json(group);
 });
 
+router.delete('/:id', auth('delete:group'), async (req, res: AuthResponse, next) => {
+    await db.group.delete({
+        where: {
+            id: req.params.id,
+            tenantId: res.locals.user.tenantId,
+        }
+    });
+
+    res.status(201).end();
+});
+
 router.post('/', auth('create:group'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         name: z.string(),

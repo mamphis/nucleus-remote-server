@@ -4,6 +4,7 @@ import router from '@/router';
 import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
 import { typeMap } from './tasks';
+import { hasPermission } from '@/lib/permission';
 
 const { taskId } = router.currentRoute.value.params;
 
@@ -56,6 +57,17 @@ const createNewTask = async () => {
         }
     }
 }
+
+const deleteTask = async () => {
+    const response = await request.$delete(`tasks/${taskId}`);
+    if (!isErrorResponse(response)) {
+        router.back();
+    }
+
+    if (isErrorResponse(response)) {
+        errors.value.general = response.message;
+    }
+}
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
@@ -89,10 +101,13 @@ const createNewTask = async () => {
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link">Submit</button>
+                        <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:task')">Submit</button>
                     </div>
                     <div class="control">
                         <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                    </div>
+                    <div class="control">
+                        <button type="button" class="button is-danger is-light" @click="deleteTask()" v-if="hasPermission(undefined, 'delete:task')">Delete</button>
                     </div>
                 </div>
             </form>

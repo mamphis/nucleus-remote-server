@@ -1,3 +1,4 @@
+import userStore from "@/stores/user";
 import type { ApiUser, AuthUser } from "@/types/user";
 
 
@@ -10,9 +11,15 @@ function getPermissions(user: AuthUser | ApiUser): string[] {
 }
 
 export function hasPermission(user?: AuthUser | ApiUser, ...requiredPermissions: string[]) {
-    if (!user) {
-        return false;
+    let u = user;
+    if (!u) {
+        const { user } = userStore();
+        if (!user) {
+            return false;
+        }
+        u = user;
     }
-
-    return requiredPermissions.every(p => getPermissions(user).some(up => up.endsWith(p)));
+    
+    const userToCheck = u;
+    return requiredPermissions.every(p => getPermissions(userToCheck).some(up => up.endsWith(p)));
 }

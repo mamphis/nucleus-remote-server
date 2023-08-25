@@ -21,6 +21,17 @@ router.get('/:clientId', auth('read:client'), async (req, res: AuthResponse, nex
     res.json(clients);
 });
 
+router.delete('/:id', auth('delete:client'), async (req, res: AuthResponse, next) => {
+    await db.client.delete({
+        where: {
+            id: req.params.id,
+            tenantId: res.locals.user.tenantId,
+        }
+    });
+
+    res.status(201).end();
+});
+
 router.put(`/`, async (req, res, next) => {
     const schema = z.object({
         username: z.string(),

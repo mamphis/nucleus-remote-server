@@ -19,7 +19,7 @@ let debounce: number | undefined = undefined;
 
 watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate, oRead, oUpdate, oDelete]) => {
     if (nCreate) {
-        del.value = true;
+        update.value = true;
     }
 
     if (nDelete) {
@@ -69,13 +69,13 @@ watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate
         </div>
         <div class="control">
             <label class="checkbox">
-                <input v-model="del" type="checkbox" :disabled="create">
+                <input v-model="del" type="checkbox">
                 Delete
             </label>
         </div>
         <div class="control">
             <label class="checkbox">
-                <input v-model="update" type="checkbox" :disabled="del">
+                <input v-model="update" type="checkbox" :disabled="del || create">
                 Update
             </label>
         </div>
