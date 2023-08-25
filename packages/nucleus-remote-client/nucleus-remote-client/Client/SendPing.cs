@@ -13,20 +13,20 @@ namespace nucleus_remote_client.Client
     {
         public SendPing()
         {
-            
+
         }
 
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
             HttpClient client = new()
             {
-                BaseAddress = new Uri(hostSettings.BaseUrl),
+                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
             };
 
-            var appVersion = (AssemblyInformationalVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false).FirstOrDefault();
+            var appVersion = (AssemblyInformationalVersionAttribute?)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false).FirstOrDefault();
             var versionRegex = new Regex(@"\d+\.\d+\.\d+\+[a-f0-9]{8}");
 
-            var response = await client.PutAsJsonAsync("clients", new
+            var _response = await client.PutAsJsonAsync("clients", new
             {
                 username = Environment.UserName,
                 os = Environment.OSVersion.VersionString,
@@ -35,9 +35,6 @@ namespace nucleus_remote_client.Client
                 tenantId = hostSettings.TenantId,
                 id = hostSettings.Id
             });
-
-            Console.WriteLine(response.StatusCode);
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
         }
     }
 }

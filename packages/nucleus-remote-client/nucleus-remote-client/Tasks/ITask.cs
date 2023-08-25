@@ -8,5 +8,6 @@ namespace nucleus_remote_client.Tasks
 {
     internal interface ITask
     {
+        Task Run(HostSettings hostSettings);
     }
 }
