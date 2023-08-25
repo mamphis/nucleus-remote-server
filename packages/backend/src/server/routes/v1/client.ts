@@ -90,4 +90,58 @@ router.get('/:clientId/tasks', async (req, res, next) => {
     return res.json(tasks);
 });
 
+router.post('/:clientId/logs', async (req, res, next) => {
+    const schema = z.object({
+        message: z.string(),
+    });
+
+    try {
+        const clientData = schema.parse(req.body);
+
+        const clientLog = await db.clientLog.create({
+            data: {
+                ...clientData,
+                clientId: req.params.clientId
+            }
+        });
+
+        return res.json(clientLog);
+    } catch (e: unknown) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            return next(UnprocessableEntity(e.message));
+        }
+
+        if (e instanceof ZodError) {
+            return next(e);
+        }
+
+        return next(e);
+    }
+});
+
+router.get('/:clientId/logs', auth('read:client'), async (req, res, next) => {
+    try {
+        const clientLog = await db.clientLog.findMany({
+            where: {
+                clientId: req.params.clientId
+            },
+            orderBy: {
+                timestamp: 'desc'
+            }
+        });
+
+        return res.json(clientLog);
+    } catch (e: unknown) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            return next(UnprocessableEntity(e.message));
+        }
+
+        if (e instanceof ZodError) {
+            return next(e);
+        }
+
+        return next(e);
+    }
+});
+
 export default router;

@@ -28,9 +28,10 @@ model Client {
   hostname   String
   lastPing   DateTime
 
-  tenant   Tenant  @relation(fields: [tenantId], references: [id])
-  tenantId String
-  group    Group[]
+  tenant    Tenant      @relation(fields: [tenantId], references: [id])
+  tenantId  String
+  group     Group[]
+  clientLog ClientLog[]
 }
 
 model Group {
@@ -81,4 +82,14 @@ model Permission {
   scope String @id
 
   user User[]
+}
+
+model ClientLog {
+  id        Int      @id @default(autoincrement())
+  level     String   @default("info")
+  message   String
+  timestamp DateTime @default(now())
+
+  client   Client @relation(fields: [clientId], references: [id])
+  clientId String
 }

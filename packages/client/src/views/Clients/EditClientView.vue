@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import Permission from '@/components/Permission.vue';
 import request, { assertNotErrorResponse, isErrorResponse } from '@/lib/request';
+import { formatDate } from '@/lib/utils';
 import router from '@/router';
 import type { ApiClient } from '@/types/client';
+import type { ApiClientLog } from '@/types/clientLog';
 import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
 
 const { clientId } = router.currentRoute.value.params;
 const client = await request.$get<ApiClient>(`clients/${clientId}`);
 const tasks = await request.$get<ApiTask[]>(`clients/${clientId}/tasks`);
+const logs = await request.$get<ApiClientLog[]>(`clients/${clientId}/logs`);
 assertNotErrorResponse<ApiClient>(client);
 assertNotErrorResponse<ApiTask[]>(tasks);
+assertNotErrorResponse<ApiClientLog[]>(logs);
 
 </script>
 
@@ -55,6 +59,28 @@ assertNotErrorResponse<ApiTask[]>(tasks);
                 </nav>
             </div>
         </div>
+        
+        <div class="column is-full">
+            <div class="field is-grouped">
+               <table class="table is-striped">
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Message</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="log in logs" :key="log.id">
+                        <td>{{ log.level }}</td>
+                        <td>{{ log.message }}</td>
+                        <td>{{ formatDate(log.timestamp) }}</td>
+                    </tr>
+                </tbody>
+               </table>
+            </div>
+        </div>
+
         <div class="column is-full">
             <div class="field is-grouped">
                 <div class="control">
