@@ -9,9 +9,9 @@ namespace nucleus_remote_client.Tasks
 {
     internal class TaskContainer
     {
- internal string        id      {get;set;}
- internal string name   {get;set;}
- internal string type    {get;set;}
- internal string content {get;set;}
+        public string? id { get; set; }
+        public string? name { get; set; }
+        public string? type { get; set; }
+        public string? content { get; set; }
     }
 }

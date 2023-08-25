@@ -13,17 +13,17 @@ namespace nucleus_remote_client.Client
     {
         public SendPing()
         {
-            
+
         }
 
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
             HttpClient client = new()
             {
-                BaseAddress = new Uri(hostSettings.BaseUrl),
+                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
             };
 
-            var appVersion = (AssemblyInformationalVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false).FirstOrDefault();
+            var appVersion = (AssemblyInformationalVersionAttribute?)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false).FirstOrDefault();
             var versionRegex = new Regex(@"\d+\.\d+\.\d+\+[a-f0-9]{8}");
 
             var response = await client.PutAsJsonAsync("clients", new

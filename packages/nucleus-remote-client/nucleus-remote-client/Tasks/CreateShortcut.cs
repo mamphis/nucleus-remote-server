@@ -9,24 +9,26 @@ namespace nucleus_remote_client.Tasks
 {
     internal class CreateShortcut : ITask
     {
-        /*var options = new JsonSerializerOptions
-{
-    PropertyNameCaseInsensitive = true
-};*/
-        public Environment.SpecialFolder LinkDirectory { get; set; }
-        public string LinkName { get; set; }
-        public string TargetPath { get; set; }
+        public string? LinkDirectory { get; set; }
+        public string? LinkName { get; set; }
+        public string? TargetPath { get; set; }
         public string? Arguments { get; set; }
         public string? WorkingDirectory { get; set; }
         public bool OverrideExisting { get; set; }
 
-        internal async Task Run()
+        public Task Run(HostSettings hostSettings)
         {
-            var path = Path.Join(Environment.GetFolderPath(LinkDirectory), LinkName + ".lnk");
+            if (this.LinkDirectory == null)
+            {
+                throw new Exception("Invalid Link Directory. Cannot create shortcut.");
+            }
+            var specialFolder = Enum.Parse<Environment.SpecialFolder>(this.LinkDirectory);
+
+            var path = Path.Join(Environment.GetFolderPath(specialFolder), LinkName + ".lnk");
 
             if (System.IO.File.Exists(path) && !OverrideExisting)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (System.IO.File.Exists(path))
@@ -37,7 +39,8 @@ namespace nucleus_remote_client.Tasks
             WshShell wshShell = new WshShell();
             IWshShortcut wshShortcut = wshShell.CreateShortcut(path);
             wshShortcut.TargetPath = TargetPath;
-            if (Arguments != null) { 
+            if (Arguments != null)
+            {
                 wshShortcut.Arguments = Arguments;
             }
 
@@ -47,6 +50,7 @@ namespace nucleus_remote_client.Tasks
             }
 
             wshShortcut.Save();
+            return Task.CompletedTask;
         }
     }
 }
