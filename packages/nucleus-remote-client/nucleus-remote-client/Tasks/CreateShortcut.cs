@@ -22,9 +22,9 @@ namespace nucleus_remote_client.Tasks
             {
                 throw new Exception("Invalid Link Directory. Cannot create shortcut.");
             }
-            var specialFolder = Enum.Parse<Environment.SpecialFolder>(this.LinkDirectory);
 
-            var path = Path.Join(Environment.GetFolderPath(specialFolder), LinkName + ".lnk");
+            var dirPath = PathHelper.GetPath(LinkDirectory);
+            var path = Path.Join(dirPath, LinkName + ".lnk");
 
             if (System.IO.File.Exists(path) && !OverrideExisting)
             {

@@ -18,6 +18,8 @@ namespace nucleus_remote_client.Client
         }
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
+            Console.WriteLine($"> {this.Message}");
+
             HttpClient client = new()
             {
                 BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
@@ -27,6 +29,7 @@ namespace nucleus_remote_client.Client
             {
                 message = this.Message,
             });
+
         }
     }
 }

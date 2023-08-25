@@ -23,15 +23,12 @@ namespace nucleus_remote_client.Client
                 BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
             };
 
-            var appVersion = (AssemblyInformationalVersionAttribute?)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false).FirstOrDefault();
-            var versionRegex = new Regex(@"\d+\.\d+\.\d+\+[a-f0-9]{8}");
-
             var _response = await client.PutAsJsonAsync("clients", new
             {
                 username = Environment.UserName,
                 os = Environment.OSVersion.VersionString,
                 hostname = Environment.MachineName,
-                appVersion = versionRegex.Match(appVersion?.InformationalVersion ?? "0.0.0+00000000").Value,
+                appVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0.0",
                 tenantId = hostSettings.TenantId,
                 id = hostSettings.Id
             });
