@@ -6,6 +6,7 @@ import request, { assertNotErrorResponse, isErrorResponse, isValidationError } f
 import type { ApiConfiguration } from '@/types/configuration';
 import Dropdown from '@/components/Dropdown.vue';
 import type { ApiClient } from '@/types/client';
+import { hasPermission } from '@/lib/permission';
 
 const { groupId } = router.currentRoute.value.params;
 const grp = await request.$get<ApiGroup>(`groups/${groupId}`);
@@ -85,6 +86,17 @@ const removeSelectedClient = (client?: { id: string }) => {
         group.value.client = group.value.client.filter(c => c.id !== client.id);
     }
 } 
+
+const deleteGroup = async () => {
+    const response = await request.$delete(`groups/${groupId}`);
+    if (!isErrorResponse(response)) {
+        router.back();
+    }
+    
+    if (isErrorResponse(response)) {
+        errors.value.general = response.message;
+    }
+}
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
@@ -156,10 +168,13 @@ const removeSelectedClient = (client?: { id: string }) => {
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link">Submit</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:group')">Submit</button>
                 </div>
                 <div class="control">
                     <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                </div>
+                <div class="control">
+                    <button type="button" class="button is-danger is-light" @click="deleteGroup()" v-if="hasPermission(undefined, 'delete:group')">Delete</button>
                 </div>
             </div>
         </form>

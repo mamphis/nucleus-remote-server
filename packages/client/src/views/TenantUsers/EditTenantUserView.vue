@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Permission from '@/components/Permission.vue';
+import { hasPermission } from '@/lib/permission';
 import request, { isErrorResponse } from '@/lib/request';
 import router from '@/router';
 import type { ApiUser } from '@/types/user';
@@ -24,6 +25,17 @@ const updateUser = async (user: ApiUser) => {
     const response = await request.$patch<ApiUser>(`tenant-users/${userId}`, {
         email: user.email,
     });
+
+    if (isErrorResponse(response)) {
+        errors.value.general = response.message;
+    }
+}
+
+const deleteTenantUser = async () => {
+    const response = await request.$delete(`tenant-users/${userId}`);
+    if (!isErrorResponse(response)) {
+        router.back();
+    }
 
     if (isErrorResponse(response)) {
         errors.value.general = response.message;
@@ -66,10 +78,13 @@ const permissions = [
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link">Submit</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:tenant-user')">Submit</button>
                 </div>
                 <div class="control">
                     <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                </div>
+                <div class="control">
+                    <button type="button" class="button is-danger is-light" @click="deleteTenantUser()" v-if="hasPermission(undefined, 'delete:tenant-user')">Delete</button>
                 </div>
             </div>
         </form>

@@ -5,6 +5,7 @@ import type { ApiConfiguration } from '@/types/configuration';
 import { computed, ref } from 'vue';
 import request, { assertNotErrorResponse, isErrorResponse, isValidationError } from '@/lib/request';
 import type { ApiGroup } from '@/types/group';
+import { hasPermission } from '@/lib/permission';
 
 const { configurationId } = router.currentRoute.value.params;
 const cfg = await request.$get<ApiConfiguration>(`configurations/${configurationId}`);
@@ -70,6 +71,17 @@ const removeSelectedGroup = (group?: { id: string }) => {
 const removeSelectedTask = (task?: { id: string }) => {
     if (task) {
         configuration.value.task = configuration.value.task.filter(t => t.id !== task.id);
+    }
+}
+
+const deleteConfiguration = async () => {
+    const response = await request.$delete(`configurations/${configurationId}`);
+    if (!isErrorResponse(response)) {
+        router.back();
+    }
+    
+    if (isErrorResponse(response)) {
+        errors.value.general = response.message;
     }
 }
 </script>
@@ -140,10 +152,13 @@ const removeSelectedTask = (task?: { id: string }) => {
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link">Submit</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:configuration')">Submit</button>
                 </div>
                 <div class="control">
                     <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                </div>
+                <div class="control">
+                    <button type="button" class="button is-danger is-light" @click="deleteConfiguration()" v-if="hasPermission(undefined, 'delete:configuration')">Delete</button>
                 </div>
             </div>
         </form>
