@@ -45,7 +45,7 @@ namespace nucleus_remote_client.Client
         private ITask GetTask(TaskContainer taskContainer)
         {
             var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-            if (taskContainer.content == null)
+            if (string.IsNullOrEmpty(taskContainer.content))
             {
                 throw new Exception($"Task '{taskContainer.name}' of type {taskContainer.type} has no content.");
             }

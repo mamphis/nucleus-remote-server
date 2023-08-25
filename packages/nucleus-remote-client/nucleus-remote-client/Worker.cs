@@ -28,7 +28,7 @@ namespace nucleus_remote_client
 
                 await executer.ExecuteAsync(_hostSettings);
                 await pinger.ExecuteAsync(_hostSettings);
-                await Task.Delay(5000, stoppingToken);
+                await Task.Delay(60000, stoppingToken);
             }
         }
     }
