@@ -25,9 +25,23 @@ namespace nucleus_remote_client
                 {
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 }
+                try
+                {
+                    await executer.ExecuteAsync(_hostSettings);
+                }
 
-                await executer.ExecuteAsync(_hostSettings);
-                await pinger.ExecuteAsync(_hostSettings);
+                catch (Exception e)
+                {
+                    var _ = new SendLog(e.Message).ExecuteAsync(_hostSettings);
+                }
+                try
+                {
+                    await pinger.ExecuteAsync(_hostSettings);
+                }
+                catch (Exception e)
+                {
+                    var _ = new SendLog(e.Message).ExecuteAsync(_hostSettings);
+                }
                 await Task.Delay(60000, stoppingToken);
             }
         }
