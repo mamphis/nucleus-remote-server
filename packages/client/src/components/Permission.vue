@@ -57,7 +57,8 @@ watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate
         <div class="control is-expanded">
             <label class="label">{{ $t('permission.' + permission) }}</label>
         </div>
-        <button class="button is-small is-rounded" @click="read = update = del = create = false">clear</button>
+        <button class="button is-small is-rounded"
+            @click="read = update = del = create = false">{{ $t('button.clear') }}</button>
     </div>
     <div class="field is-grouped is-grouped-centered">
         <div class="control">

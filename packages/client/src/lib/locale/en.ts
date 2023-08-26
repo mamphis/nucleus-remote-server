@@ -1,5 +1,6 @@
 const translations: Record<string, string> = {
     'button.cancel': 'Cancel',
+    'button.clear': 'Clear',
     'button.delete': 'Delete',
     'button.submit': 'Submit',
     'clients.clients': 'Clients',
@@ -19,6 +20,7 @@ const translations: Record<string, string> = {
     'editConfiguration.newTask': 'New Task',
     'editGroup.editGroup': 'Edit Group',
     'editTask.editTask': 'Edit Task',
+    'editTenant.editTenant': 'Edit Tenant',
     'editUser.editUser': 'Edit User',
     'field.appVersion': 'App Version',
     'field.clientCount': 'No. of Clients',
@@ -60,6 +62,7 @@ const translations: Record<string, string> = {
     'newConfiguration.newConfiguration': 'Create New Configuration',
     'newGroup.newGroup': 'Create New Group',
     'newTask.createNewTask': 'Create New Task',
+    'newTenant.createNewTenant': 'Create New Tenant',
     'newUser.createNewUser': 'Create New User',
     'newUser.selectTenant': 'Please Select Tenant',
     'newUser.usernameNotAvailable': 'The username "{0}" is not available.',
