@@ -63,6 +63,7 @@ const updateTask = async () => {
 }
 
 const deleteTask = async () => {
+    return;
     clearError();
     const response = await request.$delete(`tasks/${taskId}`);
     if (!isErrorResponse(response)) {
@@ -115,7 +116,7 @@ const deleteTask = async () => {
                     </div>
                     <div class="control">
                         <button type="button" class="button is-danger is-light" @click="deleteTask()"
-                            v-if="hasPermission(undefined, 'delete:task')">{{ $t('button.delete') }}</button>
+                            v-if="hasPermission(undefined, 'delete:task') && false /** TODO */">{{ $t('button.delete') }}</button>
                     </div>
                 </div>
             </form>
