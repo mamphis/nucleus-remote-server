@@ -10,10 +10,31 @@ export function formatDate(date: Date | string | number): string {
 }
 
 export function humanizeDate(date: Date | string | number): string {
-    const oneHour = 1000 * 60 * 60;
-    const msBetweenDates = new Date().getTime() - getDate(date).getTime();
-    if (msBetweenDates < oneHour * 24) {
-        return humanizer.format(-msBetweenDates / oneHour, 'hour');
-    }
-    return humanizer.format(-msBetweenDates / (oneHour * 24), 'day');
+    const
+        WEEK_IN_MILLIS = 6.048e8,
+        DAY_IN_MILLIS = 8.64e7,
+        HOUR_IN_MILLIS = 3.6e6,
+        MIN_IN_MILLIS = 6e4,
+        SEC_IN_MILLIS = 1e3;
+
+    // For testing only, remove the constructor argument in production.
+    const getCurrentUTCTime = () => new Date().getTime();
+
+    const timeFromNow = () => {
+        const
+            millis = new Date(date).getTime(),
+            diff = millis - getCurrentUTCTime();
+        if (Math.abs(diff) > WEEK_IN_MILLIS)
+            return humanizer.format(Math.trunc(diff / WEEK_IN_MILLIS), 'week');
+        else if (Math.abs(diff) > DAY_IN_MILLIS)
+            return humanizer.format(Math.trunc(diff / DAY_IN_MILLIS), 'day');
+        else if (Math.abs(diff) > HOUR_IN_MILLIS)
+            return humanizer.format(Math.trunc((diff % DAY_IN_MILLIS) / HOUR_IN_MILLIS), 'hour');
+        else if (Math.abs(diff) > MIN_IN_MILLIS)
+            return humanizer.format(Math.trunc((diff % HOUR_IN_MILLIS) / MIN_IN_MILLIS), 'minute');
+        else
+            return humanizer.format(Math.trunc((diff % MIN_IN_MILLIS) / SEC_IN_MILLIS), 'second');
+    };
+
+    return timeFromNow();
 }

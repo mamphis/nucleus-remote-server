@@ -26,7 +26,3 @@
     - Send Configuration Back to Frontend
     - Add download button for configuration file
     - Add download button for executable
-
-- Translation
-    - rename Senden to OK or Speichern or something like that
-
