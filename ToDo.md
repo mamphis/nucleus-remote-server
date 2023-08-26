@@ -26,3 +26,10 @@
 
 - Task Delete
     - Add Option (Default Off) to report if file is missing
+
+- Translate Link Type
+
+- Set Time of execution
+    - Once on startup
+    - Every Time
+    - Every 5 minutes...
