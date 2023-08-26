@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { isErrorResponse } from '@/lib/request';
 import router from '@/router';
+import { eventStore } from '@/stores/eventBus';
 import userStore from '@/stores/user';
 import { ref } from 'vue';
 
+
+const {sendNotification} = eventStore();
 const password = ref("");
 const username = ref("");
 
@@ -14,10 +17,17 @@ const errors = ref<{
 });
 
 const { login } = userStore();
+const performLogin = async () => {
+    const response = await login(username.value, password.value)
+    if (!isErrorResponse(response)) {
+        router.push('/')
+    } else {
+        errors.value.login = response.message;
+    }
+}
 </script>
 <template>
-    <form
-        @submit.prevent="login(username, password).then((response) => { if (!isErrorResponse(response)) { router.push('/') } else { errors.login = response.message; } })">
+    <form @submit.prevent="performLogin()">
         <h1>{{ $t('login.login') }}</h1>
         <div class="field">
             <label class="label" for="username">{{ $t('field.username') }}</label>
