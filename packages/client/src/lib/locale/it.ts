@@ -16,6 +16,7 @@ const translations: Record<string, string> = {
     'deleteTask.recursive': 'Ricorsivo',
     'dropdown.defaultPlaceholder': 'Seleziona un\'opzione',
     'editClient.taskList': '(Configurazione {0}): {1}',
+    'editClient.editClient': 'Modifica client',
     'editConfiguration.editConfiguration': 'Modifica Configurazione',
     'editConfiguration.newTask': 'Nuova Attività',
     'editConfiguration.updateSuccessful': 'La configurazione è stata aggiornata con successo.',

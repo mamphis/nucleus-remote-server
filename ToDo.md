@@ -23,3 +23,6 @@
     - Send Configuration Back to Frontend
     - Add download button for configuration file
     - Add download button for executable
+
+- Task Delete
+    - Add Option (Default Off) to report if file is missing
