@@ -115,7 +115,7 @@ const deleteTask = async () => {
                     </div>
                     <div class="control">
                         <button type="button" class="button is-danger is-light" @click="deleteTask()"
-                            v-if="hasPermission(undefined, 'delete:task') && false /** TODO */">{{ $t('button.delete') }}</button>
+                            v-if="hasPermission(undefined, 'delete:task') && false /** TODO #10 */">{{ $t('button.delete') }}</button>
                     </div>
                 </div>
             </form>
