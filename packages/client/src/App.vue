@@ -5,6 +5,7 @@ import { RouterLink, RouterView } from 'vue-router';
 import { hasPermission } from './lib/permission';
 import userStore from './stores/user';
 import { eventStore, type NotificationType } from './stores/eventBus';
+import { reactive } from 'vue';
 const burgerActive = ref(false);
 
 const { user, isLoggedIn } = storeToRefs(userStore());
@@ -16,11 +17,11 @@ const hasTenantUser = computed(() => hasPermission(user.value, ':tenant-user'));
 const hasUser = computed(() => hasPermission(user.value, ':user'));
 
 const { onSendNofification } = eventStore();
-const notifications = ref<Notification[]>([]);
+let notifications = ref<Notification[]>([]);
 let notificationId = 0;
 class Notification {
     readonly maxTime = 5000;
-    timeLeft = ref(this.maxTime);
+    timeLeft= ref(this.maxTime);
 
     private running = true;
     readonly id = ++notificationId;
@@ -49,7 +50,7 @@ class Notification {
 
 onSendNofification((event) => {
     if (event.data) {
-        notifications.value = [...notifications.value, new Notification(event.data.type, event.data.message)];
+        notifications.value.push(new Notification(event.data.type, event.data.message) as any);
     }
 });
 </script>

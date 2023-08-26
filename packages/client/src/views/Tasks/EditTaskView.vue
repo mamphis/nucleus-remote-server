@@ -63,7 +63,6 @@ const updateTask = async () => {
 }
 
 const deleteTask = async () => {
-    return;
     clearError();
     const response = await request.$delete(`tasks/${taskId}`);
     if (!isErrorResponse(response)) {
