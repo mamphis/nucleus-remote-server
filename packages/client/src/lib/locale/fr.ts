@@ -1,5 +1,6 @@
 const translations: Record<string, string> = {
     'button.cancel': 'Annuler',
+    'button.clear': 'Claires',
     'button.delete': 'Supprimer',
     'button.submit': 'Soumettre',
     'clients.clients': 'Clients',
@@ -19,6 +20,7 @@ const translations: Record<string, string> = {
     'editConfiguration.newTask': 'Nouvelle tâche', 
     'editGroup.editGroup': 'Modifier le groupe',
     'editTask.editTask': 'Modifier la tâche',
+    'editTenant.editTenant': 'Modifier le locataire',
     'editUser.editUser': 'Modifier l\'utilisateur',
     'field.appVersion': 'Version de l\'application',
     'field.clientCount': 'Nombre de clients',
@@ -60,6 +62,7 @@ const translations: Record<string, string> = {
     'newConfiguration.newConfiguration': 'Créer une nouvelle configuration',
     'newGroup.newGroup': 'Créer un nouveau groupe',
     'newTask.createNewTask': 'Créer une nouvelle tâche',
+    'newTenant.createNewTenant': 'Créer un nouveau locataire',
     'newUser.createNewUser': 'Créer un nouvel utilisateur',
     'newUser.selectTenant': 'Veuillez sélectionner un locataire',
     'newUser.usernameNotAvailable': 'Le nom d\'utilisateur "{0}" n\'est pas disponible',

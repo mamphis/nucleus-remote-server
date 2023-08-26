@@ -8,6 +8,7 @@
 - [ ] Download File
 - [ ] Execute File
 - [x] Delete File
+- [ ] Exit Client
 
 ### General
 - Chainging of Task
@@ -19,9 +20,6 @@
 - Edit Task
     - Delete Doesnt Work
     DELETE /api/v1/tasks/51d2fbbf-e4ef-4718-9742-0eeff794c74c 
-
-- Edit Tenant / New Tenant
-    - Missing Translation
 
 - Feedback on sucessfull Submit
 

@@ -46,7 +46,7 @@ const deleteTenant = async () => {
     if (!isErrorResponse(response)) {
         router.back();
     }
-    
+
     if (isErrorResponse(response)) {
         errors.value.general = response.message;
     }
@@ -56,14 +56,14 @@ const deleteTenant = async () => {
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Edit Tenant</h1>
+                <h1>{{ $t('editTenant.editTenant') }}</h1>
             </div>
         </div>
         <form @submit.prevent="updateTenant(tenant)" class="column is-full" v-if="!isErrorResponse(tenant)">
             <div class="field">
-                <label class="label">Name</label>
+                <label class="label">{{ $t('field.name') }}</label>
                 <div class="control">
-                    <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" placeholder="Name"
+                    <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" :placeholder="$t('field.name')"
                         v-model="tenant.name" required>
                 </div>
                 <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
@@ -74,13 +74,16 @@ const deleteTenant = async () => {
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:tenant')">{{ $t('button.submit') }}</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:tenant')">{{
+                        $t('button.submit') }}</button>
                 </div>
                 <div class="control">
-                    <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel') }}</button>
+                    <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                    }}</button>
                 </div>
                 <div class="control">
-                    <button type="button" class="button is-danger is-light" @click="deleteTenant()" v-if="hasPermission(undefined, 'delete:tenant')">{{ $t('button.delete') }}</button>
+                    <button type="button" class="button is-danger is-light" @click="deleteTenant()"
+                        v-if="hasPermission(undefined, 'delete:tenant')">{{ $t('button.delete') }}</button>
                 </div>
             </div>
         </form>
