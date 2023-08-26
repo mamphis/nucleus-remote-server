@@ -4,6 +4,10 @@ import type { ApiTenant } from '@/types/tenant';
 import { ref } from 'vue';
 import request, { isErrorResponse, isValidationError } from '../../lib/request';
 import { hasPermission } from '@/lib/permission';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { tenantId } = router.currentRoute.value.params;
 const tenant = await request.$get<ApiTenant>(`tenants/${tenantId}`);
@@ -36,6 +40,8 @@ const updateTenant = async (tenant: ApiTenant) => {
             });
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
+        } else {
+            sendNotification('success', $t('editTenant.updateSuccessful'));
         }
     }
 }

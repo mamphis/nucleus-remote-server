@@ -7,6 +7,10 @@ import type { ApiConfiguration } from '@/types/configuration';
 import Dropdown from '@/components/Dropdown.vue';
 import type { ApiClient } from '@/types/client';
 import { hasPermission } from '@/lib/permission';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { groupId } = router.currentRoute.value.params;
 const grp = await request.$get<ApiGroup>(`groups/${groupId}`);
@@ -55,6 +59,8 @@ const updateGroup = async () => {
             });
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
+        } else {
+            sendNotification('success', $t('editGroup.updateSuccessful'));
         }
     }
 }

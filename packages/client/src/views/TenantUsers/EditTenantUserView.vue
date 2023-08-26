@@ -5,6 +5,10 @@ import request, { isErrorResponse } from '@/lib/request';
 import router from '@/router';
 import type { ApiUser } from '@/types/user';
 import { ref } from 'vue';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { userId } = router.currentRoute.value.params;
 const user = await request.$get<ApiUser>(`tenant-users/${userId}`);
@@ -28,6 +32,8 @@ const updateUser = async (user: ApiUser) => {
 
     if (isErrorResponse(response)) {
         errors.value.general = response.message;
+    } else {
+        sendNotification('success', $t('editUser.updateSuccessful'));
     }
 }
 
