@@ -6,6 +6,10 @@ import router from '@/router';
 import type { ApiTenant } from '@/types/tenant';
 import type { ApiUser } from '@/types/user';
 import { ref } from 'vue';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { userId } = router.currentRoute.value.params;
 const user = await request.$get<ApiUser>(`users/${userId}`);
@@ -31,6 +35,8 @@ const updateUser = async (user: ApiUser) => {
 
     if (isErrorResponse(response)) {
         errors.value.general = response.message;
+    } else {
+        sendNotification('success', $t('editUser.updateSuccessful'));
     }
 }
 
@@ -114,4 +120,5 @@ const permissions = [
 <style scoped>
 .column {
     margin-right: 50px;
-}</style>
+}
+</style>

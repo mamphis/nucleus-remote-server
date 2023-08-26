@@ -8,6 +8,10 @@ import type { ApiClient } from '@/types/client';
 import type { ApiClientLog } from '@/types/clientLog';
 import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { clientId } = router.currentRoute.value.params;
 const client = await request.$get<ApiClient>(`clients/${clientId}`);
@@ -113,7 +117,7 @@ const deleteClient = async () => {
                 </div>
                 <div class="control">
                     <button type="button" class="button is-danger is-light" @click="deleteClient()"
-                        v-if="hasPermission(undefined, 'delete:client')">{{ $t('button.delete') }}</button>
+                        v-if="hasPermission(undefined, 'delete:client') || false /** TODO */">{{ $t('button.delete') }}</button>
                 </div>
             </div>
         </div>

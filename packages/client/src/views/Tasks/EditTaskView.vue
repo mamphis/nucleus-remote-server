@@ -5,6 +5,10 @@ import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
 import { typeMap } from './tasks';
 import { hasPermission } from '@/lib/permission';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { taskId } = router.currentRoute.value.params;
 
@@ -34,7 +38,7 @@ const clearError = () => {
     errors.value.general = '';
 }
 
-const createNewTask = async () => {
+const updateTask = async () => {
     if (name.value && type.value) {
         const response = await request.$patch<ApiTask>(`tasks/${taskId}`, { name: name.value, content: content.value });
 
@@ -53,7 +57,7 @@ const createNewTask = async () => {
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
         } else {
-            router.push(`/tasks/${response.id}`);
+            sendNotification('success', $t('editTask.updateSuccessful'));
         }
     }
 }
@@ -78,7 +82,7 @@ const deleteTask = async () => {
             </div>
         </div>
         <div class="column is-full columns">
-            <form @submit.prevent="createNewTask()" class="column is-half">
+            <form @submit.prevent="updateTask()" class="column is-half">
                 <div class="field">
                     <label class="label">{{ $t('field.name') }}</label>
                     <div class="control">
@@ -116,4 +120,5 @@ const deleteTask = async () => {
                 </div>
             </form>
         </div>
-</div></template>
+    </div>
+</template>

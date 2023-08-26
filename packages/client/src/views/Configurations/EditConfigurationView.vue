@@ -6,6 +6,10 @@ import { computed, ref } from 'vue';
 import request, { assertNotErrorResponse, isErrorResponse, isValidationError } from '@/lib/request';
 import type { ApiGroup } from '@/types/group';
 import { hasPermission } from '@/lib/permission';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { configurationId } = router.currentRoute.value.params;
 const cfg = await request.$get<ApiConfiguration>(`configurations/${configurationId}`);
@@ -50,6 +54,8 @@ const updateConfiguration = async () => {
             });
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
+        } else {
+            sendNotification('success', $t('editConfiguration.updateSuccessful'));
         }
     }
 }
@@ -173,4 +179,5 @@ const deleteConfiguration = async () => {
 <style>
 button:focus {
     color: yellowgreen;
-}</style>
+}
+</style>

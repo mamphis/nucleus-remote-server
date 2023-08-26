@@ -21,8 +21,6 @@
     - Delete Doesnt Work
     DELETE /api/v1/tasks/51d2fbbf-e4ef-4718-9742-0eeff794c74c 
 
-- Feedback on sucessfull Submit
-
 - Client Configureable 
     - Sleep Between Requests
     - Send Configuration Back to Frontend
