@@ -144,11 +144,11 @@ const deleteConfiguration = async () => {
                         </div>
                     </div>
                     <a class="panel-block" v-for="task in configuration.task" :key="task.id"
-                        @click.self="$router.push(`/tasks/${task.id}`)">
+                        @click="$router.push(`/tasks/${task.id}`)">
                         <div class="control is-expanded">
                             {{ task?.name }}
                         </div>
-                        <button class="button is-danger is-small" tabindex="-1" @mousedown.stop="removeSelectedTask(task)">
+                        <button class="button is-danger is-small" tabindex="-1" @mousedown.self.stop="removeSelectedTask(task)">
                             x
                         </button>
                     </a>
