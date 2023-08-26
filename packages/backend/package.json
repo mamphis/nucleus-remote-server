@@ -1,12 +1,19 @@
 {
   "name": "backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "tsc": "tsc",
     "watch": "tsc -w",
-    "dev": "concurrently \"npm run watch\" \"nodemon --watch dist dist/index.js\""
+    "dev": "concurrently \"npm run watch\" \"nodemon --watch dist dist/index.js\"",
+    "build": "tsc",
+    "start:prod": "node .",
+    "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
+    "docker:build": "docker build . -t docker.home.int/nrs-backend:$(npm pkg get version | sed 's/\"//g')",
+    "docker:push": " docker push docker.home.int/nrs-backend:$(npm pkg get version | sed 's/\"//g')",
+    "docker:deploy": "npm run patch && npm run docker:build && npm run docker:push",
+    "patch": "npm version patch --git-tag-version=false"
   },
   "keywords": [],
   "author": "",
