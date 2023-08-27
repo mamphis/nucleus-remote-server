@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-nucleus_remote_client-af61bf69-f050-44cb-95ee-5b67e60a870a</UserSecretsId>
     <RootNamespace>nucleus_remote_client</RootNamespace>
-    <AssemblyVersion>1.0.1.2</AssemblyVersion>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
     <Version>0.0.1</Version>
     <OutputType>WinExe</OutputType>
     <Platforms>AnyCPU;x64</Platforms>
@@ -52,5 +52,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0-preview.7.23375.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\nucleus-remote-updater\nucleus-remote-updater.csproj" />
   </ItemGroup>
 </Project>

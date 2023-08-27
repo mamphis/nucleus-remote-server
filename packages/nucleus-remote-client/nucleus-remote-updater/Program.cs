@@ -71,13 +71,20 @@ void ApplyUpdate()
     foreach (var relativeFilename in Directory.GetFiles(UPDATE_DIRNAME, "*.*", new EnumerationOptions() { RecurseSubdirectories = true }))
     {
         Console.WriteLine($"  > Updating file {relativeFilename}");
-        var localFilename = relativeFilename.Substring(UPDATE_DIRNAME.Length + 1);
-        if (File.Exists(localFilename))
+        try
         {
-            File.Move(localFilename, Path.Combine(BACKUP_DIRNAME, localFilename));
-        }
+            var localFilename = relativeFilename.Substring(UPDATE_DIRNAME.Length + 1);
+            if (File.Exists(localFilename))
+            {
+                File.Move(localFilename, Path.Combine(BACKUP_DIRNAME, localFilename));
+            }
 
-        File.Copy(relativeFilename, localFilename);
+            File.Copy(relativeFilename, localFilename);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"  ! -> " + ex.Message);
+        }
     }
 }
 
