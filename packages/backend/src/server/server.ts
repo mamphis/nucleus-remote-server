@@ -5,6 +5,8 @@ import { HttpError, InternalServerError, NotFound } from 'http-errors';
 import { ZodError } from 'zod';
 import { Logger } from '../lib/logger';
 import api from './routes';
+import system from './routes/system';
+
 import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 export class Server {
@@ -35,6 +37,7 @@ export class Server {
         });
 
         this.app.use('/api', api);
+        this.app.use('/system', system);
 
         this.app.use((req, _res, next) => {
             next(NotFound(`${req.originalUrl} cannot be found.`));

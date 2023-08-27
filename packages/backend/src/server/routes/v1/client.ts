@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
-import { UnprocessableEntity } from 'http-errors';
+import { UnprocessableEntity,BadRequest } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const router = Router();
@@ -44,6 +44,9 @@ router.put(`/`, async (req, res, next) => {
 
     try {
         const clientData = schema.parse(req.body);
+        if (!await db.tenant.findFirst({where: {id: clientData.tenantId}})) {
+            return next(BadRequest('Invalid Tenant.'));
+        }
 
         const client = await db.client.upsert({
             where: {

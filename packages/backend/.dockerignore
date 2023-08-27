@@ -2,3 +2,4 @@ node_modules/
 prisma/dev.db*
 dist/
 .env
+update/
