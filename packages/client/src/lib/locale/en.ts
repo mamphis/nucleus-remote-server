@@ -4,6 +4,8 @@ const translations: Record<string, string> = {
     'button.delete': 'Delete',
     'button.submit': 'Submit',
     'clients.clients': 'Clients',
+    'clients.downloadClient': 'Download Client',
+    'clients.newClient': 'Download Settings',
     'configurations.configurations': 'Configurations',
     'configurations.newConfigurtion': 'New Configuration',
     'createShortcutTask.arguments': 'Arguments',

@@ -23,6 +23,7 @@ router.get('/update/file', async (req, res, next) => {
         return next(NotFound(version + ' has no content.'))
     }
 
+    res.attachment('nucleus-remote-client.' + version + '.zip')
     res.sendFile(version + '.zip', {
         root: join(process.env.UPDATE_DIR ?? '.'),
     });

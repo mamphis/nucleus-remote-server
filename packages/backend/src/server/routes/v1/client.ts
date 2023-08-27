@@ -2,8 +2,9 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
-import { UnprocessableEntity,BadRequest } from 'http-errors';
+import { UnprocessableEntity, BadRequest } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { randomUUID } from "crypto";
 
 const router = Router();
 const db = new PrismaClient();
@@ -11,8 +12,27 @@ const db = new PrismaClient();
 // GET localhost:8080/api/v1/clients/
 router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
     const clients = await db.client.findMany({ where: { tenantId: res.locals.user.tenantId } });
-
     res.json(clients);
+});
+
+router.get('/configuration/:tenantId', async (req, res, next) => {
+    res.attachment('appsettings.json');
+    res.type('application/json');
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+
+    res.send(JSON.stringify({
+        "Logging": {
+            "LogLevel": {
+                "Default": "Information",
+                "Microsoft.Hosting.Lifetime": "Information"
+            }
+        },
+        "HostSettings": {
+            "BaseUrl": `${req.header('x-forwarded-proto') ?? req.protocol}://${req.get('host')}/api/v1/`,
+            "Id": randomUUID(),
+            "TenantId": req.params.tenantId,
+        }
+    }, undefined, 4));
 });
 
 router.get('/:clientId', auth('read:client'), async (req, res: AuthResponse, next) => {
@@ -27,7 +47,7 @@ router.delete('/:id', auth('delete:client'), async (req, res: AuthResponse, next
             id: req.params.id,
             tenantId: res.locals.user.tenantId,
         }
-    }).catch(() => {});
+    }).catch(() => { });
 
     res.status(201).end();
 });
@@ -44,7 +64,7 @@ router.put(`/`, async (req, res, next) => {
 
     try {
         const clientData = schema.parse(req.body);
-        if (!await db.tenant.findFirst({where: {id: clientData.tenantId}})) {
+        if (!await db.tenant.findFirst({ where: { id: clientData.tenantId } })) {
             return next(BadRequest('Invalid Tenant.'));
         }
 
