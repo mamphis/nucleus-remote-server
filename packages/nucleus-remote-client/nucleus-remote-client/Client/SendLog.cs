@@ -12,8 +12,11 @@ namespace nucleus_remote_client.Client
     internal class SendLog : IClient
     {
         public string Message { get; set; }
-        public SendLog(string message)
+        public string Level { get; set; }
+
+        public SendLog(string level, string message)
         {
+            this.Level = level;
             this.Message = message;
         }
         public async Task ExecuteAsync(HostSettings hostSettings)
@@ -27,6 +30,7 @@ namespace nucleus_remote_client.Client
 
             var _response = await client.PostAsJsonAsync($"clients/{hostSettings.Id}/logs", new
             {
+                level = this.Level,
                 message = this.Message,
             });
 

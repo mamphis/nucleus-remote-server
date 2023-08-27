@@ -12,6 +12,7 @@ const translations: Record<string, string> = {
     'createShortcutTask.override': 'Sovrascrivi Esistente',
     'createShortcutTask.targetPath': 'Percorso di Destinazione',
     'createShortcutTask.workingDir': 'Directory di Lavoro',
+    'deleteTask.ignoreIfMissing': 'Ignorare se mancante',
     'deleteTask.path': 'Percorso',
     'deleteTask.recursive': 'Ricorsivo',
     'dropdown.defaultPlaceholder': 'Seleziona un\'opzione',

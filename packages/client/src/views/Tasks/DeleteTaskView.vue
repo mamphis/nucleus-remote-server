@@ -4,6 +4,7 @@ import { ref, watch } from 'vue';
 const content = ref({
     Path: '',
     Recursive: false,
+    IgnoreIfMissing: true,
 });
 
 const props = defineProps<{
@@ -32,6 +33,12 @@ watch(content, (newValue) => {
         <label class="checkbox" for="">
             <input class="checkbox" type="checkbox" v-model="content.Recursive" />
             {{ $t('deleteTask.recursive') }}
+        </label>
+    </div>
+    <div class="field">
+        <label class="checkbox" for="">
+            <input class="checkbox" type="checkbox" v-model="content.IgnoreIfMissing" />
+            {{ $t('deleteTask.ignoreIfMissing') }}
         </label>
     </div>
 </template>
