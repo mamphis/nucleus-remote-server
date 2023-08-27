@@ -19,10 +19,10 @@ const fileUrl = new URL(`/system/update/file`, baseApiUrl).href;
             </div>
             <div class="column is-flex is-justify-content-end">
                 <div class="buttons is-grouped">
-                    <a class="button" v-if="hasPermission(user, 'create:user')"
+                    <a class="button" v-if="hasPermission(user, 'create:client')"
                         :href="baseApiUrl + `clients/configuration/${user?.tenantId}`">
                         {{ $t('clients.newClient') }}</a>
-                    <a class="button" v-if="hasPermission(user, 'create:user')" :href="fileUrl">
+                    <a class="button" v-if="hasPermission(user, 'create:client')" :href="fileUrl">
                         {{ $t('clients.downloadClient') }}</a>
                 </div>
             </div>
