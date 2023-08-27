@@ -92,6 +92,8 @@ const translations: Record<string, string> = {
     'specialFolder.MyVideos': 'Video',
     'specialFolder.StartMenu': 'Menu di Avvio',
     'specialFolder.Startup': 'Avvio',
+    'tasks.createShortcut': 'Crea collegamento',
+    'tasks.deleteFile': 'Cancellare il file',
     'tenants.newTenant': 'Nuovo inquilino',
     'tenants.tenants': 'Inquilino',
     'users.newUser': 'Nuovo Utente',
