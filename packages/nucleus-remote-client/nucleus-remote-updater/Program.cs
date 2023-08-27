@@ -1,4 +1,5 @@
 ﻿using nucleus_remote_updater;
+using System.Diagnostics;
 using System.IO.Compression;
 
 const string UPDATE_FILENAME = "update.zip";
@@ -25,7 +26,9 @@ Directory.CreateDirectory(BACKUP_DIRNAME);
 ZipFile.ExtractToDirectory(UPDATE_FILENAME, UPDATE_DIRNAME);
 
 Thread.Sleep(5000);
-ServiceManager.StopService(SERVICE_NAME);
+var proc = Process.GetProcesses().FirstOrDefault(p => p.ProcessName == SERVICE_NAME);
+var filename = proc?.StartInfo.FileName;
+proc?.Kill();
 Thread.Sleep(5000);
 
 foreach (var relativeFilename in Directory.GetFiles(UPDATE_DIRNAME, "*.*", new EnumerationOptions() { RecurseSubdirectories = true }))
@@ -39,7 +42,14 @@ foreach (var relativeFilename in Directory.GetFiles(UPDATE_DIRNAME, "*.*", new E
     File.Move(relativeFilename, localFilename);
 }
 
-ServiceManager.StartService(SERVICE_NAME);
+if (filename != null)
+{
+    Process.Start(filename);
+}
+else
+{
+    Process.Start(SERVICE_NAME + ".exe");
+}
 
 Thread.Sleep(5000);
 Directory.Delete(UPDATE_DIRNAME, true);

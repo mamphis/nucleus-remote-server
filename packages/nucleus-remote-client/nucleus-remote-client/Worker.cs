@@ -32,7 +32,7 @@ namespace nucleus_remote_client
 
                 catch (Exception e)
                 {
-                    var _ = new SendLog(e.Message).ExecuteAsync(_hostSettings);
+                    var _ = new SendLog("error", e.Message).ExecuteAsync(_hostSettings);
                 }
                 try
                 {
@@ -40,7 +40,7 @@ namespace nucleus_remote_client
                 }
                 catch (Exception e)
                 {
-                    var _ = new SendLog(e.Message).ExecuteAsync(_hostSettings);
+                    var _ = new SendLog("error", e.Message).ExecuteAsync(_hostSettings);
                 }
                 await Task.Delay(60000, stoppingToken);
             }
