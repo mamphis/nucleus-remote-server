@@ -92,6 +92,8 @@ const translations: Record<string, string> = {
     'specialFolder.MyVideos': 'Eigene Videos',
     'specialFolder.StartMenu': 'Startmenü',
     'specialFolder.Startup': 'Autostart',
+    'tasks.createShortcut': 'Link erstellen',
+    'tasks.deleteEntry': 'Datei Löschen',
     'tenants.newTenant': 'Neuer Mandant',
     'tenants.tenants': 'Mandanten',
     'users.newUser': 'Neuer Benutzer',
