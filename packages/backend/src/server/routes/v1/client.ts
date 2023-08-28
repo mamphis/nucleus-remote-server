@@ -2,8 +2,9 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
-import { UnprocessableEntity } from 'http-errors';
+import { UnprocessableEntity, BadRequest } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { randomUUID } from "crypto";
 
 const router = Router();
 const db = new PrismaClient();
@@ -13,6 +14,26 @@ router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
     const clients = await db.client.findMany({ where: { tenantId: res.locals.user.tenantId } });
 
     res.json(clients);
+});
+
+router.get('/configuration/:tenantId', async (req, res, next) => {
+    res.attachment('appsettings.json');
+    res.type('application/json');
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+
+    res.send(JSON.stringify({
+        "Logging": {
+            "LogLevel": {
+                "Default": "Information",
+                "Microsoft.Hosting.Lifetime": "Information"
+            }
+        },
+        "HostSettings": {
+            "BaseUrl": `${req.header('x-forwarded-proto') ?? req.protocol}://${req.get('host')}/api/v1/`,
+            "Id": randomUUID(),
+            "TenantId": req.params.tenantId,
+        }
+    }, undefined, 4));
 });
 
 router.get('/:clientId', auth('read:client'), async (req, res: AuthResponse, next) => {
@@ -27,7 +48,7 @@ router.delete('/:id', auth('delete:client'), async (req, res: AuthResponse, next
             id: req.params.id,
             tenantId: res.locals.user.tenantId,
         }
-    }).catch(() => {});
+    }).catch(() => { });
 
     res.status(201).end();
 });
@@ -44,6 +65,18 @@ router.put(`/`, async (req, res, next) => {
 
     try {
         const clientData = schema.parse(req.body);
+        console.log(clientData);
+
+        // Check if the tenant exist
+        if (!await db.tenant.findFirst({ where: { id: clientData.tenantId, } })) {
+            return next(BadRequest('Invalid Tenant: ' + clientData.tenantId));
+        }
+
+        // Check if the client belongs to the same tenant if it exists.
+        var existingClient = await db.client.findFirst({where: {id: clientData.id}});
+        if (existingClient && existingClient.tenantId != clientData.tenantId) {
+            return next(BadRequest('Invalid client id: ' + clientData.id));
+        }
 
         const client = await db.client.upsert({
             where: {
@@ -92,6 +125,8 @@ router.get('/:clientId/tasks', async (req, res, next) => {
         select: {
             configuration: true,
             id: true,
+            active: true,
+            runOnce: true,
             name: true,
             type: true,
             content: true,

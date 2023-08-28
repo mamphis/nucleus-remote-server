@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using nucleus_remote_client.Client;
 using nucleus_remote_client.Tasks;
+using System.Diagnostics;
 
 namespace nucleus_remote_client
 {
@@ -17,6 +18,7 @@ namespace nucleus_remote_client
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            StartUpdater();
             var pinger = new SendPing();
             var executer = new GetConfigurationTasks();
             while (!stoppingToken.IsCancellationRequested)
@@ -43,6 +45,16 @@ namespace nucleus_remote_client
                     var _ = new SendLog("error", e.Message).ExecuteAsync(_hostSettings);
                 }
                 await Task.Delay(60000, stoppingToken);
+            }
+        }
+
+        private void StartUpdater()
+        {
+            var updaterPath = Path.GetFullPath("nucleus-remote-updater.exe");
+            if (Path.Exists(updaterPath)) {
+                var psi = new ProcessStartInfo(updaterPath);
+                psi.CreateNoWindow = true;
+                Process? proc = Process.Start(psi);
             }
         }
     }

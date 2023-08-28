@@ -12,6 +12,8 @@ namespace nucleus_remote_client.Client
 {
     internal class GetConfigurationTasks : IClient
     {
+        private static readonly HashSet<string> RunnedTasks = new HashSet<string>();
+
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
             HttpClient client = new()
@@ -27,7 +29,7 @@ namespace nucleus_remote_client.Client
                 return;
             }
 
-            foreach (var taskContainer in tasks)
+            foreach (var taskContainer in tasks.Where(task => this.Runnable(task)))
             {
                 try
                 {
@@ -35,6 +37,7 @@ namespace nucleus_remote_client.Client
                     await task.Run(hostSettings);
 
                     var _ = new SendLog("info", $"Execution of task {taskContainer.name} was successful.").ExecuteAsync(hostSettings);
+                    RunnedTasks.Add(taskContainer.id);
                 }
                 catch (Exception ex)
                 {
@@ -43,20 +46,39 @@ namespace nucleus_remote_client.Client
             }
         }
 
+        private bool Runnable(TaskContainer taskContainer)
+        {
+            if (!taskContainer.active)
+            {
+                return false;
+            }
+
+            if (taskContainer.runOnce && RunnedTasks.Contains(taskContainer.id))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private ITask GetTask(TaskContainer taskContainer)
         {
-            
+
             if (string.IsNullOrEmpty(taskContainer.content))
             {
                 throw new Exception($"Task '{taskContainer.name}' of type {taskContainer.type} has no content.");
             }
-            
+
             switch (taskContainer.type)
             {
                 case "CreateShortcut":
                     return GetTask<CreateShortcut>(taskContainer);
                 case "Delete":
                     return GetTask<Delete>(taskContainer);
+                case "DownloadFile":
+                    return GetTask<DownloadFile>(taskContainer);
+                case "ExecuteFile":
+                    return GetTask<ExecuteFile>(taskContainer);
                 default:
                     throw new Exception($"Cannot parse task, because the type '{taskContainer.type}' is unknown");
             }

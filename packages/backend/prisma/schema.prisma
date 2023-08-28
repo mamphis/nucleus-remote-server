@@ -55,10 +55,12 @@ model Configuration {
 }
 
 model Task {
-  id      String @id() @default(uuid())
+  id      String  @id() @default(uuid())
   name    String
   type    String
-  content String
+  active  Boolean @default(false)
+  runOnce Boolean @default(false)
+  content String  @default("")
 
   configuration   Configuration? @relation(fields: [configurationId], references: [id], onDelete: Cascade)
   configurationId String?

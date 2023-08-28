@@ -3,9 +3,10 @@ import SpecialFolderPicker from '@/components/SpecialFolderPicker.vue';
 import { ref, watch } from 'vue';
 
 const content = ref({
-    Path: '',
-    Recursive: false,
-    IgnoreIfMissing: true,
+    File: '',
+    Arguments: '',
+    HideWindow: false,
+    StartIfProcessIsRunning: false,
 });
 
 const props = defineProps<{
@@ -27,19 +28,23 @@ watch(content, (newValue) => {
 
 <template>
     <div class="field">
-        <label class="label" for="">{{ $t('deleteTask.path') }}</label>
-        <SpecialFolderPicker class="input" v-model="content.Path" required />
+        <label class="label" for="">{{ $t('executeFileTask.file') }}</label>
+        <SpecialFolderPicker v-model="content.File" />
+    </div>
+    <div class="field">
+        <label class="label" for="">{{ $t('executeFileTask.arguments') }}</label>
+        <input class="input" v-model="content.Arguments" />
     </div>
     <div class="field">
         <label class="checkbox" for="">
-            <input class="checkbox" type="checkbox" v-model="content.Recursive" />
-            {{ $t('deleteTask.recursive') }}
+            <input class="checkbox" type="checkbox" v-model="content.HideWindow" />
+            {{ $t('executeFileTask.hideWindow') }}
         </label>
     </div>
     <div class="field">
         <label class="checkbox" for="">
-            <input class="checkbox" type="checkbox" v-model="content.IgnoreIfMissing" />
-            {{ $t('deleteTask.ignoreIfMissing') }}
+            <input class="checkbox" type="checkbox" v-model="content.StartIfProcessIsRunning" />
+            {{ $t('executeFileTask.startIfProcessIsRunning') }}
         </label>
     </div>
 </template>
