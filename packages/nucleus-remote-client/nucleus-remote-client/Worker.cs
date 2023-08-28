@@ -51,8 +51,10 @@ namespace nucleus_remote_client
         private void StartUpdater()
         {
             var updaterPath = Path.GetFullPath("nucleus-remote-updater.exe");
-            if (Path.Exists(updaterPath)) { 
-                Process proc = Process.Start(updaterPath);
+            if (Path.Exists(updaterPath)) {
+                var psi = new ProcessStartInfo(updaterPath);
+                psi.CreateNoWindow = true;
+                Process? proc = Process.Start(psi);
             }
         }
     }

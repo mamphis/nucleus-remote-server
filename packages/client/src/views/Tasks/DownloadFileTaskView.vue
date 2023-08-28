@@ -3,9 +3,10 @@ import SpecialFolderPicker from '@/components/SpecialFolderPicker.vue';
 import { ref, watch } from 'vue';
 
 const content = ref({
-    Path: '',
-    Recursive: false,
-    IgnoreIfMissing: true,
+    RemoteUrl: '',
+    Destination: '',
+    Override: false,
+    IgnoreIfExists: true,
 });
 
 const props = defineProps<{
@@ -27,19 +28,23 @@ watch(content, (newValue) => {
 
 <template>
     <div class="field">
-        <label class="label" for="">{{ $t('deleteTask.path') }}</label>
-        <SpecialFolderPicker class="input" v-model="content.Path" required />
+        <label class="label" for="">{{ $t('downloadFileTask.remoteUrl') }}</label>
+        <input class="input" v-model="content.RemoteUrl" required />
+    </div>
+    <div class="field">
+        <label class="label" for="">{{ $t('downloadFileTask.destination') }}</label>
+        <SpecialFolderPicker v-model="content.Destination" />
     </div>
     <div class="field">
         <label class="checkbox" for="">
-            <input class="checkbox" type="checkbox" v-model="content.Recursive" />
-            {{ $t('deleteTask.recursive') }}
+            <input class="checkbox" type="checkbox" v-model="content.Override" />
+            {{ $t('downloadFileTask.override') }}
         </label>
     </div>
     <div class="field">
         <label class="checkbox" for="">
-            <input class="checkbox" type="checkbox" v-model="content.IgnoreIfMissing" />
-            {{ $t('deleteTask.ignoreIfMissing') }}
+            <input class="checkbox" type="checkbox" v-model="content.IgnoreIfExists" />
+            {{ $t('downloadFileTask.ignoreIfExists') }}
         </label>
     </div>
 </template>

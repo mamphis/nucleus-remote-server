@@ -66,6 +66,8 @@ router.patch(`/:taskId`, auth('update:task'), async (req, res, next) => {
     const schema = z.object({
         name: z.string(),
         content: z.string(),
+        active: z.boolean().optional().default(false),
+        runOnce: z.boolean().optional().default(false),
     });
 
     try {

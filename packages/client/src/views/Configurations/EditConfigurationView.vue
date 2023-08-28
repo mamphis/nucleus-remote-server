@@ -146,7 +146,7 @@ const deleteConfiguration = async () => {
                     <a class="panel-block" v-for="task in configuration.task" :key="task.id"
                         @click="$router.push(`/tasks/${task.id}`)">
                         <div class="control is-expanded">
-                            {{ task?.name }}
+                            <input :checked="task?.active" type="checkbox" class="checkbox" disabled/> {{ task?.name }}
                         </div>
                         <button class="button is-danger is-small" tabindex="-1" @mousedown.self.stop="removeSelectedTask(task)">
                             x
