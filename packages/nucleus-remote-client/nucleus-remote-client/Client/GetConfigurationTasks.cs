@@ -57,6 +57,10 @@ namespace nucleus_remote_client.Client
                     return GetTask<CreateShortcut>(taskContainer);
                 case "Delete":
                     return GetTask<Delete>(taskContainer);
+                case "DownloadFile":
+                    return GetTask<DownloadFile>(taskContainer);
+                case "ExecuteFile":
+                    return GetTask<ExecuteFile>(taskContainer);
                 default:
                     throw new Exception($"Cannot parse task, because the type '{taskContainer.type}' is unknown");
             }

@@ -15,12 +15,18 @@ namespace nucleus_remote_client
                 throw new ArgumentNullException("path");
             }
 
-            if (Enum.TryParse<Environment.SpecialFolder>(path, true, out Environment.SpecialFolder result))
+            var parts = path.Split(new char[] {'/', '\\'});
+
+            if (Enum.TryParse<Environment.SpecialFolder>(parts[0], true, out Environment.SpecialFolder result))
             {
-                return Environment.GetFolderPath(result);
+                var paths = new List<string>{ Environment.GetFolderPath(result) };
+                paths.AddRange(parts.Skip(1));
+                return Path.Combine(paths.ToArray());
             }
 
-            return path.Replace("{{username}}", Environment.UserName, StringComparison.OrdinalIgnoreCase);
+            return path
+                .Replace("{{username}}", Environment.UserName, StringComparison.OrdinalIgnoreCase)
+                .Replace("{{cwd}}", Directory.GetCurrentDirectory());
         }
     }
 }
