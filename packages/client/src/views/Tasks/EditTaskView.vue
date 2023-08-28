@@ -18,10 +18,14 @@ assertNotErrorResponse<ApiTask>(task);
 const name = ref(task.name);
 const type = ref(task.type);
 const content = ref(task.content);
+const active = ref(task.active);
+const runOnce = ref(task.runOnce);
 
 const errors = ref<{
     name: string,
     type: string,
+    active: string,
+    runOnce: string,
     content: string,
     general: string,
 }>({
@@ -29,29 +33,33 @@ const errors = ref<{
     type: '',
     content: '',
     general: '',
+    active: '',
+    runOnce: '',
 });
 
 const clearError = () => {
     errors.value.name = '';
     errors.value.type = '';
     errors.value.content = '';
+    errors.value.active = '';
+    errors.value.runOnce = '';
     errors.value.general = '';
 }
 
 const updateTask = async () => {
     if (name.value && type.value) {
-        const response = await request.$patch<ApiTask>(`tasks/${taskId}`, { name: name.value, content: content.value });
+        const response = await request.$patch<ApiTask>(`tasks/${taskId}`, {
+            name: name.value,
+            content: content.value,
+            active: active.value,
+            runOnce: runOnce.value,
+        });
 
         clearError();
         if (isValidationError(response)) {
             response.data.forEach(issue => {
-                switch (issue.validation) {
-                    case 'name':
-                        errors.value.name = issue.message;
-                        break;
-                    case 'type':
-                        errors.value.type = issue.message;
-                        break;
+                if (issue.validation in errors.value) {
+                    errors.value[issue.validation as keyof typeof errors.value] = issue.message;
                 }
             });
         } else if (isErrorResponse(response)) {
@@ -100,6 +108,26 @@ const deleteTask = async () => {
                     </span>
                 </div>
 
+                <div class="field">
+                    <div class="field">
+                        <label class="checkbox" for="">
+                            <input class="checkbox" type="checkbox" v-model="active" />
+                            {{ $t('field.active') }}
+                        </label>
+                    </div>
+                    <p v-if="!!errors.active" class="help is-danger">{{ errors.active }}</p>
+                </div>
+
+                <div class="field">
+                    <div class="field">
+                        <label class="checkbox" for="">
+                            <input class="checkbox" type="checkbox" v-model="runOnce" />
+                            {{ $t('field.runOnce') }}
+                        </label>
+                    </div>
+                    <p v-if="!!errors.runOnce" class="help is-danger">{{ errors.runOnce }}</p>
+                </div>
+
                 <component :is="typeMap[type].component" v-model="content"></component>
                 <div class="field">
                     <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
@@ -115,7 +143,8 @@ const deleteTask = async () => {
                     </div>
                     <div class="control">
                         <button type="button" class="button is-danger is-light" @click="deleteTask()"
-                            v-if="hasPermission(undefined, 'delete:task') && false /** TODO #10 */">{{ $t('button.delete') }}</button>
+                            v-if="hasPermission(undefined, 'delete:task') && false /** TODO #10 */">{{ $t('button.delete')
+                            }}</button>
                     </div>
                 </div>
             </form>
