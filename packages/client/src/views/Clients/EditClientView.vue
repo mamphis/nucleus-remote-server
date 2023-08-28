@@ -78,7 +78,7 @@ const deleteClient = async () => {
                     </div>
                     <a class="panel-block" v-for="task in tasks" :key="task.id" @click="$router.push(`/tasks/${task.id}`)">
                         <div class="control is-expanded">
-                            {{ $t('editClient.taskList', task.configuration.name, task.name) }}
+                            <input :checked="task?.active" type="checkbox" class="checkbox" disabled/> {{ $t('editClient.taskList', task.configuration.name, task.name) }}
                         </div>
                     </a>
                 </nav>
