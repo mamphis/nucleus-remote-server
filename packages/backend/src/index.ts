@@ -12,8 +12,6 @@ import { Server } from './server/server';
 
 const port = Number(process.env.PORT);
 
-
-
 const start = async () => {
     const db = new PrismaClient();
 
