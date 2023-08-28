@@ -125,6 +125,8 @@ router.get('/:clientId/tasks', async (req, res, next) => {
         select: {
             configuration: true,
             id: true,
+            active: true,
+            runOnce: true,
             name: true,
             type: true,
             content: true,
