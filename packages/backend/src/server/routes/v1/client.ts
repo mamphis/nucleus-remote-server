@@ -12,6 +12,7 @@ const db = new PrismaClient();
 // GET localhost:8080/api/v1/clients/
 router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
     const clients = await db.client.findMany({ where: { tenantId: res.locals.user.tenantId } });
+
     res.json(clients);
 });
 
@@ -64,8 +65,17 @@ router.put(`/`, async (req, res, next) => {
 
     try {
         const clientData = schema.parse(req.body);
-        if (!await db.tenant.findFirst({ where: { id: clientData.tenantId } })) {
-            return next(BadRequest('Invalid Tenant.'));
+        console.log(clientData);
+
+        // Check if the tenant exist
+        if (!await db.tenant.findFirst({ where: { id: clientData.tenantId, } })) {
+            return next(BadRequest('Invalid Tenant: ' + clientData.tenantId));
+        }
+
+        // Check if the client belongs to the same tenant if it exists.
+        var existingClient = await db.client.findFirst({where: {id: clientData.id}});
+        if (existingClient && existingClient.tenantId != clientData.tenantId) {
+            return next(BadRequest('Invalid client id: ' + clientData.id));
         }
 
         const client = await db.client.upsert({
