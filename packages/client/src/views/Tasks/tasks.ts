@@ -1,6 +1,8 @@
 
 import { type DefineComponent, type PropType, type ComputedOptions, type MethodOptions, type ComponentOptionsMixin } from 'vue';
-import CreateShortcutTaskViewVue from './CreateShortcutTaskView.vue';
+import CreateShortcutTaskView from './CreateShortcutTaskView.vue';
+import DeleteTaskView from './DeleteTaskView.vue';
+import { $t } from '@/lib/locale/locale';
 
 type ModelPropType = { modelValue: { type: PropType<string>, required: true } };
 export const typeMap: Record<string, {
@@ -9,7 +11,11 @@ export const typeMap: Record<string, {
         {}, ComputedOptions, MethodOptions, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, ModelPropType, any, any, any>>,
 }> = {
     "CreateShortcut": {
-        label: "Create Shortcut",
-        component: CreateShortcutTaskViewVue,
-    }
+        label: $t('tasks.createShortcut'),
+        component: CreateShortcutTaskView,
+    },
+    "Delete": {
+        label: $t('tasks.deleteFile'),
+        component: DeleteTaskView,
+    },
 }

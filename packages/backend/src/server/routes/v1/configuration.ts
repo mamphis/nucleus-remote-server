@@ -37,6 +37,17 @@ router.get('/:configurationId', auth('read:configuration'), async (req, res: Aut
     return res.json(configuration);
 });
 
+router.delete('/:id', auth('delete:configuration'), async (req, res: AuthResponse, next) => {
+    await db.configuration.delete({
+        where: {
+            id: req.params.id,
+            tenantId: res.locals.user.tenantId,
+        }
+    }).catch(() => {});;
+
+    res.status(201).end();
+});
+
 router.get('/:configurationId/groups', auth('read:configuration', 'read:group'), async (req, res: AuthResponse, next) => {
     const groups = await db.group.findMany({
         where: { tenantId: res.locals.user.tenantId, configuration: { some: { id: req.params.configurationId } } }, select: {
@@ -85,6 +96,11 @@ router.patch('/:configurationId', auth('update:configuration'), async (req, res:
                 id: z.string(),
             }),
         ),
+        task: z.array(
+            z.object({
+                id: z.string(),
+            }),
+        ),
     });
 
     try {
@@ -99,6 +115,9 @@ router.patch('/:configurationId', auth('update:configuration'), async (req, res:
                 name: configurationData.name,
                 group: {
                     set: configurationData.group
+                },
+                task: {
+                    set: configurationData.task,
                 }
             }
         });

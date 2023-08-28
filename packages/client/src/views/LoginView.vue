@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { isErrorResponse } from '@/lib/request';
 import router from '@/router';
+import { eventStore } from '@/stores/eventBus';
 import userStore from '@/stores/user';
 import { ref } from 'vue';
 
+
+const {sendNotification} = eventStore();
 const password = ref("");
 const username = ref("");
 
@@ -14,26 +17,33 @@ const errors = ref<{
 });
 
 const { login } = userStore();
+const performLogin = async () => {
+    const response = await login(username.value, password.value)
+    if (!isErrorResponse(response)) {
+        router.push('/')
+    } else {
+        errors.value.login = response.message;
+    }
+}
 </script>
 <template>
-    <form
-        @submit.prevent="login(username, password).then((response) => { if (!isErrorResponse(response)) { router.push('/') } else { errors.login = response.message; } })">
-        <h1>Login</h1>
+    <form @submit.prevent="performLogin()">
+        <h1>{{ $t('login.login') }}</h1>
         <div class="field">
-            <label class="label" for="username">Username</label>
+            <label class="label" for="username">{{ $t('field.username') }}</label>
             <div class="control">
                 <input class="input" type="text" name="username" id="username" v-model="username">
             </div>
         </div>
         <div class="field">
-            <label class="label" for="password">Password</label>
+            <label class="label" for="password">{{ $t('field.password') }}</label>
             <div class="control">
                 <input class="input" type="password" name="password" id="password" v-model="password">
             </div>
         </div>
         <div class="field">
             <p v-if="!!errors.login" class="help is-danger">{{ errors.login }}</p>
-            <button class="button" type="submit">Login</button>
+            <button class="button" type="submit">{{ $t('login.login') }}</button>
         </div>
     </form>
 </template>

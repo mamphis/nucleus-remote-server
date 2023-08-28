@@ -4,6 +4,11 @@ import router from '@/router';
 import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
 import { typeMap } from './tasks';
+import { hasPermission } from '@/lib/permission';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { taskId } = router.currentRoute.value.params;
 
@@ -33,7 +38,7 @@ const clearError = () => {
     errors.value.general = '';
 }
 
-const createNewTask = async () => {
+const updateTask = async () => {
     if (name.value && type.value) {
         const response = await request.$patch<ApiTask>(`tasks/${taskId}`, { name: name.value, content: content.value });
 
@@ -52,22 +57,34 @@ const createNewTask = async () => {
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
         } else {
-            router.push(`/tasks/${response.id}`);
+            sendNotification('success', $t('editTask.updateSuccessful'));
         }
+    }
+}
+
+const deleteTask = async () => {
+    clearError();
+    const response = await request.$delete(`tasks/${taskId}`);
+    if (!isErrorResponse(response)) {
+        router.back();
+    }
+
+    if (isErrorResponse(response)) {
+        errors.value.general = response.message;
     }
 }
 </script>
 <template>
-    <div class="columns is-flex-grow-1 is-multiline">
+    <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Create New Task</h1>
+                <h1>{{ $t('editTask.editTask') }}</h1>
             </div>
         </div>
         <div class="column is-full columns">
-            <form @submit.prevent="createNewTask()" class="column is-half">
+            <form @submit.prevent="updateTask()" class="column is-half">
                 <div class="field">
-                    <label class="label">Name</label>
+                    <label class="label">{{ $t('field.name') }}</label>
                     <div class="control">
                         <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" placeholder="Name"
                             v-model="name" required>
@@ -75,7 +92,7 @@ const createNewTask = async () => {
                     <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
                 </div>
                 <div class="field">
-                    <label class="label" for="">Type</label>
+                    <label class="label" for="">{{ $t('field.type') }}</label>
                     <span class="select">
                         <select v-model="type" disabled>
                             <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label }}</option>
@@ -89,10 +106,16 @@ const createNewTask = async () => {
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link">Submit</button>
+                        <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:task')">{{
+                            $t('button.submit') }}</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                        }}</button>
+                    </div>
+                    <div class="control">
+                        <button type="button" class="button is-danger is-light" @click="deleteTask()"
+                            v-if="hasPermission(undefined, 'delete:task') && false /** TODO #10 */">{{ $t('button.delete') }}</button>
                     </div>
                 </div>
             </form>

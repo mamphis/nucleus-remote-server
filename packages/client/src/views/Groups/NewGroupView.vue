@@ -43,19 +43,19 @@ const createNewGroup = async () => {
 }
 </script>
 <template>
-    <div class="columns is-flex-grow-1 is-multiline">
+    <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Create New group</h1>
+                <h1>{{ $t('newGroup.newGroup') }}</h1>
             </div>
         </div>
         <div class="column is-full columns">
             <form @submit.prevent="createNewGroup()" class="column is-half">
                 <div class="field">
-                    <label class="label">Name</label>
+                    <label class="label">{{ $t('field.name') }}</label>
                     <div class="control">
-                        <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" placeholder="Name"
-                            v-model="name" required>
+                        <input :class="{ 'is-danger': !!errors.name }" class="input" type="text"
+                            :placeholder="$t('field.name')" v-model="name" required>
                     </div>
                     <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
                 </div>
@@ -64,10 +64,11 @@ const createNewGroup = async () => {
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link">Submit</button>
+                        <button type="submit" class="button is-link">{{ $t('button.submit') }}</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                        }}</button>
                     </div>
                 </div>
             </form>

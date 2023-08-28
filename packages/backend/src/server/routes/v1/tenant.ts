@@ -81,6 +81,16 @@ router.get('/:tenantId', auth('read:tenant'), async (req, res: AuthResponse, nex
     return res.json(tenant);
 });
 
+router.delete('/:id', auth('delete:tenant'), async (req, res: AuthResponse, next) => {
+    await db.tenant.delete({
+        where: {
+            id: req.params.id,
+        }
+    }).catch(() => {});;
+
+    res.status(201).end();
+});
+
 router.post('/', auth('create:tenant'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         name: z.string(),

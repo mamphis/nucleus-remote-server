@@ -28,7 +28,7 @@ router.get('/:taskId', auth('read:task'), async (req, res, next) => {
     }
 
     return res.json(task);
-})
+});
 
 router.post(`/`, auth('create:task'), async (req, res, next) => {
     const schema = z.object({

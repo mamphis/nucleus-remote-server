@@ -47,6 +47,16 @@ router.get('/:username', auth('read:user'), async (req, res: AuthResponse, next)
     return res.json(user);
 });
 
+router.delete('/:id', auth('delete:user'), async (req, res: AuthResponse, next) => {
+    await db.user.delete({
+        where: {
+            id: req.params.id,
+        }
+    }).catch(() => {});;
+
+    res.status(201).end();
+});
+
 router.post('/', auth('create:user'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         username: z.string(),

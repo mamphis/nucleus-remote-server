@@ -10,7 +10,6 @@ const props = defineProps<{
     permission: string,
 }>()
 
-const label = props.permission.split('-').map(s => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
 const create = ref(hasPermission(props.user, `create:${props.permission}`));
 const read = ref(hasPermission(props.user, `read:${props.permission}`));
 const update = ref(hasPermission(props.user, `update:${props.permission}`));
@@ -19,7 +18,7 @@ let debounce: number | undefined = undefined;
 
 watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate, oRead, oUpdate, oDelete]) => {
     if (nCreate) {
-        del.value = true;
+        update.value = true;
     }
 
     if (nDelete) {
@@ -56,33 +55,34 @@ watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate
 <template>
     <div class="field is-grouped">
         <div class="control is-expanded">
-            <label class="label">{{ label }}</label>
+            <label class="label">{{ $t('permission.' + permission) }}</label>
         </div>
-        <button class="button is-small is-rounded" @click="read = update = del = create = false">clear</button>
+        <button class="button is-small is-rounded"
+            @click="read = update = del = create = false">{{ $t('button.clear') }}</button>
     </div>
     <div class="field is-grouped is-grouped-centered">
         <div class="control">
             <label class="checkbox">
                 <input v-model="create" type="checkbox">
-                Create
+                {{ $t('permission.create') }}
             </label>
         </div>
         <div class="control">
             <label class="checkbox">
-                <input v-model="del" type="checkbox" :disabled="create">
-                Delete
+                <input v-model="del" type="checkbox">
+                {{ $t('permission.delete') }}
             </label>
         </div>
         <div class="control">
             <label class="checkbox">
-                <input v-model="update" type="checkbox" :disabled="del">
-                Update
+                <input v-model="update" type="checkbox" :disabled="del || create">
+                {{ $t('permission.update') }}
             </label>
         </div>
         <div class="control">
             <label class="checkbox">
                 <input v-model="read" type="checkbox" :disabled="update">
-                Read
+                {{ $t('permission.read') }}
             </label>
         </div>
     </div>

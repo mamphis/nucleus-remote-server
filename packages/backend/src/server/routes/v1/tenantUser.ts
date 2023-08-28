@@ -51,6 +51,17 @@ router.get('/:username', auth('read:tenant-user'), async (req, res: AuthResponse
     return res.json(user);
 });
 
+router.delete('/:id', auth('delete:user'), async (req, res: AuthResponse, next) => {
+    await db.user.delete({
+        where: {
+            id: req.params.id,
+            tenantId: res.locals.user.tenantId,
+        }
+    }).catch(() => {});;
+
+    res.status(201).end();
+});
+
 router.post('/', auth('create:tenant-user'), async (req, res: AuthResponse, next) => {
     const schema = z.object({
         username: z.string(),

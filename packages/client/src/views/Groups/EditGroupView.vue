@@ -6,6 +6,11 @@ import request, { assertNotErrorResponse, isErrorResponse, isValidationError } f
 import type { ApiConfiguration } from '@/types/configuration';
 import Dropdown from '@/components/Dropdown.vue';
 import type { ApiClient } from '@/types/client';
+import { hasPermission } from '@/lib/permission';
+import { eventStore } from '@/stores/eventBus';
+import { $t } from '@/lib/locale/locale';
+
+const { sendNotification } = eventStore();
 
 const { groupId } = router.currentRoute.value.params;
 const grp = await request.$get<ApiGroup>(`groups/${groupId}`);
@@ -54,6 +59,8 @@ const updateGroup = async () => {
             });
         } else if (isErrorResponse(response)) {
             errors.value.general = response.message;
+        } else {
+            sendNotification('success', $t('editGroup.updateSuccessful'));
         }
     }
 }
@@ -84,20 +91,32 @@ const removeSelectedClient = (client?: { id: string }) => {
     if (client) {
         group.value.client = group.value.client.filter(c => c.id !== client.id);
     }
-} 
+}
+
+const deleteGroup = async () => {
+    clearError();
+    const response = await request.$delete(`groups/${groupId}`);
+    if (!isErrorResponse(response)) {
+        router.back();
+    }
+
+    if (isErrorResponse(response)) {
+        errors.value.general = response.message;
+    }
+}
 </script>
 <template>
-    <div class="columns is-flex-grow-1 is-multiline">
+    <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Edit group</h1>
+                <h1>{{ $t('editGroup.editGroup') }}</h1>
             </div>
         </div>
         <form @submit.prevent="updateGroup()" class="column is-full">
             <div class="field">
-                <label class="label">Name</label>
+                <label class="label">{{ $t('field.name') }}</label>
                 <div class="control">
-                    <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" placeholder="Name"
+                    <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" :placeholder="$t('field.name')"
                         v-model="group.name" required>
                 </div>
                 <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
@@ -105,7 +124,7 @@ const removeSelectedClient = (client?: { id: string }) => {
             <div class="field">
                 <nav class="panel">
                     <p class="panel-heading">
-                        Configurations
+                        {{ $t('field.configurations') }}
                     </p>
                     <div class="panel-block">
                         <div class="field has-addons is-flex-grow-1">
@@ -129,7 +148,7 @@ const removeSelectedClient = (client?: { id: string }) => {
             <div class="field">
                 <nav class="panel">
                     <p class="panel-heading">
-                        Clients
+                        {{ $t('field.clients') }}
                     </p>
                     <div class="panel-block">
                         <div class="field has-addons is-flex-grow-1">
@@ -156,10 +175,16 @@ const removeSelectedClient = (client?: { id: string }) => {
             </div>
             <div class="field is-grouped">
                 <div class="control">
-                    <button type="submit" class="button is-link">Submit</button>
+                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:group')">{{
+                        $t('button.submit') }}</button>
                 </div>
                 <div class="control">
-                    <button type="reset" class="button is-link is-light" @click="$router.back()">Cancel</button>
+                    <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                    }}</button>
+                </div>
+                <div class="control">
+                    <button type="button" class="button is-danger is-light" @click="deleteGroup()"
+                        v-if="hasPermission(undefined, 'delete:group')">{{ $t('button.delete') }}</button>
                 </div>
             </div>
         </form>

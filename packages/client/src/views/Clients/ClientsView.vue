@@ -1,26 +1,41 @@
 <script setup lang="ts">
+import { hasPermission } from '@/lib/permission';
 import request, { isErrorResponse } from '@/lib/request';
-import { formatDate,humanizeDate } from '@/lib/utils';
+import { formatDate, humanizeDate } from '@/lib/utils';
+import { settingsStore } from '@/stores/settings';
+import userStore from '@/stores/user';
 import type { ApiClient } from '@/types/client';
 
 const clients = await request.$get<ApiClient[]>('clients');
+const { baseApiUrl } = settingsStore();
+const { user } = userStore();
+const fileUrl = new URL(`/system/update/file`, baseApiUrl).href;
 </script>
 <template>
-    <div class="columns is-flex-grow-1 is-multiline">
+    <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>Clients</h1>
+                <h1>{{ $t('clients.clients') }}</h1>
+            </div>
+            <div class="column is-flex is-justify-content-end">
+                <div class="buttons is-grouped">
+                    <a class="button" v-if="hasPermission(user, 'create:client')"
+                        :href="baseApiUrl + `clients/configuration/${user?.tenantId}`">
+                        {{ $t('clients.newClient') }}</a>
+                    <a class="button" v-if="hasPermission(user, 'create:client')" :href="fileUrl">
+                        {{ $t('clients.downloadClient') }}</a>
+                </div>
             </div>
         </div>
         <div class="column is-full">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Username</th>
-                        <th>Hostname</th>
-                        <th>OS Version</th>
-                        <th>App Version</th>
-                        <th>Last Connection</th>
+                        <th>{{ $t('field.username') }}</th>
+                        <th>{{ $t('field.hostname') }}</th>
+                        <th>{{ $t('field.osVersion') }}</th>
+                        <th>{{ $t('field.appVersion') }}</th>
+                        <th>{{ $t('field.lastPing') }}</th>
                     </tr>
                 </thead>
                 <tbody v-if="!isErrorResponse(clients)">

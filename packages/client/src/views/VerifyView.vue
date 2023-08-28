@@ -9,15 +9,15 @@ const { verify } = userStore();
 </script>
 <template>
     <form @submit.prevent="verify(onetimePassword, password).then((response) => { router.push('/') })">
-        <h1>Create Password</h1>
+        <h1>{{ $t('verify.createPassword') }}</h1>
         <div class="field">
-            <label class="label" for="password">Password</label>
+            <label class="label" for="password">{{ $t('field.password') }}</label>
             <div class="control">
                 <input class="input" type="password" name="password" id="password" v-model="password">
             </div>
         </div>
         <div class="field">
-            <button class="button" type="submit">Create Password</button>
+            <button class="button" type="submit">{{ $t('verify.createPassword') }}</button>
         </div>
     </form>
 </template>

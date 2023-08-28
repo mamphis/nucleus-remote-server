@@ -1,5 +1,6 @@
 import { settingsStore } from "@/stores/settings";
 import userStore from "@/stores/user";
+import { $t } from "./locale/locale";
 
 type RequestMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -29,11 +30,11 @@ function isErrorResponse(value: unknown): value is ErrorResponse {
 
 function assertNotErrorResponse<T>(value: unknown): asserts value is T {
     if (!value) {
-        throw new Error('value is undefined.');
+        throw new Error($t('request.valueUndefined'));
     }
 
     if (isErrorResponse(value)) {
-        throw new Error('value is an error response: ' + value.message);
+        throw new Error($t('request.errorResponse', value.message));
     }
 }
 
@@ -69,6 +70,7 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
 
     const response = await fetch(new URL(normalizeApiRoute(apiRoute), baseApiUrl), requestInit);
     if (!response.ok) {
+
         const errorResponse = await response.json();
         if (isErrorResponse(errorResponse)) {
             return errorResponse;
@@ -81,6 +83,10 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
         };
     }
 
+    if (response.status === 201) {
+        return undefined as T;
+    }
+    
     const result = response.json();
     return result as T;
 };
@@ -90,7 +96,7 @@ export default {
     $post: <T>(apiRoute: string, body: any) => request<T>('POST', apiRoute, body),
     $patch: <T>(apiRoute: string, body: any) => request<T>('PATCH', apiRoute, body),
     $put: <T>(apiRoute: string, body: any) => request<T>('PUT', apiRoute, body),
-    $delete: <T>(apiRoute: string) => request<T>('DELETE', apiRoute),
+    $delete: (apiRoute: string) => request<undefined>('DELETE', apiRoute),
 };
 
 export {

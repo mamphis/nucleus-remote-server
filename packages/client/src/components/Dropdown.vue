@@ -2,8 +2,9 @@
     <div class="dropdown" v-if="options">
 
         <!-- Dropdown Input -->
-        <input class="dropdown-input input" :class="$props.inputClass" :name="name" @focus="showOptions(true)" @input="showOptions(false)" @blur="exit()"
-            @keyup="keyMonitor" v-model="searchFilter" :disabled="disabled" :placeholder="placeholder" autocomplete="off" />
+        <input class="dropdown-input input" :class="$props.inputClass" :name="name" @focus="showOptions(true)"
+            @input="showOptions(false)" @blur="exit()" @keyup="keyMonitor" v-model="searchFilter" :disabled="disabled"
+            :placeholder="placeholder" autocomplete="off" />
 
         <!-- Dropdown Menu -->
         <div class="dropdown-content" v-show="optionsShown">
@@ -16,6 +17,7 @@
 </template>
   
 <script lang="ts" setup>
+import { $t } from '@/lib/locale/locale';
 import { computed, ref, watch } from 'vue';
 
 type KeyValuePair = {
@@ -40,7 +42,7 @@ const props = defineProps(
         placeholder: {
             type: String,
             required: false,
-            default: 'Please select an option',
+            default: $t('dropdown.defaultPlaceholder'),
             note: 'Placeholder of dropdown'
         },
         disabled: {
@@ -57,6 +59,20 @@ const props = defineProps(
         },
         inputClass: {
             type: String
+        },
+        isSingle: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        allowCustom: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        default: {
+            type: String,
+            required: false,
         }
     });
 
@@ -64,10 +80,10 @@ const emits = defineEmits<{
     (event: 'selected', selectedId?: KeyValuePair): void,
     (event: 'filter', searchFilter: string): void,
 }>()
-
-const selected = ref<KeyValuePair>();
+console.log(props.default);
+const selected = ref<KeyValuePair | undefined>(props.default ? props.options.find(o => o.id === props.default) ?? { id: props.default ?? '', name: props.default ?? '' } : undefined);
 const optionsShown = ref(false);
-const searchFilter = ref('');
+const searchFilter = ref(selected.value?.name ?? '');
 const preselectedItemIndex = ref(0);
 
 emits('selected', selected.value);
@@ -84,17 +100,21 @@ const filteredOptions = computed(() => {
 });
 
 
-function selectOption(option: KeyValuePair) {
-    console.log('dropdown', 'select', option)
-    selected.value = option;
-    emits('selected', option);
+function selectOption(option?: KeyValuePair) {
+    if (!option && props.allowCustom) {
+        selected.value = { id: searchFilter.value, name: searchFilter.value };
+    } else {
+        selected.value = option;
+    }
+    emits('selected', selected.value);
     optionsShown.value = false;
-    searchFilter.value = '';
+
+    searchFilter.value = props.isSingle ? selected.value?.name ?? '' : '';
 }
 
 function showOptions(clearInput: boolean) {
     if (!props.disabled) {
-        if (clearInput) {
+        if (clearInput && !props.allowCustom) {
             searchFilter.value = '';
         }
         optionsShown.value = true;
@@ -103,7 +123,7 @@ function showOptions(clearInput: boolean) {
 }
 
 function exit() {
-    optionsShown.value = false;
+    selectOption(filteredOptions.value[preselectedItemIndex.value])
 }
 
 // Selecting when pressing Enter
