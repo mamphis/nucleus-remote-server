@@ -4,28 +4,29 @@ import { Router } from "express";
 import { BadRequest, Unauthorized } from 'http-errors';
 import { getToken } from '../../../lib/auth';
 
-const router = Router();
-const db = new PrismaClient();
+export default function (db: PrismaClient) {
+    const router = Router();
 
-router.post('/', async (req, res, next) => {
-    const { username, password } = req.body;
-    if (username && password) {
-        const user = await db.user.findFirst({ where: { username }, select: { tenantId: true, username: true, password: true, permission: true } });
+    router.post('/', async (req, res, next) => {
+        const { username, password } = req.body;
+        if (username && password) {
+            const user = await db.user.findFirst({ where: { username }, select: { tenantId: true, username: true, password: true, permission: true } });
 
-        if (!user) {
-            return next(Unauthorized('invalid username or password'));
+            if (!user) {
+                return next(Unauthorized('invalid username or password'));
+            }
+
+            if (!await compare(password, user.password)) {
+                return next(Unauthorized('invalid username or password'));
+            }
+
+            const { token, user: authUser } = getToken(user);
+
+            return res.json({ token, user: authUser });
         }
 
-        if (!await compare(password, user.password)) {
-            return next(Unauthorized('invalid username or password'));
-        }
-
-        const { token, user: authUser } = getToken(user);
-
-        return res.json({ token, user: authUser });
-    }
-
-    return next(BadRequest('please provide username and password.'));
-});
-
-export default router;
+        return next(BadRequest('please provide username and password.'));
+    });
+    
+    return router;
+}

@@ -5,123 +5,125 @@ import { NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
 
-const router = Router();
-const db = new PrismaClient();
+export default function (db: PrismaClient) {
+    const router = Router();
 
-router.get('/', auth('read:group'), async (req, res: AuthResponse, next) => {
-    const groups = await db.group.findMany({
-        where: { tenantId: res.locals.user.tenantId }, select: {
-            id: true,
-            name: true,
-            client: true,
-            configuration: true,
-        }
-    });
-    return res.json(groups);
-});
 
-router.get('/:groupId', auth('read:group'), async (req, res: AuthResponse, next) => {
-    const group = await db.group.findFirst({
-        where: { tenantId: res.locals.user.tenantId, id: req.params.groupId }, select: {
-            id: true,
-            name: true,
-            client: true,
-            configuration: true,
-        }
-    });
-
-    if (!group) {
-        return NotFound(`Group with id "${req.params.groupId}" was not found.`);
-    }
-
-    return res.json(group);
-});
-
-router.delete('/:id', auth('delete:group'), async (req, res: AuthResponse, next) => {
-    await db.group.delete({
-        where: {
-            id: req.params.id,
-            tenantId: res.locals.user.tenantId,
-        }
-    }).catch(() => {});;
-
-    res.status(201).end();
-});
-
-router.post('/', auth('create:group'), async (req, res: AuthResponse, next) => {
-    const schema = z.object({
-        name: z.string(),
-    });
-
-    try {
-        const groupData = schema.parse(req.body);
-
-        const group = await db.group.create({
-            data: {
-                name: groupData.name,
-                tenantId: res.locals.user.tenantId,
+    router.get('/', auth('read:group'), async (req, res: AuthResponse, next) => {
+        const groups = await db.group.findMany({
+            where: { tenantId: res.locals.user.tenantId }, select: {
+                id: true,
+                name: true,
+                client: true,
+                configuration: true,
             }
         });
-        return res.json(group);
-    } catch (e: unknown) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            return next(UnprocessableEntity(e.message));
-        }
-
-        if (e instanceof ZodError) {
-            return next(e);
-        }
-
-        return next(e);
-    }
-})
-
-router.patch('/:groupId', auth('update:group'), async (req, res: AuthResponse, next) => {
-    const schema = z.object({
-        name: z.string(),
-        configuration: z.array(
-            z.object({
-                id: z.string(),
-            }),
-        ),
-        client: z.array(
-            z.object({
-                id: z.string(),
-            }),
-        ),
+        return res.json(groups);
     });
 
-    try {
-        const groupData = schema.parse(req.body);
+    router.get('/:groupId', auth('read:group'), async (req, res: AuthResponse, next) => {
+        const group = await db.group.findFirst({
+            where: { tenantId: res.locals.user.tenantId, id: req.params.groupId }, select: {
+                id: true,
+                name: true,
+                client: true,
+                configuration: true,
+            }
+        });
 
-        const group = await db.group.update({
+        if (!group) {
+            return NotFound(`Group with id "${req.params.groupId}" was not found.`);
+        }
+
+        return res.json(group);
+    });
+
+    router.delete('/:id', auth('delete:group'), async (req, res: AuthResponse, next) => {
+        await db.group.delete({
             where: {
-                id: req.params.groupId,
+                id: req.params.id,
                 tenantId: res.locals.user.tenantId,
-            },
-            data: {
-                name: groupData.name,
-                configuration: {
-                    set: groupData.configuration,
-                },
-                client: {
-                    set: groupData.client,
-                }
             }
+        }).catch(() => { });;
+
+        res.status(201).end();
+    });
+
+    router.post('/', auth('create:group'), async (req, res: AuthResponse, next) => {
+        const schema = z.object({
+            name: z.string(),
         });
 
-        return res.json(group);
-    } catch (e: unknown) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            return next(UnprocessableEntity(e.message));
-        }
+        try {
+            const groupData = schema.parse(req.body);
 
-        if (e instanceof ZodError) {
+            const group = await db.group.create({
+                data: {
+                    name: groupData.name,
+                    tenantId: res.locals.user.tenantId,
+                }
+            });
+            return res.json(group);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
             return next(e);
         }
+    })
 
-        return next(e);
-    }
-})
+    router.patch('/:groupId', auth('update:group'), async (req, res: AuthResponse, next) => {
+        const schema = z.object({
+            name: z.string(),
+            configuration: z.array(
+                z.object({
+                    id: z.string(),
+                }),
+            ),
+            client: z.array(
+                z.object({
+                    id: z.string(),
+                }),
+            ),
+        });
 
-export default router;
+        try {
+            const groupData = schema.parse(req.body);
+
+            const group = await db.group.update({
+                where: {
+                    id: req.params.groupId,
+                    tenantId: res.locals.user.tenantId,
+                },
+                data: {
+                    name: groupData.name,
+                    configuration: {
+                        set: groupData.configuration,
+                    },
+                    client: {
+                        set: groupData.client,
+                    }
+                }
+            });
+
+            return res.json(group);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
+            return next(e);
+        }
+    });
+    
+    return router;
+}
