@@ -1,12 +1,9 @@
 <script lang="ts" setup>
 import { isErrorResponse } from '@/lib/request';
 import router from '@/router';
-import { eventStore } from '@/stores/eventBus';
 import userStore from '@/stores/user';
 import { ref } from 'vue';
 
-
-const {sendNotification} = eventStore();
 const password = ref("");
 const username = ref("");
 
@@ -18,7 +15,7 @@ const errors = ref<{
 
 const { login } = userStore();
 const performLogin = async () => {
-    const response = await login(username.value, password.value)
+    const response = await login(username.value, password.value);
     if (!isErrorResponse(response)) {
         router.push('/')
     } else {

@@ -1,11 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from "@prisma/client/runtime/library";
 import { Router } from "express";
-import { Forbidden, NotFound, UnprocessableEntity } from 'http-errors';
+import { Forbidden, BadRequest, NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
 import mailer from "../../../lib/mailer";
 import { randomString } from "../../../lib/util";
+import { compare, hash } from "bcrypt";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -20,6 +21,112 @@ export default function (db: PrismaClient) {
                 email: true,
             }
         }));
+    });
+
+    router.get('/me', auth(), async (req, res: AuthResponse, next) => {
+        const user = await db.user.findFirst({
+            where: {
+                id: res.locals.user.id,
+            },
+            select: {
+                id: true,
+                username: true,
+                permission: true,
+                tenant: true,
+                email: true,
+            }
+        });
+
+        if (!user) {
+            return next(NotFound(`${req.params.username} was not found.`));
+        }
+
+        return res.json(user);
+    });
+
+    router.patch('/me', auth(), async (req, res: AuthResponse, next) => {
+        const schema = z.object({
+            email: z.string().email(),
+        });
+
+        try {
+            const userData = schema.parse(req.body);
+            const user = await db.user.update({
+                where: {
+                    id: res.locals.user.id,
+                },
+                data: {
+                    email: userData.email,
+                },
+                select: {
+                    id: true,
+                    username: true,
+                    permission: true,
+                    tenant: true,
+                    email: true,
+                }
+            });
+
+            return res.json(user);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
+            return next(e);
+        }
+    });
+
+    router.patch('/changePassword', auth(), async (req, res: AuthResponse, next) => {
+        const schema = z.object({
+            oldPassword: z.string(),
+            newPassword: z.string(),
+        });
+
+        try {
+            const user = await db.user.findFirst({ where: { id: res.locals.user.id } });
+
+            if (!user) {
+                return next(NotFound(`${res.locals.user.username} was not found.`));
+            }
+
+            const userData = schema.parse(req.body);
+            if (!await compare(userData.oldPassword, user?.password)) {
+                return next(BadRequest('Your old password is not correct.'));
+            }
+
+            const update = await db.user.update({
+                where: {
+                    id: user.id,
+                },
+                data: {
+                    password: await hash(userData.newPassword, 10),
+                },
+                select: {
+                    id: true,
+                    username: true,
+                    permission: true,
+                    tenant: true,
+                    email: true,
+                },
+            })
+
+            return res.json(update);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
+            return next(e);
+        }
     });
 
     router.get('/:username', auth('read:user'), async (req, res: AuthResponse, next) => {
@@ -221,6 +328,6 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
-    
+
     return router;
 };

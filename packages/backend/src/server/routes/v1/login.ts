@@ -10,7 +10,7 @@ export default function (db: PrismaClient) {
     router.post('/', async (req, res, next) => {
         const { username, password } = req.body;
         if (username && password) {
-            const user = await db.user.findFirst({ where: { username }, select: { tenantId: true, username: true, password: true, permission: true } });
+            const user = await db.user.findFirst({ where: { username }, select: { id: true, tenantId: true, username: true, password: true, permission: true } });
 
             if (!user) {
                 return next(Unauthorized('invalid username or password'));

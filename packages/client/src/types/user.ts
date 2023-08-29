@@ -9,6 +9,7 @@ export type ApiUser = {
 };
 
 export type AuthUser = {
+    id: string;
     username: string;
     tenantId: string;
     permissions: string[];

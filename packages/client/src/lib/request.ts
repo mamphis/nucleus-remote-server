@@ -1,6 +1,8 @@
 import { settingsStore } from "@/stores/settings";
 import userStore from "@/stores/user";
 import { $t } from "./locale/locale";
+import { ref, type Ref, type UnwrapNestedRefs } from "vue";
+import type { UnwrapRef } from "vue";
 
 type RequestMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -52,7 +54,16 @@ const normalizeApiRoute = (apiRoute: string): string => {
     return apiRoute;
 }
 
-const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): Promise<ErrorResponse | T> => {
+type SuccessResponse<T> = T & {
+    toRef: () => Ref<UnwrapRef<T>>;
+};
+
+type Response<T> = (ErrorResponse | T) & {
+    assertNotError: () => SuccessResponse<T>;
+};
+
+
+const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): Promise<Response<T>> => {
     const user = userStore();
     const { baseApiUrl } = settingsStore();
 
@@ -69,26 +80,32 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
     }
 
     const response = await fetch(new URL(normalizeApiRoute(apiRoute), baseApiUrl), requestInit);
-    if (!response.ok) {
-
-        const errorResponse = await response.json();
-        if (isErrorResponse(errorResponse)) {
-            return errorResponse;
-        }
-
+    const makeResponse = (response: unknown) => {
         return {
-            type: 'Unknown',
-            error: 'Internal Server Error',
-            message: JSON.stringify(errorResponse),
+            ...response as T | ErrorResponse,
+            assertNotError: () => {
+                assertNotErrorResponse<T>(response);
+                return {
+                    ...response,
+                    toRef: () => {
+                        return ref<T>(response);
+                    }
+                };
+            }
         };
+    }
+    if (!response.ok) {
+        const errorResponse = await response.json();
+
+        return makeResponse(errorResponse);
     }
 
     if (response.status === 201) {
-        return undefined as T;
+        return makeResponse(undefined);
     }
-    
-    const result = response.json();
-    return result as T;
+
+    const result = await response.json();
+    return makeResponse(result);
 };
 
 export default {
