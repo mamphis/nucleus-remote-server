@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import clients from './client';
 import configurations from './configuration';
@@ -10,15 +11,16 @@ import users from './user';
 import verify from './verify';
 
 const router = Router();
+const db = new PrismaClient();
 
-router.use('/login', login);
-router.use('/verify', verify);
-router.use('/clients', clients);
-router.use('/users', users);
-router.use('/tenants', tenants);
-router.use('/tenant-users', tenantUsers);
-router.use('/groups', groups);
-router.use('/configurations', configurations);
-router.use('/tasks', tasks);
+router.use('/login', login(db));
+router.use('/verify', verify(db));
+router.use('/clients', clients(db));
+router.use('/users', users(db));
+router.use('/tenants', tenants(db));
+router.use('/tenant-users', tenantUsers(db));
+router.use('/groups', groups(db));
+router.use('/configurations', configurations(db));
+router.use('/tasks', tasks(db));
 
 export default router;
