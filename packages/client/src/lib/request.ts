@@ -81,20 +81,23 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
 
     const response = await fetch(new URL(normalizeApiRoute(apiRoute), baseApiUrl), requestInit);
     const makeResponse = (response: unknown) => {
-        const obj = {
-            ...response as T | ErrorResponse,
-        };
-
+        const obj = response as T | ErrorResponse;
+        
         Object.defineProperty(obj, 'assertNotError', {
             enumerable: false,
+            configurable: false,
+            writable: false,
             value: () => {
                 assertNotErrorResponse<T>(response);
-                return {
-                    ...response,
-                    toRef: () => {
+                Object.defineProperty(obj, 'toRef', {
+                    enumerable: false,
+                    configurable: false,
+                    writable: false,
+                    value: () => {
                         return ref<T>(response);
                     }
-                };
+                });
+                return obj;
             },
         });
 
