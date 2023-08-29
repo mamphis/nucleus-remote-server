@@ -14,7 +14,7 @@ namespace nucleus_remote_client.Tasks
         public bool HideWindow { get; set; }
         public bool StartIfProcessIsRunning { get; set; }
 
-        private static Dictionary<string, int> StartedProcesses = new Dictionary<string, int>();
+        private static Dictionary<int, string> StartedProcesses = new Dictionary<int, string>();
 
         public async Task Run(HostSettings hostSettings)
         {
@@ -25,15 +25,19 @@ namespace nucleus_remote_client.Tasks
                 return;
             }
 
-            if (StartedProcesses.ContainsKey(path) && !this.StartIfProcessIsRunning)
+            if (StartedProcesses.ContainsValue(path) && !this.StartIfProcessIsRunning)
             {
-                var existingProc = Process.GetProcesses().FirstOrDefault(p => p.Id == StartedProcesses[path]);
-                if (existingProc != null && !existingProc.HasExited)
+                var procs = Process.GetProcesses();
+                foreach (var item in StartedProcesses)
                 {
-                    return;
-                }
+                    var existingProc = procs.FirstOrDefault(p => p.Id == item.Key);
+                    if (existingProc != null && !existingProc.HasExited)
+                    {
+                        return;
+                    }
 
-                StartedProcesses.Remove(path);
+                    StartedProcesses.Remove(item.Key);
+                }
             }
 
             var psi = new ProcessStartInfo(path, this.Arguments ?? "");
@@ -45,7 +49,7 @@ namespace nucleus_remote_client.Tasks
                 throw new Exception("The process cannot be started.");
             }
 
-            ExecuteFile.StartedProcesses.Add(path, proc.Id);
+            ExecuteFile.StartedProcesses.Add(proc.Id, path);
         }
     }
 }
