@@ -3,7 +3,7 @@ import type { ApiUser, AuthUser } from "@/types/user";
 
 
 function getPermissions(user: AuthUser | ApiUser): string[] {
-    if ('id' in user) {
+    if ('permission' in user) {
         return user.permission.map(p => p.scope);
     }
 
