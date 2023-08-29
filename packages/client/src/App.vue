@@ -101,6 +101,9 @@ onSendNofification((event) => {
                         <div class="navbar-dropdown">
                             <RouterLink class="navbar-item" to="/profile">{{ $t('navbar.profile') }}
                             </RouterLink>
+                            <hr class="navbar-divider">
+                            <RouterLink class="navbar-item" to="/issue">{{ $t('navbar.reportIssue') }}
+                            </RouterLink>
                         </div>
                     </div>
                     <RouterLink v-if="!isLoggedIn" class="navbar-item" to="/login">{{ $t('navbar.login') }}</RouterLink>

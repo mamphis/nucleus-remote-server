@@ -4,6 +4,7 @@ import clients from './client';
 import configurations from './configuration';
 import groups from './group';
 import login from './login';
+import misc from "./misc";
 import tasks from './task';
 import tenants from './tenant';
 import tenantUsers from './tenantUser';
@@ -22,5 +23,6 @@ router.use('/tenant-users', tenantUsers(db));
 router.use('/groups', groups(db));
 router.use('/configurations', configurations(db));
 router.use('/tasks', tasks(db));
+router.use('/misc', misc(db));
 
 export default router;
