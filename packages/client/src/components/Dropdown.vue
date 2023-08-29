@@ -19,6 +19,7 @@
 <script lang="ts" setup>
 import { $t } from '@/lib/locale/locale';
 import { computed, ref, watch } from 'vue';
+import fuzzysort from 'fuzzysort';
 
 type KeyValuePair = {
     id: string;
@@ -89,14 +90,8 @@ const preselectedItemIndex = ref(0);
 emits('selected', selected.value);
 
 const filteredOptions = computed(() => {
-    const filtered = [];
-    const regOption = new RegExp(searchFilter.value, 'ig');
-    for (const option of props.options) {
-        if (searchFilter.value.length < 1 || option.name.match(regOption)) {
-            if (filtered.length < props.maxItem) filtered.push(option);
-        }
-    }
-    return filtered;
+    const result = fuzzysort.go(searchFilter.value, props.options, { key: 'name', limit: props.maxItem, all: true });
+    return result.map(r => r.obj);
 });
 
 
