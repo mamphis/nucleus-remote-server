@@ -81,9 +81,13 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
 
     const response = await fetch(new URL(normalizeApiRoute(apiRoute), baseApiUrl), requestInit);
     const makeResponse = (response: unknown) => {
-        return {
+        const obj = {
             ...response as T | ErrorResponse,
-            assertNotError: () => {
+        };
+
+        Object.defineProperty(obj, 'assertNotError', {
+            enumerable: false,
+            value: () => {
                 assertNotErrorResponse<T>(response);
                 return {
                     ...response,
@@ -91,8 +95,10 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
                         return ref<T>(response);
                     }
                 };
-            }
-        };
+            },
+        });
+
+        return obj as Response<T>;
     }
     if (!response.ok) {
         const errorResponse = await response.json();
