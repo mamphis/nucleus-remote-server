@@ -71,7 +71,7 @@ export default function (db: PrismaClient) {
             }
         }).catch(() => { });;
 
-        res.status(201).end();
+        res.status(204).end();
     });
 
     router.post('/', auth('create:tenant'), async (req, res: AuthResponse, next) => {

@@ -108,7 +108,7 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
         return makeResponse(errorResponse);
     }
 
-    if (response.status === 201) {
+    if (response.status === 204) {
         return makeResponse(undefined);
     }
 

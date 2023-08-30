@@ -45,7 +45,7 @@ export default function (db: PrismaClient) {
             }
         }).catch(() => { });;
 
-        res.status(201).end();
+        res.status(204).end();
     });
 
     router.get('/:configurationId/groups', auth('read:configuration', 'read:group'), async (req, res: AuthResponse, next) => {

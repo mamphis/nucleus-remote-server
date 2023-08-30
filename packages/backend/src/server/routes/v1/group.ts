@@ -46,7 +46,7 @@ export default function (db: PrismaClient) {
             }
         }).catch(() => { });;
 
-        res.status(201).end();
+        res.status(204).end();
     });
 
     router.post('/', auth('create:group'), async (req, res: AuthResponse, next) => {
