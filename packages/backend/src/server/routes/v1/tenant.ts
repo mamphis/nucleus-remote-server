@@ -1,9 +1,27 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Router } from "express";
 import { NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
+
+const tenantSelect: Prisma.TenantSelect = {
+    id: true,
+    name: true,
+    maxClients: true,
+    user: {
+        select: {
+            username: true,
+            id: true,
+        }
+    },
+    client: {
+        select: {
+            id: true,
+            active: true,
+        }
+    }
+}
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -12,31 +30,14 @@ export default function (db: PrismaClient) {
     router.get('/', auth('read:tenant'), async (req, res: AuthResponse, next) => {
         if (res.locals.user.permissions.includes('special:admin')) {
             const tenants = await db.tenant.findMany({
-                select: {
-                    id: true,
-                    name: true,
-                    user: {
-                        select: {
-                            username: true,
-                            id: true,
-                        }
-                    }
-                }
+                select: tenantSelect
             });
+
             return res.json(tenants);
         }
 
         const tenants = await db.tenant.findMany({
-            where: { user: { some: { username: res.locals.user.username } } }, select: {
-                id: true,
-                name: true,
-                user: {
-                    select: {
-                        username: true,
-                        id: true,
-                    }
-                }
-            }
+            where: { user: { some: { username: res.locals.user.username } } }, select: tenantSelect
         });
         return res.json(tenants);
     });
@@ -47,31 +48,13 @@ export default function (db: PrismaClient) {
                 where: {
                     id: req.params.tenantId,
                 },
-                select: {
-                    id: true,
-                    name: true,
-                    user: {
-                        select: {
-                            username: true,
-                            id: true,
-                        }
-                    }
-                }
+                select: tenantSelect
             });
             return res.json(tenants);
         }
 
         const tenant = await db.tenant.findFirst({
-            where: { user: { some: { username: res.locals.user.username } }, id: req.params.tenantId }, select: {
-                id: true,
-                name: true,
-                user: {
-                    select: {
-                        username: true,
-                        id: true,
-                    }
-                }
-            }
+            where: { user: { some: { username: res.locals.user.username } }, id: req.params.tenantId }, select: tenantSelect
         });
 
         if (!tenant) {
@@ -148,6 +131,6 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
-    
+
     return router;
 }

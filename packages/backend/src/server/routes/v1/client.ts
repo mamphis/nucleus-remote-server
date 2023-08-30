@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
@@ -65,10 +65,24 @@ export default function (db: PrismaClient) {
 
         try {
             const clientData = schema.parse(req.body);
-            console.log(clientData);
 
             // Check if the tenant exist
-            if (!await db.tenant.findFirst({ where: { id: clientData.tenantId, } })) {
+            const tenant = await db.tenant.findFirst({
+                where: { id: clientData.tenantId, }, select: {
+                    _count: {
+                        select: {
+                            // Only get active Clients
+                            client: {
+                                where: {
+                                    active: true
+                                }
+                            }
+                        }
+                    },
+                    maxClients: true,
+                }
+            });
+            if (!tenant) {
                 return next(BadRequest('Invalid Tenant: ' + clientData.tenantId));
             }
 
@@ -76,6 +90,15 @@ export default function (db: PrismaClient) {
             var existingClient = await db.client.findFirst({ where: { id: clientData.id } });
             if (existingClient && existingClient.tenantId != clientData.tenantId) {
                 return next(BadRequest('Invalid client id: ' + clientData.id));
+            }
+
+            let active = false;
+
+            if (!existingClient) {
+                // New Client wants to be registered to a tenant. Check if it shell be active
+                if (tenant.maxClients > tenant._count.client) {
+                    active = true;
+                }
             }
 
             const client = await db.client.upsert({
@@ -86,6 +109,7 @@ export default function (db: PrismaClient) {
                 create: {
                     ...clientData,
                     lastPing: new Date(),
+                    active,
                 },
                 update: {
                     ...clientData,
@@ -108,6 +132,12 @@ export default function (db: PrismaClient) {
     });
 
     router.get('/:clientId/tasks', async (req, res, next) => {
+        const client = await db.client.findFirst({ where: { id: req.params.clientId } });
+        if (client && !client.active) {
+            // If the client is not active. Simply ignore the tasks it should execute otherwise
+            return res.json([]);
+        }
+
         const tasks = await db.task.findMany({
             where: {
                 configuration: {
@@ -120,7 +150,8 @@ export default function (db: PrismaClient) {
                             }
                         }
                     }
-                }
+                },
+                active: true,
             },
             select: {
                 configuration: true,
@@ -191,6 +222,6 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
-    
+
     return router;
 }
