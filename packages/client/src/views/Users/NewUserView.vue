@@ -55,16 +55,10 @@ const createNewUser = async () => {
         clearError();
         if (isValidationError(response)) {
             response.data.forEach(issue => {
-                switch (issue.validation) {
-                    case 'email':
-                        errors.value.email = issue.message;
-                        break;
-                    case 'tenant':
-                        errors.value.tenant = issue.message;
-                        break;
-                    case 'username':
-                        errors.value.username = issue.message;
-                        break;
+                if (issue.path in errors.value) {
+                    errors.value[issue.path as keyof typeof errors.value] = issue.message;
+                } else {
+                    errors.value.general = issue.message;
                 }
             });
         } else if (isErrorResponse(response)) {
@@ -101,11 +95,11 @@ const createNewUser = async () => {
                     <p v-if="!!errors.email" class="help is-danger">{{ errors.email }}</p>
                 </div>
                 <div class="field">
-                    <label class="label">{{$t('field.tenant')}}</label>
+                    <label class="label">{{ $t('field.tenant') }}</label>
                     <div class="control">
                         <span :class="{ 'is-danger': !!errors.tenant }" class="select">
                             <select v-model="tenant">
-                                <option value="">{{$t('newUser.selectTenant')}}</option>
+                                <option value="">{{ $t('newUser.selectTenant') }}</option>
                                 <option v-if="!isErrorResponse(tenants)" v-for=" tenant  in  tenants " :key="tenant.id"
                                     :value="tenant.id">
                                     {{ tenant.name }}
@@ -123,7 +117,8 @@ const createNewUser = async () => {
                         <button type="submit" class="button is-link">{{ $t('button.submit') }}</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel') }}</button>
+                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
+                        }}</button>
                     </div>
                 </div>
             </form>

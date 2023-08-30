@@ -47,13 +47,10 @@ const createNewUser = async () => {
         clearError();
         if (isValidationError(response)) {
             response.data.forEach(issue => {
-                switch (issue.validation) {
-                    case 'email':
-                        errors.value.email = issue.message;
-                        break;
-                    case 'username':
-                        errors.value.username = issue.message;
-                        break;
+                if (issue.path in errors.value) {
+                    errors.value[issue.path as keyof typeof errors.value] = issue.message;
+                } else {
+                    errors.value.general = issue.message;
                 }
             });
         } else if (isErrorResponse(response)) {

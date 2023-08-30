@@ -46,10 +46,10 @@ const updateConfiguration = async () => {
         clearError();
         if (isValidationError(response)) {
             response.data.forEach(issue => {
-                switch (issue.validation) {
-                    case 'name':
-                        errors.value.name = issue.message;
-                        break;
+                if (issue.path in errors.value) {
+                    errors.value[issue.path as keyof typeof errors.value] = issue.message;
+                } else {
+                    errors.value.general = issue.message;
                 }
             });
         } else if (isErrorResponse(response)) {
