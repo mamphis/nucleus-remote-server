@@ -25,7 +25,7 @@ namespace nucleus_remote_client.Client
 
             if (tasks == null)
             {
-                var _ = new SendLog("error", "Cannot parse get tasks response").ExecuteAsync(hostSettings);
+                await SendLog.Error(hostSettings, "Cannot parse get tasks response");
                 return;
             }
 
@@ -35,13 +35,13 @@ namespace nucleus_remote_client.Client
                 {
                     ITask task = this.GetTask(taskContainer);
                     await task.Run(hostSettings);
-
-                    var _ = new SendLog("info", $"Execution of task {taskContainer.name} was successful.").ExecuteAsync(hostSettings);
+                    
+                    await SendLog.Info(hostSettings, $"Execution of task {taskContainer.name} was successful.");
                     RunnedTasks.Add(taskContainer.id);
                 }
                 catch (Exception ex)
                 {
-                    var _ = new SendLog("error", $"Task {taskContainer.name}: " + ex.Message).ExecuteAsync(hostSettings);
+                    await SendLog.Error(hostSettings, $"Task {taskContainer.name}: " + ex.Message);
                 }
             }
         }
