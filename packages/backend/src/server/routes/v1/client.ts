@@ -131,6 +131,38 @@ export default function (db: PrismaClient) {
         }
     });
 
+    router.patch(`/:clientId`, auth('update:client'), async (req, res: AuthResponse, next) => {
+        const schema = z.object({
+            active: z.boolean()
+        });
+
+        try {
+            const clientData = schema.parse(req.body);
+            
+            const client = await db.client.update({
+                where: {
+                    tenantId: res.locals.user.tenantId,
+                    id: req.params.clientId,
+                },
+                data: {
+                    ...clientData,
+                }
+            });
+
+            return res.json(client);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
+            return next(e);
+        }
+    });
+
     router.get('/:clientId/tasks', async (req, res, next) => {
         const client = await db.client.findFirst({ where: { id: req.params.clientId } });
         if (client && !client.active) {
