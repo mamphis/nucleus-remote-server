@@ -4,7 +4,6 @@ import userStore from '@/stores/user';
 import type { ApiTenant } from '@/types/tenant';
 import request, { isErrorResponse } from '../../lib/request';
 
-
 const { user } = userStore();
 const tenants = await request.$get<ApiTenant[]>('tenants');
 </script>
@@ -25,6 +24,8 @@ const tenants = await request.$get<ApiTenant[]>('tenants');
                     <tr>
                         <th>{{ $t('field.name') }}</th>
                         <th>{{ $t('field.userCount') }}</th>
+                        <th>{{ $t('field.maxClients') }}</th>
+                        <th>{{ $t('field.currentClients') }}</th>
                     </tr>
                 </thead>
                 <tbody v-if="!isErrorResponse(tenants)">
@@ -32,6 +33,8 @@ const tenants = await request.$get<ApiTenant[]>('tenants');
                         @click="$router.push(`/tenants/${tenant.id}`)">
                         <td>{{ tenant.name }}</td>
                         <td>{{ tenant.user.length }}</td>
+                        <td>{{ tenant.maxClients }}</td>
+                        <td>{{ tenant.client.filter(c => c.active).length }} / {{ tenant.client.length }}</td>
                     </tr>
                 </tbody>
             </table>

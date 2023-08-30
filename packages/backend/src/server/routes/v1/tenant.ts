@@ -76,7 +76,8 @@ export default function (db: PrismaClient) {
 
     router.post('/', auth('create:tenant'), async (req, res: AuthResponse, next) => {
         const schema = z.object({
-            name: z.string(),
+            name: z.string().trim().nonempty(),
+            maxClients: z.number().positive(),
         });
 
         try {
@@ -85,6 +86,7 @@ export default function (db: PrismaClient) {
             const tenant = await db.tenant.create({
                 data: {
                     name: tenantData.name,
+                    maxClients: tenantData.maxClients,
                 }
             });
             return res.json(tenant);
@@ -103,7 +105,8 @@ export default function (db: PrismaClient) {
 
     router.patch('/:tenantId', auth('update:tenant'), async (req, res: AuthResponse, next) => {
         const schema = z.object({
-            name: z.string(),
+            name: z.string().trim().nonempty(),
+            maxClients: z.number().positive(),
         });
 
         try {
