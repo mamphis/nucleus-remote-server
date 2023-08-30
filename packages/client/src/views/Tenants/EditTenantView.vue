@@ -10,32 +10,35 @@ import { $t } from '@/lib/locale/locale';
 const { sendNotification } = eventStore();
 
 const { tenantId } = router.currentRoute.value.params;
-const tenant = await request.$get<ApiTenant>(`tenants/${tenantId}`);
+const response = await request.$get<ApiTenant>(`tenants/${tenantId}`);
+const tenant = response.assertNotError().toRef();
 
-const errors = ref<{
-    name: string,
-    general: string,
-}>({
+const errors = ref({
     name: '',
+    maxClients: '',
     general: '',
 });
 
 const clearError = () => {
     errors.value.name = '';
+    errors.value.maxClients = '';
     errors.value.general = '';
 }
 
-const updateTenant = async (tenant: ApiTenant) => {
-    if (tenant.name) {
-        const response = await request.$patch<ApiTenant>(`tenants/${tenantId}`, { name: tenant.name });
-
+const updateTenant = async () => {
+    if (tenant.value.name) {
         clearError();
+        const response = await request.$patch<ApiTenant>(`tenants/${tenantId}`, {
+            name: tenant.value.name,
+            maxClients: tenant.value.maxClients,
+        });
+
         if (isValidationError(response)) {
             response.data.forEach(issue => {
-                switch (issue.validation) {
-                    case 'name':
-                        errors.value.name = issue.message;
-                        break;
+                if (issue.path in errors.value) {
+                    errors.value[issue.path as keyof typeof errors.value] = issue.message;
+                } else {
+                    errors.value.general = issue.message;
                 }
             });
         } else if (isErrorResponse(response)) {
@@ -65,7 +68,7 @@ const deleteTenant = async () => {
                 <h1>{{ $t('editTenant.editTenant') }}</h1>
             </div>
         </div>
-        <form @submit.prevent="updateTenant(tenant)" class="column is-full" v-if="!isErrorResponse(tenant)">
+        <form @submit.prevent="updateTenant()" class="column is-full" v-if="!isErrorResponse(tenant)">
             <div class="field">
                 <label class="label">{{ $t('field.name') }}</label>
                 <div class="control">
@@ -73,6 +76,14 @@ const deleteTenant = async () => {
                         v-model="tenant.name" required>
                 </div>
                 <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
+            </div>
+            <div class="field">
+                <label class="label">{{ $t('field.maxClients') }}</label>
+                <div class="control">
+                    <input :class="{ 'is-danger': !!errors.maxClients }" class="input" type="number"
+                        :placeholder="$t('field.maxClients')" v-model="tenant.maxClients" required>
+                </div>
+                <p v-if="!!errors.maxClients" class="help is-danger">{{ errors.maxClients }}</p>
             </div>
 
             <div class="field">

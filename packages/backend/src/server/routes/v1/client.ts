@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
@@ -50,7 +50,7 @@ export default function (db: PrismaClient) {
             }
         }).catch(() => { });
 
-        res.status(201).end();
+        res.status(204).end();
     });
 
     router.put(`/`, async (req, res, next) => {
@@ -65,10 +65,24 @@ export default function (db: PrismaClient) {
 
         try {
             const clientData = schema.parse(req.body);
-            console.log(clientData);
 
             // Check if the tenant exist
-            if (!await db.tenant.findFirst({ where: { id: clientData.tenantId, } })) {
+            const tenant = await db.tenant.findFirst({
+                where: { id: clientData.tenantId, }, select: {
+                    _count: {
+                        select: {
+                            // Only get active Clients
+                            client: {
+                                where: {
+                                    active: true
+                                }
+                            }
+                        }
+                    },
+                    maxClients: true,
+                }
+            });
+            if (!tenant) {
                 return next(BadRequest('Invalid Tenant: ' + clientData.tenantId));
             }
 
@@ -76,6 +90,15 @@ export default function (db: PrismaClient) {
             var existingClient = await db.client.findFirst({ where: { id: clientData.id } });
             if (existingClient && existingClient.tenantId != clientData.tenantId) {
                 return next(BadRequest('Invalid client id: ' + clientData.id));
+            }
+
+            let active = false;
+
+            if (!existingClient) {
+                // New Client wants to be registered to a tenant. Check if it shell be active
+                if (tenant.maxClients > tenant._count.client) {
+                    active = true;
+                }
             }
 
             const client = await db.client.upsert({
@@ -86,6 +109,7 @@ export default function (db: PrismaClient) {
                 create: {
                     ...clientData,
                     lastPing: new Date(),
+                    active,
                 },
                 update: {
                     ...clientData,
@@ -107,7 +131,45 @@ export default function (db: PrismaClient) {
         }
     });
 
+    router.patch(`/:clientId`, auth('update:client'), async (req, res: AuthResponse, next) => {
+        const schema = z.object({
+            active: z.boolean()
+        });
+
+        try {
+            const clientData = schema.parse(req.body);
+            
+            const client = await db.client.update({
+                where: {
+                    tenantId: res.locals.user.tenantId,
+                    id: req.params.clientId,
+                },
+                data: {
+                    ...clientData,
+                }
+            });
+
+            return res.json(client);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
+            return next(e);
+        }
+    });
+
     router.get('/:clientId/tasks', async (req, res, next) => {
+        const client = await db.client.findFirst({ where: { id: req.params.clientId } });
+        if (client && !client.active) {
+            // If the client is not active. Simply ignore the tasks it should execute otherwise
+            return res.json([]);
+        }
+
         const tasks = await db.task.findMany({
             where: {
                 configuration: {
@@ -120,7 +182,8 @@ export default function (db: PrismaClient) {
                             }
                         }
                     }
-                }
+                },
+                active: true,
             },
             select: {
                 configuration: true,
@@ -191,6 +254,6 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
-    
+
     return router;
 }

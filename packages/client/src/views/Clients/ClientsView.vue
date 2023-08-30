@@ -31,6 +31,7 @@ const fileUrl = new URL(`/system/update/file`, baseApiUrl).href;
             <table class="table">
                 <thead>
                     <tr>
+                        <th>{{ $t('field.active') }}</th>
                         <th>{{ $t('field.username') }}</th>
                         <th>{{ $t('field.hostname') }}</th>
                         <th>{{ $t('field.osVersion') }}</th>
@@ -41,6 +42,7 @@ const fileUrl = new URL(`/system/update/file`, baseApiUrl).href;
                 <tbody v-if="!isErrorResponse(clients)">
                     <tr v-for="client in clients" :key="client.id" class="is-clickable"
                         @click="$router.push(`/clients/${client.id}`)">
+                        <td><input type="checkbox" :checked="client.active" disabled></td>
                         <td>{{ client.username }}</td>
                         <td>{{ client.hostname }}</td>
                         <td>{{ client.os }}</td>

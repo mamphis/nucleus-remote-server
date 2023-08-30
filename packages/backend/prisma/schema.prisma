@@ -11,8 +11,10 @@ datasource db {
 }
 
 model Tenant {
-  id            String          @id() @default(uuid())
-  name          String
+  id         String @id() @default(uuid())
+  name       String
+  maxClients Int    @default(5)
+
   client        Client[]
   group         Group[]
   task          Task[]
@@ -27,6 +29,7 @@ model Client {
   appVersion String
   hostname   String
   lastPing   DateTime
+  active     Boolean  @default(true)
 
   tenant    Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tenantId  String

@@ -53,7 +53,10 @@ export class Server {
             }
 
             if (err instanceof ZodError) {
-                return res.status(400).json({ type: 'ValidationError', error: err.name, data: err.errors, message: err.message });
+                return res.status(400).json({ type: 'ValidationError', error: err.name, data: err.issues.map(i => ({
+                    ...i,
+                    path: i.path.join('.'),
+                })), message: err.message });
             }
 
             if (err instanceof PrismaClientValidationError) {

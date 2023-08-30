@@ -7,5 +7,6 @@ export type ApiClient = {
     appVersion: string;
     hostname: string;
     lastPing: string;
-    tenant: ApiTenant;
+    tenantId: string;
+    active: boolean;
 }

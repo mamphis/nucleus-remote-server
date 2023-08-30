@@ -58,8 +58,10 @@ const updateTask = async () => {
         clearError();
         if (isValidationError(response)) {
             response.data.forEach(issue => {
-                if (issue.validation in errors.value) {
-                    errors.value[issue.validation as keyof typeof errors.value] = issue.message;
+                if (issue.path in errors.value) {
+                    errors.value[issue.path as keyof typeof errors.value] = issue.message;
+                } else {
+                    errors.value.general = issue.message;
                 }
             });
         } else if (isErrorResponse(response)) {

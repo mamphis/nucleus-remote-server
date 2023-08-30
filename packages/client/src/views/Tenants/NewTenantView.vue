@@ -4,34 +4,35 @@ import type { ApiTenant } from '@/types/tenant';
 import { ref } from 'vue';
 import request, { isErrorResponse, isValidationError } from '../../lib/request';
 
-const tenants = await request.$get<ApiTenant[]>('tenants');
-
 const name = ref('');
+const maxClients = ref(5);
 
-const errors = ref<{
-    name: string,
-    general: string,
-}>({
+const errors = ref({
     name: '',
+    maxClients: '',
     general: '',
 });
 
 const clearError = () => {
     errors.value.name = '';
+    errors.value.maxClients = '';
     errors.value.general = '';
 }
 
 const createNewTenant = async () => {
     if (name.value) {
-        const response = await request.$post<ApiTenant>(`tenants`, { name: name.value });
+        const response = await request.$post<ApiTenant>(`tenants`, {
+            name: name.value,
+            maxClients: maxClients.value,
+        });
 
         clearError();
         if (isValidationError(response)) {
             response.data.forEach(issue => {
-                switch (issue.validation) {
-                    case 'name':
-                        errors.value.name = issue.message;
-                        break;
+                if (issue.path in errors.value) {
+                    errors.value[issue.path as keyof typeof errors.value] = issue.message;
+                } else {
+                    errors.value.general = issue.message;
                 }
             });
         } else if (isErrorResponse(response)) {
@@ -58,6 +59,15 @@ const createNewTenant = async () => {
                             :placeholder="$t('field.name')" v-model="name" required>
                     </div>
                     <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
+                </div>
+
+                <div class="field">
+                    <label class="label">{{ $t('field.maxClients') }}</label>
+                    <div class="control">
+                        <input :class="{ 'is-danger': !!errors.maxClients }" class="input" type="number"
+                            :placeholder="$t('field.maxClients')" v-model="maxClients" required>
+                    </div>
+                    <p v-if="!!errors.maxClients" class="help is-danger">{{ errors.maxClients }}</p>
                 </div>
                 <div class="field">
                     <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>

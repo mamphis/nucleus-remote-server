@@ -14,7 +14,7 @@ type GeneralErrorResponse = {
 
 type ValidationErrorResponse = GeneralErrorResponse & {
     type: 'ValidationError';
-    data: Array<{ validation: string, code: string, path: string[], message: string }>;
+    data: Array<{ code: string, path: string, message: string }>;
 }
 
 export type ErrorResponse = ValidationErrorResponse | GeneralErrorResponse;
@@ -62,7 +62,6 @@ type Response<T> = (ErrorResponse | T) & {
     assertNotError: () => SuccessResponse<T>;
 };
 
-
 const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): Promise<Response<T>> => {
     const user = userStore();
     const { baseApiUrl } = settingsStore();
@@ -109,7 +108,7 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
         return makeResponse(errorResponse);
     }
 
-    if (response.status === 201) {
+    if (response.status === 204) {
         return makeResponse(undefined);
     }
 
