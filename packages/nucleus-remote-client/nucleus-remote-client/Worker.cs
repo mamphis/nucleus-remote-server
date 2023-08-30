@@ -34,7 +34,7 @@ namespace nucleus_remote_client
 
                 catch (Exception e)
                 {
-                    var _ = new SendLog("error", e.Message).ExecuteAsync(_hostSettings);
+                    await SendLog.Error(_hostSettings, e.Message);
                 }
                 try
                 {
@@ -42,7 +42,7 @@ namespace nucleus_remote_client
                 }
                 catch (Exception e)
                 {
-                    var _ = new SendLog("error", e.Message).ExecuteAsync(_hostSettings);
+                    await SendLog.Error(_hostSettings, e.Message);
                 }
                 await Task.Delay(60000, stoppingToken);
             }
@@ -51,7 +51,8 @@ namespace nucleus_remote_client
         private void StartUpdater()
         {
             var updaterPath = Path.GetFullPath("nucleus-remote-updater.exe");
-            if (Path.Exists(updaterPath)) {
+            if (Path.Exists(updaterPath))
+            {
                 var psi = new ProcessStartInfo(updaterPath);
                 psi.CreateNoWindow = true;
                 Process? proc = Process.Start(psi);

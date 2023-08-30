@@ -22,18 +22,34 @@ namespace nucleus_remote_client.Client
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
             Console.WriteLine($"> {this.Message}");
-
-            HttpClient client = new()
+            try
             {
-                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-            };
 
-            var _response = await client.PostAsJsonAsync($"clients/{hostSettings.Id}/logs", new
+                HttpClient client = new()
+                {
+                    BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
+                };
+
+                var _response = await client.PostAsJsonAsync($"clients/{hostSettings.Id}/logs", new
+                {
+                    level = this.Level,
+                    message = this.Message,
+                });
+            }
+            catch (Exception ex)
             {
-                level = this.Level,
-                message = this.Message,
-            });
+                Console.WriteLine($">>> {ex.Message}");
+            }
+        }
 
+        public static async Task Info(HostSettings hostSettings, string message)
+        {
+            await new SendLog("info", message).ExecuteAsync(hostSettings);
+        }
+
+        public static async Task Error(HostSettings hostSettings, string message)
+        {
+            await new SendLog("error", message).ExecuteAsync(hostSettings);
         }
     }
 }
