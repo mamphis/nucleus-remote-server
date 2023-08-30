@@ -22,6 +22,8 @@ import ClientsView from '@/views/Clients/ClientsView.vue'
 import NewTaskView from '@/views/Tasks/NewTaskView.vue';
 import EditTaskView from '@/views/Tasks/EditTaskView.vue';
 import EditClientView from '@/views/Clients/EditClientView.vue';
+import EditProfileView from '@/views/EditProfileView.vue';
+import IssueView from '@/views/IssueView.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -46,6 +48,16 @@ const router = createRouter({
                 logout();
                 return '/';
             },
+        },
+        {
+            path: '/profile',
+            name: 'Profile',
+            component: EditProfileView,
+        },
+        {
+            path: '/issue',
+            name: 'Issue',
+            component: IssueView,
         },
         {
             path: '/users',

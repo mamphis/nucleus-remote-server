@@ -21,7 +21,7 @@ let notifications = ref<Notification[]>([]);
 let notificationId = 0;
 class Notification {
     readonly maxTime = 5000;
-    timeLeft= ref(this.maxTime);
+    timeLeft = ref(this.maxTime);
 
     private running = true;
     readonly id = ++notificationId;
@@ -93,7 +93,19 @@ onSendNofification((event) => {
                     <RouterLink class="navbar-item" to="/users" v-if="hasUser">{{ $t('navbar.user') }}</RouterLink>
                 </div>
                 <div class="navbar-end">
-                    <div class="navbar-item" v-if="user">{{ user?.username }}</div>
+                    <div class="navbar-item has-dropdown is-hoverable" v-if="user">
+                        <a class="navbar-link">
+                            {{ user.username }}
+                        </a>
+
+                        <div class="navbar-dropdown">
+                            <RouterLink class="navbar-item" to="/profile">{{ $t('navbar.profile') }}
+                            </RouterLink>
+                            <hr class="navbar-divider">
+                            <RouterLink class="navbar-item" to="/issue">{{ $t('navbar.reportIssue') }}
+                            </RouterLink>
+                        </div>
+                    </div>
                     <RouterLink v-if="!isLoggedIn" class="navbar-item" to="/login">{{ $t('navbar.login') }}</RouterLink>
                     <RouterLink v-if="isLoggedIn" class="navbar-item" to="/logout">{{ $t('navbar.logout') }}</RouterLink>
                 </div>

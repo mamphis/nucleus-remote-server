@@ -5,14 +5,29 @@ import { NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
 
-const router = Router();
-const db = new PrismaClient();
+export default function (db: PrismaClient) {
+    const router = Router();
 
-// GET localhost:8080/api/v1/tenants/
-router.get('/', auth('read:tenant'), async (req, res: AuthResponse, next) => {
-    if (res.locals.user.permissions.includes('special:admin')) {
+    // GET localhost:8080/api/v1/tenants/
+    router.get('/', auth('read:tenant'), async (req, res: AuthResponse, next) => {
+        if (res.locals.user.permissions.includes('special:admin')) {
+            const tenants = await db.tenant.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    user: {
+                        select: {
+                            username: true,
+                            id: true,
+                        }
+                    }
+                }
+            });
+            return res.json(tenants);
+        }
+
         const tenants = await db.tenant.findMany({
-            select: {
+            where: { user: { some: { username: res.locals.user.username } } }, select: {
                 id: true,
                 name: true,
                 user: {
@@ -24,30 +39,30 @@ router.get('/', auth('read:tenant'), async (req, res: AuthResponse, next) => {
             }
         });
         return res.json(tenants);
-    }
-
-    const tenants = await db.tenant.findMany({
-        where: { user: { some: { username: res.locals.user.username } } }, select: {
-            id: true,
-            name: true,
-            user: {
-                select: {
-                    username: true,
-                    id: true,
-                }
-            }
-        }
     });
-    return res.json(tenants);
-});
 
-router.get('/:tenantId', auth('read:tenant'), async (req, res: AuthResponse, next) => {
-    if (res.locals.user.permissions.includes('special:admin')) {
-        const tenants = await db.tenant.findFirst({
-            where:{
-                id: req.params.tenantId,
-            },
-            select: {
+    router.get('/:tenantId', auth('read:tenant'), async (req, res: AuthResponse, next) => {
+        if (res.locals.user.permissions.includes('special:admin')) {
+            const tenants = await db.tenant.findFirst({
+                where: {
+                    id: req.params.tenantId,
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    user: {
+                        select: {
+                            username: true,
+                            id: true,
+                        }
+                    }
+                }
+            });
+            return res.json(tenants);
+        }
+
+        const tenant = await db.tenant.findFirst({
+            where: { user: { some: { username: res.locals.user.username } }, id: req.params.tenantId }, select: {
                 id: true,
                 name: true,
                 user: {
@@ -58,95 +73,81 @@ router.get('/:tenantId', auth('read:tenant'), async (req, res: AuthResponse, nex
                 }
             }
         });
-        return res.json(tenants);
-    }
-    
-    const tenant = await db.tenant.findFirst({
-        where: { user: { some: { username: res.locals.user.username } }, id: req.params.tenantId }, select: {
-            id: true,
-            name: true,
-            user: {
-                select: {
-                    username: true,
-                    id: true,
-                }
-            }
+
+        if (!tenant) {
+            return NotFound(`Tenant with id "${req.params.tenantId}" was not found.`);
         }
-    });
 
-    if (!tenant) {
-        return NotFound(`Tenant with id "${req.params.tenantId}" was not found.`);
-    }
-
-    return res.json(tenant);
-});
-
-router.delete('/:id', auth('delete:tenant'), async (req, res: AuthResponse, next) => {
-    await db.tenant.delete({
-        where: {
-            id: req.params.id,
-        }
-    }).catch(() => {});;
-
-    res.status(201).end();
-});
-
-router.post('/', auth('create:tenant'), async (req, res: AuthResponse, next) => {
-    const schema = z.object({
-        name: z.string(),
-    });
-
-    try {
-        const tenantData = schema.parse(req.body);
-
-        const tenant = await db.tenant.create({
-            data: {
-                name: tenantData.name,
-            }
-        });
         return res.json(tenant);
-    } catch (e: unknown) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            return next(UnprocessableEntity(e.message));
-        }
-
-        if (e instanceof ZodError) {
-            return next(e);
-        }
-
-        return next(e);
-    }
-})
-
-router.patch('/:tenantId', auth('update:tenant'), async (req, res: AuthResponse, next) => {
-    const schema = z.object({
-        name: z.string(),
     });
 
-    try {
-        const tenantData = schema.parse(req.body);
-
-        const tenant = await db.tenant.update({
+    router.delete('/:id', auth('delete:tenant'), async (req, res: AuthResponse, next) => {
+        await db.tenant.delete({
             where: {
-                id: req.params.tenantId,
-            },
-            data: {
-                name: tenantData.name,
+                id: req.params.id,
             }
+        }).catch(() => { });;
+
+        res.status(201).end();
+    });
+
+    router.post('/', auth('create:tenant'), async (req, res: AuthResponse, next) => {
+        const schema = z.object({
+            name: z.string(),
         });
 
-        return res.json(tenant);
-    } catch (e: unknown) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            return next(UnprocessableEntity(e.message));
-        }
+        try {
+            const tenantData = schema.parse(req.body);
 
-        if (e instanceof ZodError) {
+            const tenant = await db.tenant.create({
+                data: {
+                    name: tenantData.name,
+                }
+            });
+            return res.json(tenant);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
             return next(e);
         }
+    })
 
-        return next(e);
-    }
-})
+    router.patch('/:tenantId', auth('update:tenant'), async (req, res: AuthResponse, next) => {
+        const schema = z.object({
+            name: z.string(),
+        });
 
-export default router;
+        try {
+            const tenantData = schema.parse(req.body);
+
+            const tenant = await db.tenant.update({
+                where: {
+                    id: req.params.tenantId,
+                },
+                data: {
+                    name: tenantData.name,
+                }
+            });
+
+            return res.json(tenant);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
+            return next(e);
+        }
+    });
+    
+    return router;
+}

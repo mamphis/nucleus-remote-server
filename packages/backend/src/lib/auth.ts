@@ -7,12 +7,14 @@ import { Logger } from './logger';
 import { isProduction } from './util';
 
 interface User {
+    id: string;
     username: string;
     tenantId: string;
     permission: Array<{ scope: string }>
 }
 
 interface AuthUser {
+    id: string;
     username: string;
     tenantId: string;
     permissions: string[];
@@ -26,7 +28,7 @@ export interface AuthResponse extends Response {
     locals: AuthLocals
 }
 
-interface AuthRequest<Route extends string> extends core.Request<core.RouteParameters<Route>, any, any, any, AuthLocals>{
+interface AuthRequest<Route extends string> extends core.Request<core.RouteParameters<Route>, any, any, any, AuthLocals> {
 
 }
 
@@ -38,7 +40,7 @@ if (isProduction() && !process.env.JWT_SECRET) {
 const jwtSecret: string = process.env.JWT_SECRET ?? 'change-this-immidiately';
 
 const getToken = (user: User): { token: string, user: AuthUser } => {
-    const authUser = { username: user.username, tenantId: user.tenantId, permissions: user.permission.map(p => p.scope) };
+    const authUser = { username: user.username, tenantId: user.tenantId, id: user.id, permissions: user.permission.map(p => p.scope) };
     return { token: sign(authUser, jwtSecret), user: authUser };
 }
 
