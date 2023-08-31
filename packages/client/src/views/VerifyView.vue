@@ -9,7 +9,7 @@ const { verify } = userStore();
 </script>
 <template>
     <form @submit.prevent="verify(onetimePassword, password).then((response) => { router.push('/') })">
-        <h1>{{ $t('verify.createPassword') }}</h1>
+        <h1 class="is-title">{{ $t('verify.createPassword') }}</h1>
         <div class="field">
             <label class="label" for="password">{{ $t('field.password') }}</label>
             <div class="control">

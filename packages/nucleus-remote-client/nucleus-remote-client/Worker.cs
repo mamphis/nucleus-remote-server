@@ -27,24 +27,23 @@ namespace nucleus_remote_client
                 {
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 }
-                try
-                {
-                    await executer.ExecuteAsync(_hostSettings);
-                }
 
-                catch (Exception e)
-                {
-                    await SendLog.Error(_hostSettings, e.Message);
-                }
-                try
-                {
-                    await pinger.ExecuteAsync(_hostSettings);
-                }
-                catch (Exception e)
-                {
-                    await SendLog.Error(_hostSettings, e.Message);
-                }
+                Try(executer, _hostSettings);
+                Try(new SendDetails(), _hostSettings);
+                Try(pinger, _hostSettings);
                 await Task.Delay(60000, stoppingToken);
+            }
+        }
+
+        private async void Try(IClient client, HostSettings hostSettings)
+        {
+            try
+            {
+                await client.ExecuteAsync(_hostSettings);
+            }
+            catch (Exception e)
+            {
+                await SendLog.Error(_hostSettings, e.Message);
             }
         }
 

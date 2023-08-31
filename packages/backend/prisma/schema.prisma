@@ -31,10 +31,11 @@ model Client {
   lastPing   DateTime
   active     Boolean  @default(true)
 
-  tenant    Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId  String
-  group     Group[]
-  clientLog ClientLog[]
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId     String
+  group        Group[]
+  clientLog    ClientLog[]
+  clientDetail ClientDetail[]
 }
 
 model Group {
@@ -97,4 +98,14 @@ model ClientLog {
 
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId String
+}
+
+model ClientDetail {
+  key      String
+  clientId String
+  value    String
+
+  client Client @relation(fields: [clientId], references: [id])
+
+  @@id([key, clientId])
 }

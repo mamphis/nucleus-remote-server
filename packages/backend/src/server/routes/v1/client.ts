@@ -2,7 +2,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
-import { UnprocessableEntity, BadRequest } from 'http-errors';
+import { UnprocessableEntity, BadRequest, Forbidden } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { randomUUID } from "crypto";
 
@@ -138,12 +138,32 @@ export default function (db: PrismaClient) {
 
         try {
             const clientData = schema.parse(req.body);
+            const tenant = await db.tenant.findFirstOrThrow({
+                where: { id: res.locals.user.tenantId, }, select: {
+                    _count: {
+                        select: {
+                            // Only get active Clients
+                            client: {
+                                where: {
+                                    active: true
+                                }
+                            }
+                        }
+                    },
+                    maxClients: true,
+                }
+            });
+
+            // New Client wants to be registered to a tenant. Check if it shell be active
+            if (tenant.maxClients <= tenant._count.client) {
+                return next(Forbidden('Max Clients in this tenant reached.'))
+            }
 
             const client = await db.client.update({
                 where: {
                     tenantId: res.locals.user.tenantId,
                     id: req.params.clientId,
-                },
+                }, 
                 data: {
                     ...clientData,
                 }
@@ -243,6 +263,77 @@ export default function (db: PrismaClient) {
             });
 
             return res.json(clientLog);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
+            return next(e);
+        }
+    });
+
+    router.post('/:clientId/details', async (req, res, next) => {
+        const schema = z.record(z.string().or(z.number()));
+
+        try {
+            const clientDetailsData = schema.parse(req.body);
+            for (const key in clientDetailsData) {
+                if (Object.prototype.hasOwnProperty.call(clientDetailsData, key)) {
+                    const value = clientDetailsData[key];
+                    await db.clientDetail.upsert({
+                        where: {
+                            key_clientId: {
+                                clientId: req.params.clientId,
+                                key,
+                            }
+                        },
+                        create: {
+                            key,
+                            clientId: req.params.clientId,
+                            value: value.toString(),
+                        },
+                        update: {
+                            key,
+                            clientId: req.params.clientId,
+                            value: value.toString(),
+                        }
+                    });
+                }
+            }
+
+            const clientDetails = await db.clientDetail.findMany({
+                where: {
+                    clientId: req.params.clientId
+                },
+            });
+
+            return res.json(clientDetails);
+        } catch (e: unknown) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                return next(UnprocessableEntity(e.message));
+            }
+
+            if (e instanceof ZodError) {
+                return next(e);
+            }
+
+            return next(e);
+        }
+    });
+
+    router.get('/:clientId/details', auth('read:client'), async (req, res, next) => {
+        try {
+            const clientDetails = await db.clientDetail.findMany({
+                where: {
+                    clientId: req.params.clientId
+                },
+            });
+
+            return res.json(clientDetails);
         } catch (e: unknown) {
             if (e instanceof PrismaClientKnownRequestError) {
                 return next(UnprocessableEntity(e.message));
