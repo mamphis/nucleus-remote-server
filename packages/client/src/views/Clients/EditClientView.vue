@@ -102,9 +102,9 @@ const updateClient = async () => {
                         <td><input type="text" class="input is-small" v-model="client.appVersion" disabled></td>
                     </tr>
 
-                    <tr v-for="detail in details" :key="detail.key">
+                    <tr v-for="detail in details" :key="detail.key" class="content is-small">
                         <td>{{ detail.key }}</td>
-                        <td><input type="text" class="input is-small" :value="detail.value" disabled></td>
+                        <td>{{ detail.value }}</td>
                     </tr>
                 </tbody>
             </table>
