@@ -37,7 +37,7 @@ const createIssue = async () => {
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full">
-            <h1>{{ $t('issue.createIssue') }}</h1>
+            <h1 class="is-title">{{ $t('issue.createIssue') }}</h1>
         </div>
         <form @submit.prevent="createIssue();" class="column is-full">
             <div class="field">

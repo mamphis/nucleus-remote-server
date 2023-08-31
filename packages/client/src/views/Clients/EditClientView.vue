@@ -71,7 +71,7 @@ const updateClient = async () => {
 <template>
     <form @submit.prevent="updateClient()" class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full">
-            <h1>{{ $t('editClient.editClient') }}</h1>
+            <h1 class="is-title">{{ $t('editClient.editClient') }}</h1>
         </div>
         <div class="column is-half">
             <table class="table is-fullwidth">

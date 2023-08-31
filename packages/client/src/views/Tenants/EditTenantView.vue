@@ -65,7 +65,7 @@ const deleteTenant = async () => {
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>{{ $t('editTenant.editTenant') }}</h1>
+                <h1 class="is-title">{{ $t('editTenant.editTenant') }}</h1>
             </div>
         </div>
         <form @submit.prevent="updateTenant()" class="column is-full" v-if="!isErrorResponse(tenant)">

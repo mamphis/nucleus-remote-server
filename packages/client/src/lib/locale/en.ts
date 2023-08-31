@@ -6,6 +6,7 @@ const translations: Record<string, string> = {
     'button.submit': 'Submit',
     'clients.clients': 'Clients',
     'clients.downloadClient': 'Download Client',
+    'clients.maxConcurrentClients': 'Max count of concurrent clients: {0}',
     'clients.newClient': 'Download Settings',
     'configurations.configurations': 'Configurations',
     'configurations.newConfigurtion': 'New Configuration',

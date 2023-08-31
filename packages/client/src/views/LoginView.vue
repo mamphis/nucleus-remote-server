@@ -25,7 +25,7 @@ const performLogin = async () => {
 </script>
 <template>
     <form @submit.prevent="performLogin()">
-        <h1>{{ $t('login.login') }}</h1>
+        <h1 class="is-title">{{ $t('login.login') }}</h1>
         <div class="field">
             <label class="label" for="username">{{ $t('field.username') }}</label>
             <div class="control">

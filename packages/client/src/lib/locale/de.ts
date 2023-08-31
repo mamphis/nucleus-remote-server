@@ -6,6 +6,7 @@ const translations: Record<string, string> = {
     'button.submit': 'Speichern',
     'clients.clients': 'Clients',
     'clients.downloadClient': 'Client Herunterladen',
+    'clients.maxConcurrentClients': 'Maximale Anzahl von gleichzeitigen Clients: {0}',
     'clients.newClient': 'Einstellungen Herunterladen',
     'configurations.configurations': 'Konfigurationen',
     'configurations.newConfigurtion': 'Neue Konfiguration',

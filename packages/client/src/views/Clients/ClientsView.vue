@@ -5,17 +5,21 @@ import { formatDate, humanizeDate } from '@/lib/utils';
 import { settingsStore } from '@/stores/settings';
 import userStore from '@/stores/user';
 import type { ApiClient } from '@/types/client';
+import type { ApiTenant } from '@/types/tenant';
 
 const clients = await request.$get<ApiClient[]>('clients');
 const { baseApiUrl } = settingsStore();
 const { user } = userStore();
+const tenantResponse = await request.$get<ApiTenant>(`tenants/${user?.tenantId}`);
+const tenant = tenantResponse.assertNotError();
 const fileUrl = new URL(`/system/update/file`, baseApiUrl).href;
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1>{{ $t('clients.clients') }}</h1>
+                <h1 class="title">{{ $t('clients.clients') }}</h1>
+                <h6 class="subtitle">{{ $t('clients.maxConcurrentClients', tenant.maxClients) }}</h6>
             </div>
             <div class="column is-flex is-justify-content-end">
                 <div class="buttons is-grouped">
