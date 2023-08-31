@@ -15,7 +15,7 @@ const { sendNotification } = eventStore();
 
 const { clientId } = router.currentRoute.value.params;
 const response = await request.$get<ApiClient>(`clients/${clientId}`);
-const tasks = await request.$get<ApiTask[]>(`clients/${clientId}/tasks`);
+const tasks = await request.$get<ApiTask[]>(`clients/${clientId}/tasks?design=true`);
 const logs = await request.$get<ApiClientLog[]>(`clients/${clientId}/logs`);
 assertNotErrorResponse<ApiTask[]>(tasks);
 assertNotErrorResponse<ApiClientLog[]>(logs);

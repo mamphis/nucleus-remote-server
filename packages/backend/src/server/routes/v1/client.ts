@@ -138,7 +138,7 @@ export default function (db: PrismaClient) {
 
         try {
             const clientData = schema.parse(req.body);
-            
+
             const client = await db.client.update({
                 where: {
                     tenantId: res.locals.user.tenantId,
@@ -165,7 +165,8 @@ export default function (db: PrismaClient) {
 
     router.get('/:clientId/tasks', async (req, res, next) => {
         const client = await db.client.findFirst({ where: { id: req.params.clientId } });
-        if (client && !client.active) {
+        const design = req.query.design === 'true';
+        if (client && !client.active && !design) {
             // If the client is not active. Simply ignore the tasks it should execute otherwise
             return res.json([]);
         }
@@ -183,7 +184,7 @@ export default function (db: PrismaClient) {
                         }
                     }
                 },
-                active: true,
+                active: design ? undefined : true,
             },
             select: {
                 configuration: true,
