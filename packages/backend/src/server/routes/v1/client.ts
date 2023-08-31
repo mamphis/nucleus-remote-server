@@ -138,6 +138,26 @@ export default function (db: PrismaClient) {
 
         try {
             const clientData = schema.parse(req.body);
+            const tenant = await db.tenant.findFirstOrThrow({
+                where: { id: res.locals.user.tenantId, }, select: {
+                    _count: {
+                        select: {
+                            // Only get active Clients
+                            client: {
+                                where: {
+                                    active: true
+                                }
+                            }
+                        }
+                    },
+                    maxClients: true,
+                }
+            });
+
+            // New Client wants to be registered to a tenant. Check if it shell be active
+            if (tenant.maxClients <= tenant._count.client) {
+                return next(Forbidden('Max Clients in this tenant reached.'))
+            }
 
             const client = await db.client.update({
                 where: {
