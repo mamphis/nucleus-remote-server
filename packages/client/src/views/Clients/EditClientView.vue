@@ -10,6 +10,7 @@ import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
 import { eventStore } from '@/stores/eventBus';
 import { $t } from '@/lib/locale/locale';
+import type { ApiClientDetail } from '@/types/clientDetail';
 
 const { sendNotification } = eventStore();
 
@@ -17,8 +18,10 @@ const { clientId } = router.currentRoute.value.params;
 const response = await request.$get<ApiClient>(`clients/${clientId}`);
 const tasks = await request.$get<ApiTask[]>(`clients/${clientId}/tasks?design=true`);
 const logs = await request.$get<ApiClientLog[]>(`clients/${clientId}/logs`);
+const details = await request.$get<ApiClientDetail[]>(`clients/${clientId}/details`);
 assertNotErrorResponse<ApiTask[]>(tasks);
 assertNotErrorResponse<ApiClientLog[]>(logs);
+assertNotErrorResponse<ApiClientDetail[]>(details);
 const client = response.assertNotError().toRef();
 
 const errors = ref({
@@ -71,25 +74,41 @@ const updateClient = async () => {
             <h1>{{ $t('editClient.editClient') }}</h1>
         </div>
         <div class="column is-half">
-            <div class="field">
-                <label class="label" for="">{{ $t('field.username') }}</label>
-                <input type="text" class="input" v-model="client.username" disabled>
-            </div>
+            <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th style="min-width: 25%;">{{ $t('editClient.property') }}</th>
+                        <th>{{ $t('editClient.value') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ $t('field.username') }}</td>
+                        <td><input type="text" class="input is-small" v-model="client.username" disabled></td>
+                    </tr>
 
-            <div class="field">
-                <label class="label" for="">{{ $t('field.hostname') }}</label>
-                <input type="text" class="input" v-model="client.hostname" disabled>
-            </div>
+                    <tr>
+                        <td>{{ $t('field.hostname') }}</td>
+                        <td><input type="text" class="input is-small" v-model="client.hostname" disabled></td>
+                    </tr>
 
-            <div class="field">
-                <label class="label" for="">{{ $t('field.osVersion') }}</label>
-                <input type="text" class="input" v-model="client.os" disabled>
-            </div>
+                    <tr>
+                        <td>{{ $t('field.osVersion') }}</td>
+                        <td><input type="text" class="input is-small" v-model="client.os" disabled></td>
+                    </tr>
 
-            <div class="field">
-                <label class="label" for="">{{ $t('field.appVersion') }}</label>
-                <input type="text" class="input" v-model="client.appVersion" disabled>
-            </div>
+                    <tr>
+                        <td>{{ $t('field.appVersion') }}</td>
+                        <td><input type="text" class="input is-small" v-model="client.appVersion" disabled></td>
+                    </tr>
+
+                    <tr v-for="detail in details" :key="detail.key">
+                        <td>{{ detail.key }}</td>
+                        <td><input type="text" class="input is-small" :value="detail.value" disabled></td>
+                    </tr>
+                </tbody>
+            </table>
+
 
             <div class="field">
                 <label class="checkbox" for="" :class="{ 'is-danger': !!errors.active }">
