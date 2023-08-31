@@ -130,7 +130,7 @@ const updateClient = async () => {
                 </div>
                 <div class="control">
                     <button type="button" class="button is-danger is-light" @click="deleteClient()"
-                        v-if="hasPermission(undefined, 'delete:client') && false /** TODO #9 */">{{ $t('button.delete')
+                        v-if="hasPermission(undefined, 'delete:client')">{{ $t('button.delete')
                         }}</button>
                 </div>
             </div>
