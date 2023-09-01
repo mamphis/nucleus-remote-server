@@ -10,10 +10,14 @@ export default function (db: PrismaClient) {
     router.post('/', async (req, res, next) => {
         const { username, password } = req.body;
         if (username && password) {
-            const user = await db.user.findFirst({ where: { username }, select: { id: true, tenantId: true, username: true, password: true, permission: true } });
+            const user = await db.user.findFirst({ where: { username }, select: { id: true, tenantId: true, username: true, password: true, permission: true, onetimePassword: true } });
 
             if (!user) {
                 return next(Unauthorized('invalid username or password'));
+            }
+
+            if (user.onetimePassword) {
+                return next(Unauthorized('pending verification'));
             }
 
             if (!await compare(password, user.password)) {
@@ -27,6 +31,6 @@ export default function (db: PrismaClient) {
 
         return next(BadRequest('please provide username and password.'));
     });
-    
+
     return router;
 }

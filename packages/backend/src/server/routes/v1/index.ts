@@ -10,12 +10,14 @@ import tenants from './tenant';
 import tenantUsers from './tenantUser';
 import users from './user';
 import verify from './verify';
+import resetPassword from "./resetPassword";
 
 const router = Router();
 const db = new PrismaClient();
 
 router.use('/login', login(db));
 router.use('/verify', verify(db));
+router.use('/resetPassword', resetPassword(db));
 router.use('/clients', clients(db));
 router.use('/users', users(db));
 router.use('/tenants', tenants(db));

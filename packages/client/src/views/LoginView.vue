@@ -40,7 +40,9 @@ const performLogin = async () => {
         </div>
         <div class="field">
             <p v-if="!!errors.login" class="help is-danger">{{ errors.login }}</p>
+
             <button class="button" type="submit">{{ $t('login.login') }}</button>
+            <p class="help is-link"><RouterLink to="/reset-password">{{ $t('login.forgotPassword') }}</RouterLink></p>
         </div>
     </form>
 </template>
@@ -58,7 +60,7 @@ form {
 }
 
 .field {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
 }
 
 form {
