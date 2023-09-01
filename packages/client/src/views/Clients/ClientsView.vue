@@ -10,7 +10,7 @@ import type { ApiTenant } from '@/types/tenant';
 const clients = await request.$get<ApiClient[]>('clients');
 const { baseApiUrl } = settingsStore();
 const { user } = userStore();
-const tenantResponse = await request.$get<ApiTenant>(`tenants/${user?.tenantId}`);
+const tenantResponse = await request.$get<Pick<ApiTenant, 'maxClients'>>(`tenants/${user?.tenantId}`);
 const tenant = tenantResponse.assertNotError();
 const fileUrl = new URL(`/system/update/file`, baseApiUrl).href;
 </script>
