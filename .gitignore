@@ -1,0 +1,5 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/packages/nucleus-remote-client/nucleus-remote-client/Properties/PublishProfiles/FolderProfile.pubxml.user
