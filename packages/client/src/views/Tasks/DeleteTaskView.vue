@@ -28,7 +28,7 @@ watch(content, (newValue) => {
 <template>
     <div class="field">
         <label class="label" for="">{{ $t('deleteTask.path') }}</label>
-        <SpecialFolderPicker class="input" v-model="content.Path" required />
+        <SpecialFolderPicker v-model="content.Path" required />
     </div>
     <div class="field">
         <label class="checkbox" for="">
