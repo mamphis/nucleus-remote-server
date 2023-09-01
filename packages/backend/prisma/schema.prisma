@@ -105,7 +105,7 @@ model ClientDetail {
   clientId String
   value    String
 
-  client Client @relation(fields: [clientId], references: [id])
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@id([key, clientId])
 }
