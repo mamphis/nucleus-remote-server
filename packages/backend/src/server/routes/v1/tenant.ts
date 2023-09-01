@@ -124,9 +124,11 @@ export default function (db: PrismaClient) {
                     id: req.params.tenantId,
                 },
                 data: {
-                    name: tenantData.name,
+                    ...tenantData
                 }
             });
+
+            // TODO: deactivate clients that exceed the maxClients limit
 
             return res.json(tenant);
         } catch (e: unknown) {
