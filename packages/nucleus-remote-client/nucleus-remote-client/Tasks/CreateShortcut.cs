@@ -38,13 +38,17 @@ namespace nucleus_remote_client.Tasks
 
             WshShell wshShell = new WshShell();
             IWshShortcut wshShortcut = wshShell.CreateShortcut(path);
-            wshShortcut.TargetPath = PathHelper.GetPath(TargetPath);
+            if (!string.IsNullOrEmpty(TargetPath))
+            {
+                wshShortcut.TargetPath = PathHelper.GetPath(TargetPath);
+            }
+
             if (Arguments != null)
             {
                 wshShortcut.Arguments = Arguments;
             }
 
-            if (WorkingDirectory != null)
+            if (!string.IsNullOrEmpty(WorkingDirectory))
             {
                 wshShortcut.WorkingDirectory = PathHelper.GetPath(WorkingDirectory);
             }
