@@ -183,6 +183,10 @@ class Mailer {
             html: templateResetLink(mail, onetimePassword, this.uiBaseUrl),
         });
     }
+
+    get operational() {
+        return !!this.transporter;
+    }
 }
 
 const mailer = new Mailer();
