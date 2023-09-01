@@ -24,6 +24,7 @@ import EditTaskView from '@/views/Tasks/EditTaskView.vue';
 import EditClientView from '@/views/Clients/EditClientView.vue';
 import EditProfileView from '@/views/EditProfileView.vue';
 import IssueView from '@/views/IssueView.vue';
+import ResetPassword from '@/views/ResetPassword.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -53,6 +54,11 @@ const router = createRouter({
             path: '/profile',
             name: 'Profile',
             component: EditProfileView,
+        },
+        {
+            path: '/reset-password',
+            name: 'ResetPassword',
+            component: ResetPassword,
         },
         {
             path: '/issue',

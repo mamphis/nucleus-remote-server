@@ -83,11 +83,22 @@ const userStore = defineStore('user', () => {
         return result;
     }
 
+    const sendResetLink = async (mail: string) => {
+        await fetch(`${baseApiUrl}resetPassword`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ mail }),
+        });
+    }
+
     return {
         isLoggedIn,
         login,
         logout,
         verify,
+        sendResetLink,
         token,
         user,
     };
