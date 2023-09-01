@@ -2,9 +2,9 @@
     <div class="dropdown" v-if="options">
 
         <!-- Dropdown Input -->
-        <input class="dropdown-input input" :class="$props.inputClass" :name="name" @focus="showOptions(true)"
-            @input="showOptions(false)" @blur="exit()" @keyup="keyMonitor" v-model="searchFilter" :disabled="disabled"
-            :placeholder="placeholder" autocomplete="off" />
+        <input class="dropdown-input input" :class="$props.inputClass" @keypress="keyMonitor" :name="name"
+            @focus="showOptions(true)" @input="showOptions(false)" @blur="exit()" v-model="searchFilter"
+            :disabled="disabled" :placeholder="placeholder" autocomplete="off" />
 
         <!-- Dropdown Menu -->
         <div class="dropdown-content" v-show="optionsShown">
@@ -81,6 +81,7 @@ const emits = defineEmits<{
     (event: 'selected', selectedId?: KeyValuePair): void,
     (event: 'filter', searchFilter: string): void,
 }>()
+
 console.log(props.default);
 const selected = ref<KeyValuePair | undefined>(props.default ? props.options.find(o => o.id === props.default) ?? { id: props.default ?? '', name: props.default ?? '' } : undefined);
 const optionsShown = ref(false);
@@ -94,16 +95,16 @@ const filteredOptions = computed(() => {
     return result.map(r => r.obj);
 });
 
-
 function selectOption(option?: KeyValuePair) {
     if (!option && props.allowCustom) {
         selected.value = { id: searchFilter.value, name: searchFilter.value };
     } else {
         selected.value = option;
     }
-    emits('selected', selected.value);
-    optionsShown.value = false;
 
+    emits('selected', selected.value);
+
+    optionsShown.value = false;
     searchFilter.value = props.isSingle ? selected.value?.name ?? '' : '';
 }
 
@@ -118,12 +119,13 @@ function showOptions(clearInput: boolean) {
 }
 
 function exit() {
-    selectOption(filteredOptions.value[preselectedItemIndex.value])
+    optionsShown.value = false;
 }
 
 // Selecting when pressing Enter
 function keyMonitor(event: KeyboardEvent) {
     if (event.key === "Enter" && filteredOptions.value[preselectedItemIndex.value]) {
+        event.preventDefault();
         selectOption(filteredOptions.value[preselectedItemIndex.value]);
     }
 
