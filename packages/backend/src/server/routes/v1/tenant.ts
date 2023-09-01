@@ -3,7 +3,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Router } from "express";
 import { NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
-import { AuthResponse, auth } from "../../../lib/auth";
+import { AuthResponse, auth, hasPermission } from "../../../lib/auth";
 
 const tenantSelect: Prisma.TenantSelect = {
     id: true,
@@ -42,7 +42,7 @@ export default function (db: PrismaClient) {
         return res.json(tenants);
     });
 
-    router.get('/:tenantId', auth('read:tenant'), async (req, res: AuthResponse, next) => {
+    router.get('/:tenantId', auth(), async (req, res: AuthResponse, next) => {
         if (res.locals.user.permissions.includes('special:admin')) {
             const tenants = await db.tenant.findFirst({
                 where: {
@@ -61,7 +61,14 @@ export default function (db: PrismaClient) {
             return NotFound(`Tenant with id "${req.params.tenantId}" was not found.`);
         }
 
-        return res.json(tenant);
+        if (hasPermission(res.locals.user, 'read:tenant')) {
+            return res.json(tenant);
+        } else {
+            return res.json({
+                maxClients: tenant.maxClients,
+            });
+        }
+
     });
 
     router.delete('/:id', auth('delete:tenant'), async (req, res: AuthResponse, next) => {

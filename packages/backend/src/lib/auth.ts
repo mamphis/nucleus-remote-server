@@ -44,6 +44,19 @@ const getToken = (user: User): { token: string, user: AuthUser } => {
     return { token: sign(authUser, jwtSecret), user: authUser };
 }
 
+function getPermissions(user: AuthUser | User): string[] {
+    if ('permission' in user) {
+        return user.permission.map(p => p.scope);
+    }
+
+    return user.permissions;
+}
+
+export function hasPermission(user: AuthUser | User, ...requiredPermissions: string[]) {
+    const userToCheck = user;
+    return requiredPermissions.every(p => getPermissions(userToCheck).some(up => up.endsWith(p)));
+}
+
 const auth = <Route extends string>(...scopes: string[]): core.RequestHandler<core.RouteParameters<Route>, any, any, any, AuthLocals> => {
     return (req: AuthRequest<Route>, res: AuthResponse, next: NextFunction) => {
         const auth = req.headers.authorization;
