@@ -79,6 +79,7 @@ export default function (db: PrismaClient) {
                             }
                         }
                     },
+                    id: true,
                     maxClients: true,
                 }
             });
@@ -93,12 +94,23 @@ export default function (db: PrismaClient) {
             }
 
             let active = false;
+            let groups: Array<{ id: string }> = [];
 
             if (!existingClient) {
                 // New Client wants to be registered to a tenant. Check if it shell be active
                 if (tenant.maxClients > tenant._count.client) {
                     active = true;
                 }
+
+                groups = await db.group.findMany({
+                    where: {
+                        tenantId: tenant.id,
+                        isDefault: true,
+                    },
+                    select: {
+                        id: true
+                    },
+                });
             }
 
             const client = await db.client.upsert({
@@ -108,6 +120,9 @@ export default function (db: PrismaClient) {
                 },
                 create: {
                     ...clientData,
+                    group: {
+                        connect: groups
+                    },
                     lastPing: new Date(),
                     active,
                 },
@@ -163,7 +178,7 @@ export default function (db: PrismaClient) {
                 where: {
                     tenantId: res.locals.user.tenantId,
                     id: req.params.clientId,
-                }, 
+                },
                 data: {
                     ...clientData,
                 }
