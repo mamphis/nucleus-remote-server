@@ -14,6 +14,7 @@ namespace nucleus_remote_client.Tasks
         public string? TargetPath { get; set; }
         public string? Arguments { get; set; }
         public string? WorkingDirectory { get; set; }
+        public string? IconLocation { get; set; }
         public bool OverrideExisting { get; set; }
 
         public Task Run(HostSettings hostSettings)
@@ -31,19 +32,15 @@ namespace nucleus_remote_client.Tasks
                 return Task.CompletedTask;
             }
 
-            if (System.IO.File.Exists(path))
-            {
-                System.IO.File.Delete(path);
-            }
-
             WshShell wshShell = new WshShell();
             IWshShortcut wshShortcut = wshShell.CreateShortcut(path);
+            
             if (!string.IsNullOrEmpty(TargetPath))
             {
                 wshShortcut.TargetPath = PathHelper.GetPath(TargetPath);
             }
 
-            if (Arguments != null)
+            if (!string.IsNullOrEmpty(Arguments))
             {
                 wshShortcut.Arguments = Arguments;
             }
@@ -51,6 +48,12 @@ namespace nucleus_remote_client.Tasks
             if (!string.IsNullOrEmpty(WorkingDirectory))
             {
                 wshShortcut.WorkingDirectory = PathHelper.GetPath(WorkingDirectory);
+            }
+
+            if (!string.IsNullOrEmpty(IconLocation))
+            {
+                Console.WriteLine("Old Icon: " + wshShortcut.IconLocation);
+                wshShortcut.IconLocation = IconLocation;
             }
 
             wshShortcut.Save();
