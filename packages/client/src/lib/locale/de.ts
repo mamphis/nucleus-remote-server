@@ -58,6 +58,7 @@ const translations: Record<string, string> = {
     'field.content': 'Inhalt',
     'field.currentClients': 'Anzahl der Clients (Aktiv/Gesamt)',
     'field.currentPassword': 'Aktuelles Passwort',
+    'field.defaultGroup': 'Standardgruppe',
     'field.eMail': 'E-Mail',
     'field.groupCount': 'Anzahl der Gruppen',
     'field.groups': 'Gruppen',

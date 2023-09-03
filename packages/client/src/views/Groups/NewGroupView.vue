@@ -2,28 +2,29 @@
 import router from '@/router';
 import type { ApiGroup } from '@/types/group';
 import { ref } from 'vue';
-import request, { isErrorResponse, isValidationError } from '../../lib/request';
-
-const groups = await request.$get<ApiGroup[]>('groups');
+import request, { isErrorResponse, isValidationError } from '@/lib/request';
 
 const name = ref('');
+const isDefault = ref(false);
 
-const errors = ref<{
-    name: string,
-    general: string,
-}>({
+const errors = ref({
     name: '',
+    isDefault: '',
     general: '',
 });
 
 const clearError = () => {
     errors.value.name = '';
+    errors.value.isDefault = '';
     errors.value.general = '';
 }
 
 const createNewGroup = async () => {
     if (name.value) {
-        const response = await request.$post<ApiGroup>(`groups`, { name: name.value });
+        const response = await request.$post<ApiGroup>(`groups`, {
+            name: name.value,
+            isDefault: isDefault.value,
+        });
 
         clearError();
         if (isValidationError(response)) {
@@ -58,6 +59,15 @@ const createNewGroup = async () => {
                             :placeholder="$t('field.name')" v-model="name" required>
                     </div>
                     <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
+                </div>
+                <div class="field">
+                    <div class="field">
+                        <label class="checkbox">
+                            <input class="checkbox" type="checkbox" v-model="isDefault" />
+                            {{ $t('field.defaultGroup') }}
+                        </label>
+                    </div>
+                    <p v-if="!!errors.isDefault" class="help is-danger">{{ errors.isDefault }}</p>
                 </div>
                 <div class="field">
                     <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>

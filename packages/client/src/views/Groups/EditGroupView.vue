@@ -29,16 +29,15 @@ const remainingClients = computed(() => {
     return clients.filter(c => !group.value.client.some(gc => gc.id == c.id)).map(c => ({ id: c.id, name: c.username + " - " + c.hostname }));
 });
 
-const errors = ref<{
-    name: string,
-    general: string,
-}>({
+const errors = ref({
     name: '',
+    isDefault: '',
     general: '',
 });
 
 const clearError = () => {
     errors.value.name = '';
+    errors.value.isDefault = '';
     errors.value.general = '';
 }
 
@@ -120,6 +119,15 @@ const deleteGroup = async () => {
                         v-model="group.name" required>
                 </div>
                 <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
+            </div>
+            <div class="field">
+                <div class="field">
+                    <label class="checkbox">
+                        <input class="checkbox" type="checkbox" v-model="group.isDefault" />
+                        {{ $t('field.defaultGroup') }}
+                    </label>
+                </div>
+                <p v-if="!!errors.isDefault" class="help is-danger">{{ errors.isDefault }}</p>
             </div>
             <div class="field">
                 <nav class="panel">
