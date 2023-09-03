@@ -5,6 +5,7 @@ import { join } from "path";
 import { NotFound } from 'http-errors';
 import { PrismaClient } from "@prisma/client";
 import mailer from "../../lib/mailer";
+import db from "../../lib/db";
 
 const router = Router();
 
@@ -32,8 +33,7 @@ router.get('/update/file', async (req, res, next) => {
 });
 
 router.get('/health', async (req, res, next) => {
-    const db = new PrismaClient();
-    const dbOperational = await db.$connect().then(() => true).catch(() => false);
+    const dbOperational = await db.$queryRaw`SELECT 1;`;
     const mailerOperational = mailer.operational;
 
     res.status((
