@@ -31,7 +31,11 @@ namespace nucleus_remote_client
                 Try(executer, _hostSettings);
                 Try(new SendDetails(), _hostSettings);
                 Try(pinger, _hostSettings);
+#if DEBUG
+                await Task.Delay(10000, stoppingToken);
+#else
                 await Task.Delay(60000, stoppingToken);
+#endif
             }
         }
 

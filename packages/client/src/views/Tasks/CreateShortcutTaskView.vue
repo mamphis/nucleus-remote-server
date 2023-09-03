@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Icons from '@/components/Icons.vue';
 import SpecialFolderPicker from '@/components/SpecialFolderPicker.vue';
 import { ref, watch } from 'vue';
 
@@ -8,21 +9,21 @@ const content = ref({
     TargetPath: '',
     Arguments: '',
     WorkingDirectory: '',
+    IconLocation: '',
     OverrideExisting: false,
 });
 
-
 const props = defineProps<{
     modelValue: string
-}>()
+}>();
 const emits = defineEmits<{
     (event: 'update:modelValue', value: string): void
-}>()
+}>();
 if (props.modelValue) {
     content.value = JSON.parse(props.modelValue);
 }
+
 watch(content, (newValue) => {
-    console.log(newValue);
     emits('update:modelValue', JSON.stringify(newValue));
 }, { deep: true })
 </script>
@@ -49,6 +50,10 @@ watch(content, (newValue) => {
     <div class="field">
         <label class="label" for="">{{ $t('createShortcutTask.workingDir') }}</label>
         <input class="input" v-model="content.WorkingDirectory" />
+    </div>
+    <div class="field">
+        <label class="label" for="">{{ $t('createShortcutTask.iconLocation') }}</label>
+        <Icons v-model="content.IconLocation" />
     </div>
     <div class="field">
         <label class="checkbox" for="">
