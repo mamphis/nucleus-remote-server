@@ -28,14 +28,18 @@ namespace nucleus_remote_client
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 }
 
-                Try(executer, _hostSettings);
-                Try(new SendDetails(), _hostSettings);
-                Try(pinger, _hostSettings);
+                await Try(executer, _hostSettings);
+                await Try(pinger, _hostSettings);
+                await Try(new SendDetails(), _hostSettings);
+#if DEBUG
+                await Task.Delay(10000, stoppingToken);
+#else
                 await Task.Delay(60000, stoppingToken);
+#endif
             }
         }
 
-        private async void Try(IClient client, HostSettings hostSettings)
+        private async Task Try(IClient client, HostSettings hostSettings)
         {
             try
             {
