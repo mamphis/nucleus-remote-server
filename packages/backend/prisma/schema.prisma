@@ -39,8 +39,9 @@ model Client {
 }
 
 model Group {
-  id   String @id() @default(uuid())
-  name String
+  id        String  @id() @default(uuid())
+  name      String
+  isDefault Boolean @default(false)
 
   client        Client[]
   configuration Configuration[]

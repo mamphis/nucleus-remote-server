@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Nucleus Remote Server</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+/* From extension dendron.dendron */
+@font-face {
+  font-family: "fontello";
+  src: url("../font/fontello.eot?7840610");
+  src: url("../font/fontello.eot?7840610#iefix") format("embedded-opentype"),
+    url("../font/fontello.woff2?7840610") format("woff2"),
+    url("../font/fontello.woff?7840610") format("woff"),
+    url("../font/fontello.ttf?7840610") format("truetype"),
+    url("../font/fontello.svg?7840610#fontello") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'fontello';
+    src: url('../font/fontello.svg?7840610#fontello') format('svg');
+  }
+}
+*/
+
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+  font-family: "fontello";
+  font-style: normal;
+  font-weight: normal;
+  speak: never;
+
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: 0.2em;
+  text-align: center;
+  /* opacity: .8; */
+
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: 0.2em;
+
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.icon-link:before {
+  content: "\e800";
+} /* '' */
+
+.memo-markdown-embed {
+  /* border: 1px solid #ddd; */
+  /* border-radius: 6px; */
+  /* padding: 5px 20px 15px 20px;
+  margin: 0 20px; */
+  border-bottom: dashed thin;
+  position: relative;
+}
+
+.memo-markdown-embed-title {
+  height: 36px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 26px;
+  line-height: 42px;
+  top: 5px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: 900;
+}
+
+.memo-markdown-embed-link {
+  border-bottom: dashed thin;
+  /* position: absolute;
+  top: 6px;
+  right: 12px; */
+  /* /cursor: pointer; */
+  /* //float: right; */
+}
+
+.memo-markdown-embed-link i {
+  font-size: 18px;
+  color: #535353;
+}
+
+.memo-markdown-embed-link:hover i {
+  color: #000000;
+}
+
+.vscode-dark .memo-markdown-embed-link:hover i {
+  color: #ffffff;
+}
+
+.memo-markdown-embed-content {
+  /* max-height: 500px; */
+  /* overflow-y: auto;
+  padding-right: 10px; */
+}
+
+.memo-invalid-link {
+  color: #cc0013 !important;
+  cursor: not-allowed;
+}
+
+.memo-cyclic-link-warning {
+  text-align: center;
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="nucleus-remote-server">Nucleus Remote Server</h1>
+<p>Nucleus Remote Server dient zur Verwaltung von Computern über das Internet.</p>
+<ul>
+<li><a href="#nucleus-remote-server">Nucleus Remote Server</a>
+<ul>
+<li><a href="#clients">Clients</a></li>
+<li><a href="#aufgaben">Aufgaben</a>
+<ul>
+<li><a href="#link-erstellen">Link Erstellen</a></li>
+<li><a href="#datei-l%C3%B6schen">Datei Löschen</a></li>
+<li><a href="#datei-herunterladen">Datei Herunterladen</a></li>
+<li><a href="#datei-ausf%C3%BChren">Datei Ausführen</a></li>
+</ul>
+</li>
+<li><a href="#verzeichnisse">Verzeichnisse</a></li>
+<li><a href="#konfigurationen">Konfigurationen</a></li>
+<li><a href="#gruppen">Gruppen</a></li>
+<li><a href="#mandanten">Mandanten</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="clients">Clients</h2>
+<p>Computer, die den nucleus-remote-client ausführen, melden sich am Server an und bekommen vom Server Aufgaben, welche diese Computer dann ausführen können.</p>
+<p>Die Aufgaben werden Periodisch (alle 60 Sekunden) vom Server abgerufen und sind somit immer aktuell.</p>
+<h2 id="aufgaben">Aufgaben</h2>
+<p>Auf dem Server können Aufgaben definiert werden, welche dann von den Clients ausgeführt werden können. Aufgaben werden über die <a href="#konfigurationen">Konfigurationen</a> erstellt.</p>
+<p>Jede Aufgabe verfügt über verschiedene Eigenschaften, die bestimmen, wie diese Aufgabe ausgeführt wird.</p>
+<ul>
+<li><code>Typ</code> - Der Typ bestimmt die Art der Aufgabe.</li>
+<li><code>Aktiv</code> - Gibt an, ob die Aufgabe aktiv ist. Nicht aktive Aufgaben werden nicht vom Client ausgeführt, auch wenn diese zu einer Konfiguration gehören, die dem Client zugeordnet ist.</li>
+<li><code>Nur einmal ausführen</code> - Diese Aufgabe wird nur das erste mal wo der Client diese Aufgabe herunterlädt ausgeführt.</li>
+</ul>
+<p>Abseits dieser Eigenschaften haben die unterschiedlichen Typen von Aufgaben spezielle Eigenschaften die Konfiguriert werden müssen.</p>
+<h3 id="link-erstellen">Link Erstellen</h3>
+<ul>
+<li><code>Verzeichnis</code> <a href="#verzeichnisse"><sup>1</sup></a> - Das Verzeichnis in dem die Verknüpfung erstellt werden soll.</li>
+<li><code>Verknüpfungsname</code> - Der Name der Verknüpfung.</li>
+<li><code>Zielpfad</code> <a href="#verzeichnisse"><sup>1</sup></a> - Die Anwendung die ausgeführt werden soll, wenn auf den Link geklickt wird.</li>
+<li><code>Argumente</code> - Argumente, die der Anwendung mitgegeben werden soll.</li>
+<li><code>Arbeitsverzeichnis</code> <a href="#verzeichnisse"><sup>1</sup></a> - Das Arbeitsverzeichnis der Anwendung.</li>
+<li><code>Symbolpfad</code> - Der Pfad für das Symbol der Verknüpfung. Über den Button <code>Symbol wählen</code> kann aus einigen Standardsymbolen ausgewählt werden.</li>
+<li><code>Existierende überschreiben</code> - Gibt an, ob der Link gelöscht werden soll, bevor er wieder erstellt wird. Das kann sinnvoll sein, wenn Benutzeranpassungen überschrieben werden sollen.</li>
+</ul>
+<h3 id="datei-löschen">Datei Löschen</h3>
+<ul>
+<li><code>Pfad</code> <a href="#verzeichnisse"><sup>1</sup></a> - Der Pfad der zu löschenden Datei oder des zu löschenden Verzeichnisses</li>
+<li><code>Rekursiv</code> - Wenn der Pfad ein Verzeichnis ist, werden Unterordner und Dateien im Verzeichnis auch gelöscht. Ist die Option deaktiviert, wird der Ordner nicht gelöscht.</li>
+<li><code>Ignorieren, wenn nicht vorhanden</code> - Wenn diese Option aktiviert ist, wird keine Fehlermeldung zum Server geschickt, sollte die Datei nicht vorhanden sein.</li>
+</ul>
+<h3 id="datei-herunterladen">Datei Herunterladen</h3>
+<ul>
+<li><code>Remote Url</code> - Die URL von der die Datei heruntergeladen werden soll</li>
+<li><code>Ziel</code> - Der Dateipfad unter dem die Datei gespeichert werden soll</li>
+<li><code>Überschreiben</code> - Wenn diese Option aktiviert ist, werden vorhandene Dateien überschrieben.</li>
+<li><code>Ignorieren, wenn vorhanden</code> - Wenn am Zielpfad bereits eine Datei ist, wird keine Datei heruntergeladen.</li>
+</ul>
+<h3 id="datei-ausführen">Datei Ausführen</h3>
+<ul>
+<li><code>Datei</code> <a href="#verzeichnisse"><sup>1</sup></a> - Die Anwendung die ausgeführt werden soll.</li>
+<li><code>Argumente</code> - Argumente, die der Anwendung mitgegeben werden soll.</li>
+<li><code>Fenster verstecken</code> - Gibt an ob ein Fenster geöffnet wird, wenn diese Anwendung gestartet wird.</li>
+<li><code>Starten, wenn bereits gestartet</code> - Wenn diese Option deaktiviert ist, wird vor dem Ausführen überprüft, ob ein Prozess mit gleichen Namen bereits gestartet ist. Ist dies nicht der fall wird die Anwendung gestartet. Andernfalls wird die Anwendung nicht erneut gestartet.</li>
+</ul>
+<h2 id="verzeichnisse">Verzeichnisse</h2>
+<p>Verzeichnisse werden Serverseitig aufbereitet. Folgende Platzhalter können verwendet werden um den Pfad dynamisch zu erstellen:</p>
+<ul>
+<li><code>{{username}}</code> - Der Benutzername des angemeldeten Benutzers</li>
+<li><code>{{cwd}}</code> - Das aktuelle Arbeitsverzeichnis des Clients</li>
+</ul>
+<p>Des weiteren gibt es einige Standardpfade, die ersetzt werden können. Dazu muss dieser Standardpfad an erster Stelle im Textfeld des Pfades sein.</p>
+<p>Bspw. <code>Desktop/Taschenrechner.lnk</code>.</p>
+<p>Dabei wird der <strong>erste</strong> Teil (<code>Desktop</code>) durch den Benutzerdesktop des angemeldeten Benutzer ersetzt.</p>
+<p>Folgende Pfade können verwendet werden:</p>
+<ul>
+<li><code>Desktop</code> - C:/Users/&lt;Benutzername&gt;/Desktop</li>
+<li><code>Eigene Dokumente</code> - C:/Users/&lt;Benutzername&gt;/Documents</li>
+<li><code>Eigene Musik</code> - C:/Users/&lt;Benutzername&gt;/Music</li>
+<li><code>Eigene Bilder</code> - C:/Users/&lt;Benutzername&gt;/Pictures</li>
+<li><code>Eigene Videos</code> - C:/Users/&lt;Benutzername&gt;/Videos</li>
+<li><code>Startmenü</code> - C:/Users/&lt;Benutzername&gt;/AppData/Roaming/Microsoft/Windows/Start Menu/Programs</li>
+<li><code>Autostart</code> - C:/Users/&lt;Benutzername&gt;/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup</li>
+</ul>
+<h2 id="konfigurationen">Konfigurationen</h2>
+<p>Konfigurationen sind Gruppierungen von Aufgaben. Sie stellen ein Bindegleid zwischen den Gruppen und den Aufgaben dar.</p>
+<h2 id="gruppen">Gruppen</h2>
+<p>Clients und Konfigurationen werden Gruppen zugeordnet. Dies kann manuell erfolgen, oder wenn der Haken <code>Standardgruppe</code> aktiv ist, werden neue Clients automatisch dieser Gruppe zugeordnet.</p>
+<p>Beim Abruf der Aufgaben werden alle <em>aktiven Aufgaben</em> aus allen <em>Konfigurationen</em> der <em>Gruppen</em> die dem Client zugeordnet sind heruntergeladen und ausgeführt.</p>
+<h2 id="mandanten">Mandanten</h2>
+<p>Jedem Mandanten sind eine bestimmte Anzahl an gleichzeitig agierenden Clients zugeordnet. Die Anzahl der gleichzeitigen Clients kann über der Auflistung aller Clients eingesehen werden.</p>
+<p>Clients, welche darüber hinaus sich anmelden werden als <code>nicht aktiv</code> angezeigt, und können damit auch keine Aufgaben ausführen.</p>
+
+        
+        
+    </body>
+    </html>
