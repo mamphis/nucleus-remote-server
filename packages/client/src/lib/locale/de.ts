@@ -12,7 +12,7 @@ const translations: Record<string, string> = {
     'configurations.newConfigurtion': 'Neue Konfiguration',
     'createShortcutTask.arguments': 'Argumente',
     'createShortcutTask.iconLocation': 'Symbolpfad',
-    'createShortcutTask.linkDirectory': 'Verzeichnis verlinken',
+    'createShortcutTask.linkDirectory': 'Verzeichnis',
     'createShortcutTask.linkName': 'Verknüpfungsname',
     'createShortcutTask.override': 'Existierende überschreiben',
     'createShortcutTask.targetPath': 'Zielpfad',
