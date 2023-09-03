@@ -24,6 +24,7 @@ const groups = await request.$get<ApiGroup[]>('groups');
                 <thead>
                     <tr>
                         <th>{{ $t('field.name') }}</th>
+                        <th>{{ $t('field.defaultGroup') }}</th>
                         <th>{{ $t('field.clientCount') }}</th>
                         <th>{{ $t('field.configurationCount') }}</th>
                     </tr>
@@ -32,6 +33,7 @@ const groups = await request.$get<ApiGroup[]>('groups');
                     <tr v-for="group in groups" :key="group.id" class="is-clickable"
                         @click="$router.push(`/groups/${group.id}`)">
                         <td>{{ group.name }}</td>
+                        <td><input type="checkbox" :checked="group.isDefault" disabled></td>
                         <td>{{ group.client.length }}</td>
                         <td>{{ group.configuration.length }}</td>
                     </tr>
