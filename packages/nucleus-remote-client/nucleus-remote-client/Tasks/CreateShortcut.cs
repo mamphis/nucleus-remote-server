@@ -32,6 +32,11 @@ namespace nucleus_remote_client.Tasks
                 return Task.CompletedTask;
             }
 
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
+
             WshShell wshShell = new WshShell();
             IWshShortcut wshShortcut = wshShell.CreateShortcut(path);
             
