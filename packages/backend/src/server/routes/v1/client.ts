@@ -1,10 +1,10 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-import { Router } from "express";
-import { AuthResponse, auth } from "../../../lib/auth";
-import { ZodError, z } from "zod";
-import { UnprocessableEntity, BadRequest, Forbidden } from 'http-errors';
+import { PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { randomUUID } from "crypto";
+import { Router } from "express";
+import { BadRequest, Forbidden, UnprocessableEntity } from 'http-errors';
+import { ZodError, z } from "zod";
+import { AuthResponse, auth } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { $t } from '@/lib/locale/locale';
-import request, { isErrorResponse } from '@/lib/request';
+import request, { isErrorResponse, isValidationError } from '@/lib/request';
 import { eventStore } from '@/stores/eventBus';
 import type { ApiUser } from '@/types/user';
 import { ref } from 'vue';
@@ -10,20 +10,18 @@ const { sendNotification } = eventStore();
 const response = await request.$get<ApiUser>(`users/me`);
 const user = response.assertNotError().toRef();
 
-const errors = ref<{
-    general: string,
-    confirmPassword: string,
-    oldPassword: string,
-}>({
+const errors = ref({
     general: '',
     confirmPassword: '',
     oldPassword: '',
+    newPassword: '',
 });
 
 const clearError = () => {
     errors.value.general = '';
     errors.value.confirmPassword = '';
     errors.value.oldPassword = '';
+    errors.value.newPassword = '';
 }
 
 const updateUser = async () => {
@@ -55,7 +53,16 @@ const changePassword = async () => {
         newPassword: newPassword.value,
     });
 
-    if (isErrorResponse(response)) {
+    if (isValidationError(response)) {
+        response.data.forEach(issue => {
+            if (issue.path in errors.value) {
+                errors.value[issue.path as keyof typeof errors.value] = issue.message;
+            } else {
+                errors.value.general = issue.message;
+            }
+        });
+    }
+    else if (isErrorResponse(response)) {
         errors.value.oldPassword = response.message;
     } else {
         sendNotification('success', $t('editProfile.passwordChangeSuccess'));
@@ -96,6 +103,7 @@ const changePassword = async () => {
                     <div class="control">
                         <input class="input" type="password" name="password" id="password" v-model="newPassword">
                     </div>
+                    <p v-if="!!errors.newPassword" class="help is-danger">{{ errors.newPassword }}</p>
                 </div>
                 <div class="field pl-1">
                     <label class="label" for="password">{{ $t('field.confirmPassword') }}</label>

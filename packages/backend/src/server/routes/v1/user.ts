@@ -85,7 +85,7 @@ export default function (db: PrismaClient) {
     router.patch('/changePassword', auth(), async (req, res: AuthResponse, next) => {
         const schema = z.object({
             oldPassword: z.string(),
-            newPassword: z.string(),
+            newPassword: z.string().min(8),
         });
 
         try {
