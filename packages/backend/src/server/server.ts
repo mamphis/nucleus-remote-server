@@ -7,7 +7,8 @@ import { Logger } from '../lib/logger';
 import api from './routes';
 import system from './routes/system';
 
-import { PrismaClientValidationError } from '@prisma/client/runtime/library';
+import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
+import { handlePrismaClientKnownRequestError } from '../lib/locale/prismaError';
 
 export class Server {
     private app: Application;
@@ -53,14 +54,26 @@ export class Server {
             }
 
             if (err instanceof ZodError) {
-                return res.status(400).json({ type: 'ValidationError', error: err.name, data: err.issues.map(i => ({
-                    ...i,
-                    path: i.path.join('.'),
-                })), message: err.message });
+                return res.status(400).json({
+                    type: 'ValidationError', error: err.name, data: err.issues.map(i => ({
+                        ...i,
+                        path: i.path.join('.'),
+                    })), message: err.message
+                });
             }
 
             if (err instanceof PrismaClientValidationError) {
                 return res.status(400).json({ type: 'ValidationError', error: err.name, message: `Invalid database operation.` });
+            }
+
+            if (err instanceof PrismaClientKnownRequestError) {
+                const prismaError = handlePrismaClientKnownRequestError(req, err);
+                return res.status(prismaError.status).json({ type: prismaError.type, code: err.code, error: prismaError.name, message: prismaError.message, data: [
+                    {
+                        message: prismaError.message,
+                        path: prismaError.path
+                    }
+                ] });
             }
 
             const internalServerError = InternalServerError();

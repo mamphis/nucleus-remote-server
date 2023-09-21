@@ -11,12 +11,17 @@ const languages: { [lang: string]: { [key in ValidKeys]?: string } } = {
 
 function formatString(term: string, args: any[]): string {
     return args.reduce((text, item, index) => {
+        let val = item;
+        if (Array.isArray(item)) {
+            val = item.join(', ');
+        }
+
         return text.replaceAll(`{${index}}`, item);
     }, term);
 }
 
 export function $t(req: Request, key: ValidKeys, ...args: any[]): string {
-    let language = req.acceptsLanguages(Object.keys(languages))
+    let language = req.acceptsLanguages(Object.keys(languages));
     if (!language) {
         language = fallbackLanguage;
     }
@@ -31,7 +36,7 @@ export function $t(req: Request, key: ValidKeys, ...args: any[]): string {
         }
     }
 
-    const term = languages['en'][key];
+    const term = languages[fallbackLanguage][key];
     if (!term) {
         console.warn('missing key', key);
     }

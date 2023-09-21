@@ -20,6 +20,10 @@ const translations = {
     'error.404.noTenantFound': 'The tenant with id "{0}" was not found.',
     'error.404.noUserFound': 'The user with id "{0}" was not found.',
     'error.500.issueCannotBeCreated': 'The issue cannot be created.',
+    'error.prisma.duplicateKey': 'The value of the field "{0}" already exists.',
+    'error.prisma.invalidId': 'The id "{0}" is not valid.',
+    'error.prisma.invalidInput': 'The input "{0}" is not valid.',
+    'error.prisma.timeout': 'A connection to the database has been timed out.',
 } as const;
 
 export default translations;
