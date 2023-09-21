@@ -135,14 +135,6 @@ export default function (db: PrismaClient) {
 
             return res.json(client);
         } catch (e: unknown) {
-            if (e instanceof PrismaClientKnownRequestError) {
-                return next(UnprocessableEntity(e.message));
-            }
-
-            if (e instanceof ZodError) {
-                return next(e);
-            }
-
             return next(e);
         }
     });
@@ -187,14 +179,6 @@ export default function (db: PrismaClient) {
 
             return res.json(client);
         } catch (e: unknown) {
-            if (e instanceof PrismaClientKnownRequestError) {
-                return next(UnprocessableEntity(e.message));
-            }
-
-            if (e instanceof ZodError) {
-                return next(e);
-            }
-
             return next(e);
         }
     });
@@ -254,14 +238,6 @@ export default function (db: PrismaClient) {
 
             return res.json(clientLog);
         } catch (e: unknown) {
-            if (e instanceof PrismaClientKnownRequestError) {
-                return next(UnprocessableEntity(e.message));
-            }
-
-            if (e instanceof ZodError) {
-                return next(e);
-            }
-
             return next(e);
         }
     });
@@ -280,14 +256,6 @@ export default function (db: PrismaClient) {
 
             return res.json(clientLog);
         } catch (e: unknown) {
-            if (e instanceof PrismaClientKnownRequestError) {
-                return next(UnprocessableEntity(e.message));
-            }
-
-            if (e instanceof ZodError) {
-                return next(e);
-            }
-
             return next(e);
         }
     });
@@ -329,14 +297,6 @@ export default function (db: PrismaClient) {
 
             return res.json(clientDetails);
         } catch (e: unknown) {
-            if (e instanceof PrismaClientKnownRequestError) {
-                return next(UnprocessableEntity(e.message));
-            }
-
-            if (e instanceof ZodError) {
-                return next(e);
-            }
-
             return next(e);
         }
     });
@@ -351,14 +311,6 @@ export default function (db: PrismaClient) {
 
             return res.json(clientDetails);
         } catch (e: unknown) {
-            if (e instanceof PrismaClientKnownRequestError) {
-                return next(UnprocessableEntity(e.message));
-            }
-
-            if (e instanceof ZodError) {
-                return next(e);
-            }
-
             return next(e);
         }
     });
