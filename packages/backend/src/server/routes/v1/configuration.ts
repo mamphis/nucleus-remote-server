@@ -4,6 +4,7 @@ import { Router } from "express";
 import { NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
+import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -31,7 +32,7 @@ export default function (db: PrismaClient) {
         });
 
         if (!configuration) {
-            return NotFound(`Configuration with id "${req.params.configurationId}" was not found.`);
+            return NotFound($t(req, 'error.404.noConfigurationFound', req.params.configurationId));
         }
 
         return res.json(configuration);
@@ -135,6 +136,6 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
-    
+
     return router;
 }

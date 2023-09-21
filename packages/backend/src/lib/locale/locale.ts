@@ -1,15 +1,12 @@
+import { Request } from "express";
 import de from "./de";
-import en, { type ValidKeys } from "./en";
-import it from "./it";
-import fr from "./fr";
+import en, { ValidKeys } from "./en";
 
-const fallbackLanguage = 'en';
+const fallbackLanguage = 'en'
 
 const languages: { [lang: string]: { [key in ValidKeys]?: string } } = {
     en,
     de,
-    it,
-    fr,
 }
 
 function formatString(term: string, args: any[]): string {
@@ -18,8 +15,11 @@ function formatString(term: string, args: any[]): string {
     }, term);
 }
 
-export function $t(key: ValidKeys, ...args: any[]): string {
-    const language = navigator.language.split('-')[0] ?? fallbackLanguage;
+export function $t(req: Request, key: ValidKeys, ...args: any[]): string {
+    let language = req.acceptsLanguages(Object.keys(languages))
+    if (!language) {
+        language = fallbackLanguage;
+    }
 
     if (language in languages) {
         const term = languages[language as keyof typeof languages][key];

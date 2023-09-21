@@ -143,3 +143,4 @@ const translations: Record<string, string> = {
 }
 
 export default translations;
+export type ValidKeys = keyof typeof translations;

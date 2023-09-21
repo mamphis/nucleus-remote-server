@@ -4,16 +4,16 @@ import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
 import { NotFound, UnprocessableEntity } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router();
 
-
     // GET localhost:8080/api/v1/clients/
-    router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
-        const clients = await db.client.findMany({ where: { tenantId: res.locals.user.tenantId } });
+    router.get('/', auth('read:task'), async (req, res: AuthResponse, next) => {
+        const tasks = await db.task.findMany({ where: { tenantId: res.locals.user.tenantId } });
 
-        res.json(clients);
+        res.json(tasks);
     });
 
     router.get('/:taskId', auth('read:task'), async (req, res, next) => {
@@ -25,7 +25,7 @@ export default function (db: PrismaClient) {
         });
 
         if (!task) {
-            return next(NotFound('task was not found'));
+            return next(NotFound($t(req, 'error.404.noTaskFound', req.params.taskId)));
         }
 
         return res.json(task);
@@ -96,6 +96,6 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
-    
+
     return router;
 }

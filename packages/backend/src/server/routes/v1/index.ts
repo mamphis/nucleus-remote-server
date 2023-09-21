@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
+import { NotFound } from 'http-errors';
+import { $t } from "../../../lib/locale/locale";
 import clients from './client';
 import configurations from './configuration';
 import groups from './group';
@@ -26,5 +28,10 @@ router.use('/groups', groups(db));
 router.use('/configurations', configurations(db));
 router.use('/tasks', tasks(db));
 router.use('/misc', misc(db));
+
+router.use((req, _res, next) => {
+    next(NotFound($t(req, 'error.404.invalidApiRoute', 'v1', req.baseUrl)));
+})
+
 
 export default router;

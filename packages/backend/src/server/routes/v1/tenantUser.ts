@@ -6,6 +6,7 @@ import z, { ZodError } from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
 import mailer from "../../../lib/mailer";
 import { randomString } from "../../../lib/util";
+import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -44,7 +45,7 @@ export default function (db: PrismaClient) {
         });
 
         if (!user) {
-            return next(NotFound(`${req.params.username} was not found.`));
+            return next(NotFound($t(req, 'error.404.noUserFound', req.params.username)));
         }
 
         return res.json(user);
@@ -115,17 +116,17 @@ export default function (db: PrismaClient) {
         //Check if user is in the same tenant
         const user = await db.user.findFirst({ where: { id: req.params.userId } });
         if (!user) {
-            return next(NotFound('User not found.'))
+            return next(NotFound($t(req, 'error.404.noUserFound', req.params.userId)))
         }
 
         if (user.tenantId !== res.locals.user.tenantId) {
-            return next(Forbidden('You cannot change the users permission.'));
+            return next(Forbidden($t(req, 'error.403.cannotChangeUsersPermission')));
         }
 
         try {
             const permissionData = schema.parse(req.body);
             if (['tenant', 'user'].includes(permissionData.permission)) {
-                return next(Forbidden('You cannot change the users permission.'));
+                return next(Forbidden($t(req, 'error.403.cannotChangeUsersPermission')));
             }
 
             const updater = await db.user.findFirstOrThrow({
@@ -135,7 +136,7 @@ export default function (db: PrismaClient) {
             });
 
             if (req.params.userId === updater.id) {
-                return next(Forbidden('You cannot update your own permissions.'));
+                return next(Forbidden($t(req, 'error.403.cannotChangeUsersPermission')));
             }
 
             const updatePermission = async (allowed: boolean, scope: string) => {
@@ -237,6 +238,6 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
-    
+
     return router;
 }

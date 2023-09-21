@@ -3,6 +3,7 @@ import { Router } from "express";
 import { BadRequest, InternalServerError } from 'http-errors';
 import { AuthResponse, auth } from '../../../lib/auth';
 import { createIssue } from '../../../lib/github';
+import { $t } from '../../../lib/locale/locale';
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -16,10 +17,10 @@ export default function (db: PrismaClient) {
                 return res.json(response);
             }
 
-            next(InternalServerError('Your issue cannot be created.'));
+            next(InternalServerError($t(req, 'error.500.issueCannotBeCreated')));
         }
 
-        return next(BadRequest('please describe your issue.'));
+        return next(BadRequest($t(req, 'error.400.missingDescription')));
     });
 
     return router;
