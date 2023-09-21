@@ -7,6 +7,7 @@ import { AuthResponse, auth } from "../../../lib/auth";
 import mailer from "../../../lib/mailer";
 import { randomString } from "../../../lib/util";
 import { compare, hash } from "bcrypt";
+import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -91,12 +92,12 @@ export default function (db: PrismaClient) {
             const user = await db.user.findFirst({ where: { id: res.locals.user.id } });
 
             if (!user) {
-                return next(NotFound(`${res.locals.user.username} was not found.`));
+                return next(NotFound($t(req, 'error.403.cannotChangeUsersPermission', res.locals.user.username)));
             }
 
             const userData = schema.parse(req.body);
             if (!await compare(userData.oldPassword, user?.password)) {
-                return next(BadRequest('Your old password is not correct.'));
+                return next(BadRequest($t(req, 'error.400.incorrectOldPassword')));
             }
 
             const update = await db.user.update({
@@ -147,7 +148,7 @@ export default function (db: PrismaClient) {
         });
 
         if (!user) {
-            return next(NotFound(`${req.params.username} was not found.`));
+            return next(NotFound($t(req, 'error.404.noUserFound', req.params.username)));
         }
 
         return res.json(user);
@@ -223,7 +224,7 @@ export default function (db: PrismaClient) {
             });
 
             if (req.params.userId === updater.id) {
-                return next(Forbidden('You cannot update your own permissions.'));
+                return next(Forbidden($t(req, 'error.403.cannotChangeUsersPermission')));
             }
 
             const permissionData = schema.parse(req.body);

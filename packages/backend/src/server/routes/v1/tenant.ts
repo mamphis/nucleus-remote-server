@@ -4,6 +4,7 @@ import { Router } from "express";
 import { NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth, hasPermission } from "../../../lib/auth";
+import { $t } from "../../../lib/locale/locale";
 
 const tenantSelect: Prisma.TenantSelect = {
     id: true,
@@ -58,7 +59,7 @@ export default function (db: PrismaClient) {
         });
 
         if (!tenant) {
-            return NotFound(`Tenant with id "${req.params.tenantId}" was not found.`);
+            return NotFound($t(req, 'error.404.noTenantFound', req.params.tenantId));
         }
 
         if (hasPermission(res.locals.user, 'read:tenant')) {

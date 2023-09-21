@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { existsSync } from "fs";
 import { readFile } from "fs/promises";
-import { join } from "path";
 import { NotFound } from 'http-errors';
-import { PrismaClient } from "@prisma/client";
-import mailer from "../../lib/mailer";
+import { join } from "path";
 import db from "../../lib/db";
+import mailer from "../../lib/mailer";
+import { $t } from "../../lib/locale/locale";
 
 const router = Router();
 
@@ -23,7 +23,7 @@ router.get('/update/file', async (req, res, next) => {
     const version = await getVersion();
 
     if (!existsSync(join(process.env.UPDATE_DIR ?? '.', version + '.zip'))) {
-        return next(NotFound(version + ' has no content.'))
+        return next(NotFound($t(req, 'error.404.missingUpdate', version)));
     }
 
     res.attachment('nucleus-remote-client.' + version + '.zip')

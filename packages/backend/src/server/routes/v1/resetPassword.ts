@@ -3,6 +3,7 @@ import { Router } from "express";
 import { BadRequest } from 'http-errors';
 import mailer from '../../../lib/mailer';
 import { randomString } from '../../../lib/util';
+import { $t } from '../../../lib/locale/locale';
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -20,7 +21,7 @@ export default function (db: PrismaClient) {
             await db.user.update({
                 where: {
                     id: user.id,
-                }, 
+                },
                 data: {
                     onetimePassword,
                 }
@@ -31,7 +32,7 @@ export default function (db: PrismaClient) {
             return res.status(204).end();
         }
 
-        return next(BadRequest('please provide your mail address'));
+        return next(BadRequest($t(req, 'error.400.missingMail')));
     });
 
     return router;

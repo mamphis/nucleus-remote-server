@@ -5,6 +5,7 @@ import { BadRequest, Forbidden, Unauthorized } from 'http-errors';
 import { JsonWebTokenError, sign, verify } from 'jsonwebtoken';
 import { Logger } from './logger';
 import { isProduction } from './util';
+import { $t } from "./locale/locale";
 
 interface User {
     id: string;
@@ -62,13 +63,13 @@ const auth = <Route extends string>(...scopes: string[]): core.RequestHandler<co
         const auth = req.headers.authorization;
 
         if (!auth) {
-            return next(BadRequest('missing auth header'));
+            return next(BadRequest($t(req, 'error.400.missingAuthHeader')));
         }
 
         // Bearer ey.....
         const [method, value] = auth.split(' ');
         if (method !== 'Bearer') {
-            return next(BadRequest('invalid auth method'));
+            return next(BadRequest($t(req, 'error.400.missingAuthHeader')));
         }
 
         try {
@@ -84,9 +85,8 @@ const auth = <Route extends string>(...scopes: string[]): core.RequestHandler<co
                 res.locals.user = user;
                 return next();
             } else {
-                return next(Forbidden(`You are missing the following scopes to do that: ${scopes.filter(s => !user.permissions.includes(s)).join()}`));
+                return next(Forbidden($t(req, 'error.403.missingScopes', scopes.filter(s => !user.permissions.includes(s)).join())));
             }
-
         } catch (e: unknown) {
             if (e instanceof JsonWebTokenError) {
                 return next(Unauthorized(e.message));

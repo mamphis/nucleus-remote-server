@@ -5,6 +5,7 @@ import { ZodError, z } from "zod";
 import { UnprocessableEntity, BadRequest, Forbidden } from 'http-errors';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { randomUUID } from "crypto";
+import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -84,13 +85,13 @@ export default function (db: PrismaClient) {
                 }
             });
             if (!tenant) {
-                return next(BadRequest('Invalid Tenant: ' + clientData.tenantId));
+                return next(BadRequest($t(req, 'error.400.invalidTenant', clientData.tenantId)));
             }
 
             // Check if the client belongs to the same tenant if it exists.
             var existingClient = await db.client.findFirst({ where: { id: clientData.id } });
             if (existingClient && existingClient.tenantId != clientData.tenantId) {
-                return next(BadRequest('Invalid client id: ' + clientData.id));
+                return next(BadRequest($t(req, 'error.400.invalidClient', clientData.id)));
             }
 
             let active = false;
@@ -171,7 +172,7 @@ export default function (db: PrismaClient) {
 
             // New Client wants to be registered to a tenant. Check if it shell be active
             if (tenant.maxClients <= tenant._count.client) {
-                return next(Forbidden('Max Clients in this tenant reached.'))
+                return next(Forbidden($t(req, 'error.403.maxClientsPerTenant')))
             }
 
             const client = await db.client.update({
