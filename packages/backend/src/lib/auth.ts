@@ -2,7 +2,7 @@
 import { Locals, NextFunction, Request, RequestHandler, Response, Router } from "express";
 import type * as core from 'express-serve-static-core';
 import { BadRequest, Forbidden, Unauthorized } from 'http-errors';
-import { JsonWebTokenError, sign, verify } from 'jsonwebtoken';
+import { JsonWebTokenError, sign, verify, TokenExpiredError } from 'jsonwebtoken';
 import { Logger } from './logger';
 import { isProduction } from './util';
 import { $t } from "./locale/locale";
@@ -42,7 +42,15 @@ const jwtSecret: string = process.env.JWT_SECRET ?? 'change-this-immidiately';
 
 const getToken = (user: User): { token: string, user: AuthUser } => {
     const authUser = { username: user.username, tenantId: user.tenantId, id: user.id, permissions: user.permission.map(p => p.scope) };
-    return { token: sign(authUser, jwtSecret), user: authUser };
+    return {
+        token: sign(authUser, jwtSecret, {
+            expiresIn: '10m',
+        }), user: authUser
+    };
+}
+
+const getRefreshToken = (user: { username: string, id: string }) => {
+    return sign({ username: user.username, id: user.id, ts: new Date().getTime(), }, jwtSecret);
 }
 
 function getPermissions(user: AuthUser | User): string[] {
@@ -88,6 +96,10 @@ const auth = <Route extends string>(...scopes: string[]): core.RequestHandler<co
                 return next(Forbidden($t(req, 'error.403.missingScopes', scopes.filter(s => !user.permissions.includes(s)).join())));
             }
         } catch (e: unknown) {
+            if (e instanceof TokenExpiredError) {
+                return next(Unauthorized('Token expired'));
+            }
+
             if (e instanceof JsonWebTokenError) {
                 return next(Unauthorized(e.message));
             }
@@ -98,7 +110,25 @@ const auth = <Route extends string>(...scopes: string[]): core.RequestHandler<co
 
 }
 
+const refresh = (token: string) => {
+    try {
+        const payload = verify(token, jwtSecret);
+        let user: AuthUser;
+        if (typeof payload === 'string') {
+            user = JSON.parse(payload);
+        } else {
+            user = payload as AuthUser;
+        }
+
+        return user;
+    } catch (e: unknown) {
+
+    }
+}
+
 export {
     auth,
-    getToken
+    getToken,
+    getRefreshToken,
+    refresh,
 };
