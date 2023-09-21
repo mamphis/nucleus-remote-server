@@ -65,6 +65,9 @@ type Response<T> = (ErrorResponse | T) & {
 const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): Promise<Response<T>> => {
     const user = userStore();
     const { baseApiUrl } = settingsStore();
+    if (!user.token) {
+        await user.refreshSession();
+    }
 
     let requestInit: RequestInit = {
         headers: {
@@ -104,6 +107,11 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
     }
     if (!response.ok) {
         const errorResponse = await response.json();
+
+        if (response.status === 401 && errorResponse.message === 'Token expired') {
+            await user.refreshSession();
+            return request<T>(method, apiRoute, body);
+        }
 
         return makeResponse(errorResponse);
     }

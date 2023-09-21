@@ -7,6 +7,7 @@ const translations = {
     'error.400.missingDescription': 'Please provide a description.',
     'error.400.missingMail': 'Please provide your mail address.',
     'error.400.missingUsernamePassword': 'Please provide username and password.',
+    'error.400.invalidRefreshToken': 'You provided an invalid refresh token',
     'error.401.invalidUsernamePassword': 'Invalid username or password',
     'error.401.pendingVerification': 'Pending verification',
     'error.403.cannotChangeUsersPermission': 'You are not allowed to change the users permission.',

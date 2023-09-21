@@ -8,8 +8,21 @@ export default function piniaStoragePlugin(context: PiniaPluginContext) {
         }
 
         context.store.$subscribe((mutation, state) => {
-            console.log(mutation, state);
-            localStorage.setItem(mutation.storeId, JSON.stringify(state));
+            let store: { [key: string]: any } = {};
+            if (context.options.ignore) {
+                for (const key in state) {
+                    if (Object.prototype.hasOwnProperty.call(state, key)) {
+                        const value = state[key];
+                        if (!context.options.ignore.includes(key)) {
+                            store[key] = value;
+                        }
+                    }
+                }
+            } else {
+                store = state;
+            }
+
+            localStorage.setItem(mutation.storeId, JSON.stringify(store));
         });
     }
 }
@@ -19,5 +32,6 @@ declare module 'pinia' {
     export interface DefineStoreOptionsBase<S, Store> {
         // allow defining a number of ms for any of the actions
         persistance?: boolean;
+        ignore?: (keyof S)[]
     }
 }

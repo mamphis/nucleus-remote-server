@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { compare } from 'bcrypt';
 import { Router } from "express";
 import { BadRequest, Unauthorized } from 'http-errors';
-import { getToken } from '../../../lib/auth';
+import { getRefreshToken, getToken } from '../../../lib/auth';
 import { $t } from '../../../lib/locale/locale';
 
 export default function (db: PrismaClient) {
@@ -26,8 +26,8 @@ export default function (db: PrismaClient) {
             }
 
             const { token, user: authUser } = getToken(user);
-
-            return res.json({ token, user: authUser });
+            const refreshToken = getRefreshToken(user);
+            return res.json({ token, user: authUser, refreshToken });
         }
 
         return next(BadRequest($t(req, 'error.400.missingUsernamePassword')));

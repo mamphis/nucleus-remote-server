@@ -6,6 +6,7 @@ import { settingsStore } from "./settings";
 
 type UserResponse = {
     token: string;
+    refreshToken: string;
     user: AuthUser;
 };
 
@@ -16,6 +17,7 @@ const userStore = defineStore('user', () => {
     const { baseApiUrl } = settingsStore();
 
     const token = ref<string>('');
+    const refreshToken = ref<string>('');
     const user = ref<AuthUser>();
 
     const login = async (username: string, password: string): Promise<LoginResponse> => {
@@ -42,13 +44,16 @@ const userStore = defineStore('user', () => {
 
         const result = await response.json() as unknown as UserResponse;
         token.value = result.token;
+        refreshToken.value = result.refreshToken;
         user.value = result.user;
         isLoggedIn.value = true;
 
         return result;
     }
+
     const logout = () => {
         token.value = '';
+        refreshToken.value = '';
         isLoggedIn.value = false;
         user.value = undefined;
     }
@@ -77,6 +82,7 @@ const userStore = defineStore('user', () => {
 
         const result = await response.json() as unknown as UserResponse;
         token.value = result.token;
+        refreshToken.value = result.refreshToken;
         user.value = result.user;
         isLoggedIn.value = true;
 
@@ -93,6 +99,34 @@ const userStore = defineStore('user', () => {
         });
     }
 
+    const refreshSession = async () => {
+        const response = await fetch(`${baseApiUrl}refresh`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ refreshToken: refreshToken.value }),
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            if (isErrorResponse(errorResponse)) {
+                return errorResponse;
+            }
+
+            return {
+                type: 'Unknown',
+                error: 'Internal Server Error',
+                message: JSON.stringify(errorResponse),
+            };
+        }
+
+        const result = await response.json() as unknown as UserResponse;
+        token.value = result.token;
+        refreshToken.value = result.refreshToken;
+        user.value =  result.user;
+    }
+
     return {
         isLoggedIn,
         login,
@@ -101,7 +135,9 @@ const userStore = defineStore('user', () => {
         sendResetLink,
         token,
         user,
+        refreshToken,
+        refreshSession,
     };
-}, { persistance: true });
+}, { persistance: true, ignore: ["token"] });
 
 export default userStore;
