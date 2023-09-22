@@ -6,6 +6,7 @@ import { BadRequest, Forbidden, UnprocessableEntity } from 'http-errors';
 import { ZodError, z } from "zod";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
+import { createNotification } from "../../../lib/notification";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -112,6 +113,13 @@ export default function (db: PrismaClient) {
                         id: true
                     },
                 });
+            }
+
+            // Check if the hostname is the same. Otherwise it may be a duplicate configuration
+            if (existingClient) {
+                if (existingClient.hostname !== clientData.hostname) {
+                    await createNotification('High', 'notification.differentHostname', tenant.id, existingClient.hostname, clientData.hostname);
+                }
             }
 
             const client = await db.client.upsert({

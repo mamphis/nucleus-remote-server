@@ -25,6 +25,7 @@ const translations = {
     'error.prisma.invalidId': 'The id "{0}" is not valid.',
     'error.prisma.invalidInput': 'The input "{0}" is not valid.',
     'error.prisma.timeout': 'A connection to the database has been timed out.',
+    'notification.differentHostname': 'A client from a different hostname has been connected with the same id. Original Hostname: {0}, New Hostname: {1}',
     'notification.serverRestart': 'The server was restarted.',
 } as const;
 
