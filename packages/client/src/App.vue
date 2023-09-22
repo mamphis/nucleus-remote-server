@@ -3,10 +3,9 @@ import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 import { hasPermission } from './lib/permission';
-import userStore from './stores/user';
-import { eventStore, type NotificationType } from './stores/eventBus';
-import { reactive } from 'vue';
 import { notificationStore } from './stores/notification';
+import userStore from './stores/user';
+import Notification from '@/components/Notification.vue';
 const burgerActive = ref(false);
 
 const { user, isLoggedIn } = storeToRefs(userStore());
@@ -17,77 +16,11 @@ const hasTenant = computed(() => hasPermission(user.value, ':tenant'));
 const hasTenantUser = computed(() => hasPermission(user.value, ':tenant-user'));
 const hasUser = computed(() => hasPermission(user.value, ':user'));
 
-const { onSendNofification } = eventStore();
-let notifications = ref<Notification[]>([]);
-let notificationId = 0;
-class Notification {
-    readonly maxTime = 5000;
-    timeLeft = ref(this.maxTime);
-
-    private running = true;
-    readonly id = ++notificationId;
-
-    private previousTimestamp: number = 0;
-
-    constructor(public readonly type: NotificationType, public readonly message: string) {
-
-        requestAnimationFrame(this.update.bind(this));
-    }
-
-    update(timestamp: number) {
-        if (this.previousTimestamp === 0) {
-            this.previousTimestamp = timestamp;
-        }
-
-        let elapsed = timestamp - this.previousTimestamp;
-        if (!this.running) {
-            elapsed = 0;
-        }
-
-        this.previousTimestamp = timestamp;
-
-        this.timeLeft.value -= elapsed;
-        requestAnimationFrame(this.update.bind(this));
-
-        if (this.timeLeft.value < 0) {
-            this.clear();
-        }
-    }
-
-    clear() {
-        this.running = false;
-        notifications.value = notifications.value.filter(n => n.id != this.id);
-    }
-
-    pause() {
-        this.running = false;
-    }
-
-    continue() {
-        this.running = true;
-    }
-}
-
-onSendNofification((event) => {
-    if (event.data) {
-        notifications.value.push(new Notification(event.data.type, event.data.message) as any);
-    }
-});
-
 const { unreadNotifications } = storeToRefs(notificationStore());
-
 </script>
 
 <template>
-    <div id="notification">
-        <div v-for="notification in notifications" :key="notification.message" class="notification is-light"
-            :class="'is-' + notification.type" @mouseenter="notification.pause()" @mouseleave="notification.continue()">
-            <button class="delete" @click="notification.clear()"></button>
-            <progress :class="'is-' + notification.type" class="progress" :value="notification.timeLeft"
-                :max="notification.maxTime"></progress>
-            {{ notification.message }}
-        </div>
-    </div>
+    <Notification />
     <header>
         <nav class="navbar has-shadow">
             <div class="navbar-brand">
@@ -148,21 +81,6 @@ const { unreadNotifications } = storeToRefs(notificationStore());
 </template>
 
 <style scoped>
-#notification {
-    position: absolute;
-    z-index: 100;
-    right: 0;
-    top: 8px;
-}
-
-#notification .progress {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 2px;
-    transition: width 0.5s ease;
-}
-
 .notification-badge {
     position: absolute;
     right: 4px;

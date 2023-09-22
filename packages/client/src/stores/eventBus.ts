@@ -114,10 +114,11 @@ export const eventStore = defineStore('event', () => {
     type Notification = {
         type: NotificationType,
         message: string,
+        onclick?: () => void;
     };
 
-    const sendNotification = (type: NotificationType, message: string) => {
-        eventEmitter.fire<Notification>('notification', { type, message });
+    const sendNotification = (type: NotificationType, message: string, onclick?: () => void) => {
+        eventEmitter.fire<Notification>('notification', { type, message, onclick });
     }
 
     const onSendNofification = (listener: (notification: Event<Notification>) => void) => {
