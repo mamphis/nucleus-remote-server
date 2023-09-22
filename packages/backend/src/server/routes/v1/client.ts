@@ -102,6 +102,8 @@ export default function (db: PrismaClient) {
                 // New Client wants to be registered to a tenant. Check if it shell be active
                 if (tenant.maxClients > tenant._count.client) {
                     active = true;
+                } else {
+                    createNotification('Medium', 'notification.maxClientReached', tenant.id);
                 }
 
                 groups = await db.group.findMany({
