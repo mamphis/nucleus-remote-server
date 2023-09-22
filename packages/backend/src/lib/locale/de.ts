@@ -24,6 +24,7 @@ const translations = {
     'error.prisma.invalidId': 'Die ID "{0}" ist nicht gültig.',
     'error.prisma.invalidInput': 'Die Eingabe "{0}" ist nicht gültig.',
     'error.prisma.timeout': 'Die Verbindung zur Datenbank wurde beendet, da sie zeitlich überschritten wurde.',
+    'notification.serverRestart': 'Der Server wurde neu gestartet.',
 } as const;
 
 export default translations;

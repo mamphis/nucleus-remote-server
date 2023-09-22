@@ -25,6 +25,7 @@ const translations = {
     'error.prisma.invalidId': 'The id "{0}" is not valid.',
     'error.prisma.invalidInput': 'The input "{0}" is not valid.',
     'error.prisma.timeout': 'A connection to the database has been timed out.',
+    'notification.serverRestart': 'The server was restarted.',
 } as const;
 
 export default translations;

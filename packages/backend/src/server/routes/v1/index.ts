@@ -14,6 +14,7 @@ import users from './user';
 import verify from './verify';
 import resetPassword from "./resetPassword";
 import refresh from "./refresh";
+import notification from "./notification";
 
 const router = Router();
 const db = new PrismaClient();
@@ -30,6 +31,7 @@ router.use('/groups', groups(db));
 router.use('/configurations', configurations(db));
 router.use('/tasks', tasks(db));
 router.use('/misc', misc(db));
+router.use('/notifications', notification(db));
 
 router.use((req, _res, next) => {
     next(NotFound($t(req, 'error.404.invalidApiRoute', 'v1', req.baseUrl)));

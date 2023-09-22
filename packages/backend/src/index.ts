@@ -15,6 +15,7 @@ import i18next from 'i18next';
 import { z } from 'zod';
 import { zodI18nMap } from 'zod-i18n-map';
 import deTranslations from 'zod-i18n-map/locales/de/zod.json';
+import { createNotification } from './lib/notification';
 
 const port = Number(process.env.PORT);
 
@@ -26,6 +27,12 @@ const start = async () => {
             Logger.info('Empty database found. Seeding database.');
             await seed(db);
         }
+
+        db.tenant.findMany().then(tenants => {
+            tenants.forEach(t => {
+                createNotification('Low', 'notification.serverRestart', t.id);
+            });
+        })
     } catch (e: unknown) {
         if (e instanceof PrismaClientInitializationError) {
             Logger.fatal(e.message);
