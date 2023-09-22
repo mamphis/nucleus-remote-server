@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { eventStore } from "./eventBus";
 import { $t } from "@/lib/locale/locale";
+import router from "@/router";
 type NotificatonStats = {
     unread: number;
     total: number;
@@ -16,7 +17,7 @@ export const notificationStore = defineStore('notification', () => {
         const response = await request.$get<NotificatonStats>(`notifications/stats`);
         if (!isErrorResponse(response)) {
             if (unreadNotifications.value >= 0 && unreadNotifications.value < response.unread) {
-                event.sendNotification('info', $t('notifications.newNotification'));
+                event.sendNotification('info', $t('notifications.newNotification'), () => router.push('/notifications'));
             }
 
             unreadNotifications.value = response.unread;
