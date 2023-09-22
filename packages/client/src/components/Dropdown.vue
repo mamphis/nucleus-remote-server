@@ -82,7 +82,6 @@ const emits = defineEmits<{
     (event: 'filter', searchFilter: string): void,
 }>()
 
-console.log(props.default);
 const selected = ref<KeyValuePair | undefined>(props.default ? props.options.find(o => o.id === props.default) ?? { id: props.default ?? '', name: props.default ?? '' } : undefined);
 const optionsShown = ref(false);
 const searchFilter = ref(selected.value?.name ?? '');
@@ -120,11 +119,12 @@ function showOptions(clearInput: boolean) {
 
 function exit() {
     optionsShown.value = false;
+    selectOption(filteredOptions.value[preselectedItemIndex.value]);
 }
 
 // Selecting when pressing Enter
 function keyMonitor(event: KeyboardEvent) {
-    if (event.key === "Enter" && filteredOptions.value[preselectedItemIndex.value]) {
+    if (event.key === "Enter") {
         event.preventDefault();
         selectOption(filteredOptions.value[preselectedItemIndex.value]);
     }

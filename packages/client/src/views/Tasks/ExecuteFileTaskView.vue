@@ -19,7 +19,6 @@ if (props.modelValue) {
     content.value = JSON.parse(props.modelValue);
 }
 watch(content, (newValue) => {
-    console.log(newValue);
     emits('update:modelValue', JSON.stringify(newValue));
 }, { deep: true })
 </script>
