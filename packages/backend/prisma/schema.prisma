@@ -20,6 +20,7 @@ model Tenant {
   task          Task[]
   configuration Configuration[]
   user          User[]
+  notification  Notification[]
 }
 
 model Client {
@@ -80,9 +81,10 @@ model User {
   email           String @unique() @default("")
   onetimePassword String @default("")
 
-  tenantId   String
-  tenant     Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  permission Permission[]
+  tenantId             String
+  tenant               Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  permission           Permission[]
+  approvedNotification Notification[]
 }
 
 model Permission {
@@ -109,4 +111,24 @@ model ClientDetail {
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@id([key, clientId])
+}
+
+enum NotificationSeverity {
+  Low
+  Medium
+  High
+  Critical
+}
+
+model Notification {
+  id         String               @id() @default(uuid())
+  severity   NotificationSeverity
+  unread     Boolean              @default(true)
+  createdAt  DateTime             @default(now())
+  message    String
+  approvedBy User?                @relation(fields: [approvedByUserId], references: [id])
+
+  tenant           Tenant  @relation(fields: [tenantId], references: [id])
+  tenantId         String
+  approvedByUserId String?
 }

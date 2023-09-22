@@ -6,6 +6,7 @@ import { hasPermission } from './lib/permission';
 import userStore from './stores/user';
 import { eventStore, type NotificationType } from './stores/eventBus';
 import { reactive } from 'vue';
+import { notificationStore } from './stores/notification';
 const burgerActive = ref(false);
 
 const { user, isLoggedIn } = storeToRefs(userStore());
@@ -25,26 +26,45 @@ class Notification {
 
     private running = true;
     readonly id = ++notificationId;
+
+    private previousTimestamp: number = 0;
+
     constructor(public readonly type: NotificationType, public readonly message: string) {
-        const start = new Date().getTime();
-        const updater = () => {
-            this.timeLeft.value = this.maxTime - (new Date().getTime() - start);
 
-            if (this.running) {
-                requestAnimationFrame(updater.bind(this));
-            }
+        requestAnimationFrame(this.update.bind(this));
+    }
 
-            if (this.timeLeft.value < 0) {
-                this.clear();
-            }
+    update(timestamp: number) {
+        if (this.previousTimestamp === 0) {
+            this.previousTimestamp = timestamp;
         }
 
-        updater();
+        let elapsed = timestamp - this.previousTimestamp;
+        if (!this.running) {
+            elapsed = 0;
+        }
+
+        this.previousTimestamp = timestamp;
+
+        this.timeLeft.value -= elapsed;
+        requestAnimationFrame(this.update.bind(this));
+
+        if (this.timeLeft.value < 0) {
+            this.clear();
+        }
     }
 
     clear() {
         this.running = false;
         notifications.value = notifications.value.filter(n => n.id != this.id);
+    }
+
+    pause() {
+        this.running = false;
+    }
+
+    continue() {
+        this.running = true;
     }
 }
 
@@ -53,12 +73,15 @@ onSendNofification((event) => {
         notifications.value.push(new Notification(event.data.type, event.data.message) as any);
     }
 });
+
+const { unreadNotifications } = storeToRefs(notificationStore());
+
 </script>
 
 <template>
     <div id="notification">
         <div v-for="notification in notifications" :key="notification.message" class="notification is-light"
-            :class="'is-' + notification.type">
+            :class="'is-' + notification.type" @mouseenter="notification.pause()" @mouseleave="notification.continue()">
             <button class="delete" @click="notification.clear()"></button>
             <progress :class="'is-' + notification.type" class="progress" :value="notification.timeLeft"
                 :max="notification.maxTime"></progress>
@@ -96,10 +119,15 @@ onSendNofification((event) => {
                     <div class="navbar-item has-dropdown is-hoverable" v-if="user">
                         <a class="navbar-link">
                             {{ user.username }}
+                            <span v-if="unreadNotifications > 0" class="notification-badge"></span>
                         </a>
 
                         <div class="navbar-dropdown">
                             <RouterLink class="navbar-item" to="/profile">{{ $t('navbar.profile') }}
+                            </RouterLink>
+                            <RouterLink class="navbar-item" to="/notifications">{{ $t('navbar.notifications') }}<span
+                                    v-if="unreadNotifications > 0">&nbsp;({{ unreadNotifications }})</span>
+                                <span v-if="unreadNotifications > 0" class="notification-badge"></span>
                             </RouterLink>
                             <hr class="navbar-divider">
                             <RouterLink class="navbar-item" to="/issue">{{ $t('navbar.reportIssue') }}
@@ -132,6 +160,25 @@ onSendNofification((event) => {
     top: 0;
     left: 0;
     height: 2px;
+    transition: width 0.5s ease;
+}
+
+.notification-badge {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    font-size: smaller;
+    font-weight: 600;
+
+    background-color: rgb(38, 141, 38);
+    color: white;
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
+
+    text-align: center;
+    line-height: 1.1;
+    overflow: hidden;
 }
 
 header {

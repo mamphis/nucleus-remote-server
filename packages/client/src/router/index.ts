@@ -25,6 +25,7 @@ import EditClientView from '@/views/Clients/EditClientView.vue';
 import EditProfileView from '@/views/EditProfileView.vue';
 import IssueView from '@/views/IssueView.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
+import NotificationView from '@/views/NotificationView.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -64,6 +65,14 @@ const router = createRouter({
             path: '/issue',
             name: 'Issue',
             component: IssueView,
+        },
+        {
+            path: '/notifications',
+            name: 'Notifications',
+            component: NotificationView,
+            meta: {
+                authorized: true,
+            }
         },
         {
             path: '/users',
