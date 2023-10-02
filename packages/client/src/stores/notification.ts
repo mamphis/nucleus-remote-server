@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { eventStore } from "./eventBus";
 import { $t } from "@/lib/locale/locale";
 import router from "@/router";
+import userStore from "./user";
 type NotificatonStats = {
     unread: number;
     total: number;
@@ -11,9 +12,12 @@ type NotificatonStats = {
 
 export const notificationStore = defineStore('notification', () => {
     const event = eventStore();
+    const { isLoggedIn } = userStore();
     const unreadNotifications = ref(-1);
 
     const updateUnreadNotifications = async () => {
+        if (!isLoggedIn) { return };
+        
         const response = await request.$get<NotificatonStats>(`notifications/stats`);
         if (!isErrorResponse(response)) {
             if (unreadNotifications.value >= 0 && unreadNotifications.value < response.unread) {

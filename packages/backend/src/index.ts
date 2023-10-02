@@ -4,7 +4,7 @@ configDotenv();
 import { PrismaClient } from "@prisma/client";
 import { Logger } from './lib/logger';
 import { isProduction } from './lib/util';
-import { needSeed, seed } from "./seed";
+import { needSeed, seed, seedFeatureFlags } from "./seed";
 Logger.info('Production Environment:', isProduction());
 
 import { PrismaClientInitializationError } from '@prisma/client/runtime/library';
@@ -31,7 +31,9 @@ const start = async () => {
         db.tenant.findMany().then(tenants => {
             tenants.forEach(t => {
                 createNotification('Low', 'notification.serverRestart', t.id);
+                seedFeatureFlags(db, t);
             });
+
         })
     } catch (e: unknown) {
         if (e instanceof PrismaClientInitializationError) {
@@ -64,3 +66,4 @@ const start = async () => {
 }
 
 start();
+

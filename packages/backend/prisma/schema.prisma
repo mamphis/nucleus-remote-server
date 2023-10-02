@@ -21,6 +21,7 @@ model Tenant {
   configuration Configuration[]
   user          User[]
   notification  Notification[]
+  featureFlag   FeatureFlag[]
 }
 
 model Client {
@@ -131,4 +132,14 @@ model Notification {
   tenant           Tenant  @relation(fields: [tenantId], references: [id])
   tenantId         String
   approvedByUserId String?
+}
+
+model FeatureFlag {
+  id       String
+  name     String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id])
+  enabled  Boolean
+  tenantId String
+
+  @@id([tenantId, id])
 }
