@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Permission from '@/components/Permission.vue';
+import InstalledApps from './features/InstalledApps.vue';
 import { hasPermission } from '@/lib/permission';
 import request, { assertNotErrorResponse, isErrorResponse, isValidationError } from '@/lib/request';
 import { formatDate } from '@/lib/utils';
@@ -11,6 +11,7 @@ import { ref } from 'vue';
 import { eventStore } from '@/stores/eventBus';
 import { $t } from '@/lib/locale/locale';
 import type { ApiClientDetail } from '@/types/clientDetail';
+import type { ApiFeatureFlag } from '@/types/featureFlag';
 
 const { sendNotification } = eventStore();
 
@@ -23,6 +24,8 @@ assertNotErrorResponse<ApiTask[]>(tasks);
 assertNotErrorResponse<ApiClientLog[]>(logs);
 assertNotErrorResponse<ApiClientDetail[]>(details);
 const client = response.assertNotError().toRef();
+const featuresResponse = await request.$get<ApiFeatureFlag[]>(`tenants/${client.value.tenantId}/features`);
+const features = featuresResponse.assertNotError().toRef();
 
 const errors = ref({
     active: '',
@@ -66,116 +69,170 @@ const updateClient = async () => {
         sendNotification('success', $t('editClient.updateSuccessful'));
     }
 };
+
+const selected = ref('dashboard');
 </script>
 
 <template>
-    <form @submit.prevent="updateClient()" class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
-        <div class="column is-full">
-            <h1 class="is-title">{{ $t('editClient.editClient') }}</h1>
+    <div class="columns client-container">
+        <div class="column is-2">
+            <aside class="menu">
+                <p class="menu-label">
+                    General
+                </p>
+
+                <ul class="menu-list">
+                    <li>
+                        <a :class="{ 'is-active': selected == 'dashboard' }"
+                            @click.prevent="selected = 'dashboard'">Dashboard</a>
+                    </li>
+                    <li>
+                        <a :class="{ 'is-active': selected == 'logs' }" @click.prevent="selected = 'logs'">Logs</a>
+                    </li>
+                </ul>
+                <p class="menu-label" v-if="features.some(f => f.enabled)">
+                    Features
+                </p>
+
+                <ul class="menu-list">
+                    <li>
+                        <a v-if="features.find(f => f.id == 'f-1.0.8-installed_apps')?.enabled ?? false"
+                            :class="{ 'is-active': selected == 'f-1.0.8-installed_apps' }"
+                            @click.prevent="selected = 'f-1.0.8-installed_apps'">Installed Apps</a>
+                    </li>
+                </ul>
+            </aside>
         </div>
-        <div class="column is-half">
-            <table class="table is-fullwidth">
-                <thead>
-                    <tr>
-                        <th style="min-width: 25%;">{{ $t('editClient.property') }}</th>
-                        <th>{{ $t('editClient.value') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ $t('field.username') }}</td>
-                        <td><input type="text" class="input is-small" v-model="client.username" disabled></td>
-                    </tr>
+        <div class="column content-container">
 
-                    <tr>
-                        <td>{{ $t('field.hostname') }}</td>
-                        <td><input type="text" class="input is-small" v-model="client.hostname" disabled></td>
-                    </tr>
+            <form v-if="selected == 'dashboard'" @submit.prevent="updateClient()"
+                class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
+                <div class="column is-full">
+                    <h1 class="title">{{ $t('editClient.editClient') }}</h1>
+                </div>
+                <div class="column is-half">
+                    <table class="table is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 25%;">{{ $t('editClient.property') }}</th>
+                                <th>{{ $t('editClient.value') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ $t('field.username') }}</td>
+                                <td><input type="text" class="input is-small" v-model="client.username" disabled></td>
+                            </tr>
 
-                    <tr>
-                        <td>{{ $t('field.osVersion') }}</td>
-                        <td><input type="text" class="input is-small" v-model="client.os" disabled></td>
-                    </tr>
+                            <tr>
+                                <td>{{ $t('field.hostname') }}</td>
+                                <td><input type="text" class="input is-small" v-model="client.hostname" disabled></td>
+                            </tr>
 
-                    <tr>
-                        <td>{{ $t('field.appVersion') }}</td>
-                        <td><input type="text" class="input is-small" v-model="client.appVersion" disabled></td>
-                    </tr>
+                            <tr>
+                                <td>{{ $t('field.osVersion') }}</td>
+                                <td><input type="text" class="input is-small" v-model="client.os" disabled></td>
+                            </tr>
 
-                    <tr v-for="detail in details" :key="detail.key" class="content is-small">
-                        <td>{{ detail.key }}</td>
-                        <td>{{ detail.value }}</td>
-                    </tr>
-                </tbody>
-            </table>
+                            <tr>
+                                <td>{{ $t('field.appVersion') }}</td>
+                                <td><input type="text" class="input is-small" v-model="client.appVersion" disabled></td>
+                            </tr>
+
+                            <tr v-for="detail in details" :key="detail.key" class="content is-small">
+                                <td>{{ detail.key }}</td>
+                                <td>{{ detail.value }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
 
-            <div class="field">
-                <label class="checkbox" for="" :class="{ 'is-danger': !!errors.active }">
-                    <input class="checkbox" type="checkbox" v-model="client.active" />
-                    {{ $t('field.active') }}
-                </label>
-                <p v-if="!!errors.active" class="help is-danger">{{ errors.active }}</p>
-            </div>
-        </div>
-        <div class="column is-half">
-            <div class="field">
-                <nav class="panel">
-                    <div class="panel-heading is-flex is-align-items-center is-justify-content-space-between">
-                        {{ $t('field.tasks') }}
+                    <div class="field">
+                        <label class="checkbox" for="" :class="{ 'is-danger': !!errors.active }">
+                            <input class="checkbox" type="checkbox" v-model="client.active" />
+                            {{ $t('field.active') }}
+                        </label>
+                        <p v-if="!!errors.active" class="help is-danger">{{ errors.active }}</p>
                     </div>
-                    <a class="panel-block" v-for="task in tasks" :key="task.id" @click="$router.push(`/tasks/${task.id}`)">
-                        <div class="control is-expanded">
-                            <input :checked="task?.active" type="checkbox" class="checkbox" disabled /> {{
-                                $t('editClient.taskList', task.configuration.name, task.name) }}
+                </div>
+                <div class="column is-half">
+                    <div class="field">
+                        <nav class="panel">
+                            <div class="panel-heading is-flex is-align-items-center is-justify-content-space-between">
+                                {{ $t('field.tasks') }}
+                            </div>
+                            <a class="panel-block" v-for="task in tasks" :key="task.id"
+                                @click="$router.push(`/tasks/${task.id}`)">
+                                <div class="control is-expanded">
+                                    <input :checked="task?.active" type="checkbox" class="checkbox" disabled /> {{
+                                        $t('editClient.taskList', task.configuration.name, task.name) }}
+                                </div>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
+                </div>
+                <div class="column is-full">
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:client')">{{
+                                $t('button.submit') }}</button>
                         </div>
-                    </a>
-                </nav>
-            </div>
-        </div>
+                        <div class="control">
+                            <button type="reset" class="button is-link is-light" @click="$router.back()">{{
+                                $t('button.cancel')
+                            }}</button>
+                        </div>
+                        <div class="control">
+                            <button type="button" class="button is-danger is-light" @click="deleteClient()"
+                                v-if="hasPermission(undefined, 'delete:client')">{{ $t('button.delete')
+                                }}</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
 
-        <div class="field">
-            <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
-        </div>
-        <div class="column is-full">
-            <div class="field is-grouped">
-                <div class="control">
-                    <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:client')">{{
-                        $t('button.submit') }}</button>
+            <div v-if="selected == 'logs'" class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
+                <div class="column is-full">
+                    <h1 class="title">{{ $t('editClient.logs') }}</h1>
                 </div>
-                <div class="control">
-                    <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
-                    }}</button>
-                </div>
-                <div class="control">
-                    <button type="button" class="button is-danger is-light" @click="deleteClient()"
-                        v-if="hasPermission(undefined, 'delete:client')">{{ $t('button.delete')
-                        }}</button>
+                <div class="column is-full field is-grouped">
+                    <table class="table is-striped">
+                        <thead>
+                            <tr>
+                                <th>{{ $t('field.level') }}</th>
+                                <th>{{ $t('field.message') }}</th>
+                                <th>{{ $t('field.timestamp') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="log in logs" :key="log.id">
+                                <td>{{ log.level }}</td>
+                                <td>{{ log.message }}</td>
+                                <td>{{ formatDate(log.timestamp) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-        <div class="column is-full">
-            <div class="field is-grouped">
-                <table class="table is-striped">
-                    <thead>
-                        <tr>
-                            <th>{{ $t('field.level') }}</th>
-                            <th>{{ $t('field.message') }}</th>
-                            <th>{{ $t('field.timestamp') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="log in logs" :key="log.id">
-                            <td>{{ log.level }}</td>
-                            <td>{{ log.message }}</td>
-                            <td>{{ formatDate(log.timestamp) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-    </form>
+            <InstalledApps class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100"
+                v-if="selected == 'f-1.0.8-installed_apps'" />
+        </div>
+    </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.content-container {
+    overflow-y: auto;
+    height: 100%;
+}
+
+.client-container {
+    height: 100%;
+    width: 100%;
+}
+</style>

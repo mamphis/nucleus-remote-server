@@ -11,7 +11,7 @@ const users = await request.$get<ApiUser[]>('users');
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1 class="is-title">{{ $t('users.users') }}</h1>
+                <h1 class="title">{{ $t('users.users') }}</h1>
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
                 <button class="button" v-if="hasPermission(user, 'create:user')" @click="$router.push('/new-user')">
@@ -19,7 +19,7 @@ const users = await request.$get<ApiUser[]>('users');
             </div>
         </div>
         <div class="column is-full">
-            <table class="table">
+            <table class="table is-fullwidth">
                 <thead>
                     <tr>
                         <th>{{ $t('field.username') }}</th>

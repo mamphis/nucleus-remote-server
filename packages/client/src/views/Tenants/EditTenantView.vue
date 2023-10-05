@@ -6,12 +6,16 @@ import request, { isErrorResponse, isValidationError } from '../../lib/request';
 import { hasPermission } from '@/lib/permission';
 import { eventStore } from '@/stores/eventBus';
 import { $t } from '@/lib/locale/locale';
+import type { ApiFeatureFlag } from '@/types/featureFlag';
+import FeatureFlag from '@/components/FeatureFlag.vue';
 
 const { sendNotification } = eventStore();
 
 const { tenantId } = router.currentRoute.value.params;
 const response = await request.$get<ApiTenant>(`tenants/${tenantId}`);
+const featuresResponse = await request.$get<ApiFeatureFlag[]>(`tenants/${tenantId}/features`);
 const tenant = response.assertNotError().toRef();
+const features = featuresResponse.assertNotError().toRef();
 
 const errors = ref({
     name: '',
@@ -60,12 +64,16 @@ const deleteTenant = async () => {
         errors.value.general = response.message;
     }
 }
+
+const updateFeatureFlag = async (featureId: string, enabled: boolean) => {
+    await request.$patch<ApiFeatureFlag[]>(`tenants/${tenantId}/features/${featureId}`, { enabled });
+}
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1 class="is-title">{{ $t('editTenant.editTenant') }}</h1>
+                <h1 class="title">{{ $t('editTenant.editTenant') }}</h1>
             </div>
         </div>
         <form @submit.prevent="updateTenant()" class="column is-full" v-if="!isErrorResponse(tenant)">
@@ -104,5 +112,18 @@ const deleteTenant = async () => {
                 </div>
             </div>
         </form>
+        <div class="column is-full">
+            <div class="columns is-multiline">
+                <div class="column is-full">
+                    <h2 class="title">{{ $t('editTenant.featureFlags') }}</h2>
+                </div>
+                <div class="column is-full">
+                    <div class="columns is-multiline">
+                        <FeatureFlag class="column" v-for="feature in features" :key="feature.id" :feature="feature"
+                            @change="updateFeatureFlag" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

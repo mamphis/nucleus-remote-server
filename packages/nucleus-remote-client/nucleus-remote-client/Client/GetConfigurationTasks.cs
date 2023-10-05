@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using nucleus_remote_client.Lib;
 using nucleus_remote_client.Tasks;
 using System;
 using System.Collections.Generic;

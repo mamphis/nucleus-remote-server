@@ -7,6 +7,7 @@ import { ZodError, z } from "zod";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
 import { createNotification } from "../../../lib/notification";
+import clientInstalledApps from "./clientInstalledApps";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -229,6 +230,26 @@ export default function (db: PrismaClient) {
 
         return res.json(tasks);
     });
+    router.get('/:clientId/features', async (req, res, next) => {
+        const client = await db.client.findFirst({ where: { id: req.params.clientId } });
+        const design = req.query.design === 'true';
+        if (client && !client.active && !design) {
+            // If the client is not active. Simply ignore the tasks it should execute otherwise
+            return res.json([]);
+        }
+
+        if (!client) {
+            return res.json([]);
+        }
+
+        const features = await db.featureFlag.findMany({
+            where: {
+               tenantId: client.tenantId
+            }
+        });
+
+        return res.json(features);
+    });
 
     router.post('/:clientId/logs', async (req, res, next) => {
         const schema = z.object({
@@ -324,6 +345,8 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
+
+    router.use('/:clientId/installedApps', clientInstalledApps(db));
 
     return router;
 }

@@ -21,6 +21,7 @@ model Tenant {
   configuration Configuration[]
   user          User[]
   notification  Notification[]
+  featureFlag   FeatureFlag[]
 }
 
 model Client {
@@ -32,11 +33,12 @@ model Client {
   lastPing   DateTime
   active     Boolean  @default(true)
 
-  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId     String
-  group        Group[]
-  clientLog    ClientLog[]
-  clientDetail ClientDetail[]
+  tenant        Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String
+  group         Group[]
+  clientLog     ClientLog[]
+  clientDetail  ClientDetail[]
+  installedApps InstalledApps[]
 }
 
 model Group {
@@ -131,4 +133,28 @@ model Notification {
   tenant           Tenant  @relation(fields: [tenantId], references: [id])
   tenantId         String
   approvedByUserId String?
+}
+
+model FeatureFlag {
+  id       String
+  name     String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id])
+  enabled  Boolean
+  tenantId String
+
+  @@id([tenantId, id])
+}
+
+model InstalledApps {
+  clientId    String
+  name        String
+  version     String
+  registryKey String
+  publisher   String
+  installDate DateTime
+  lastUpdate  DateTime @default(now()) @updatedAt()
+
+  client Client @relation(fields: [clientId], references: [id])
+
+  @@id([clientId, name])
 }

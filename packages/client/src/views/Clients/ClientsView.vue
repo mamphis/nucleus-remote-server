@@ -32,7 +32,7 @@ const fileUrl = new URL(`/system/update/file`, baseApiUrl).href;
             </div>
         </div>
         <div class="column is-full">
-            <table class="table">
+            <table class="table is-fullwidth">
                 <thead>
                     <tr>
                         <th>{{ $t('field.active') }}</th>

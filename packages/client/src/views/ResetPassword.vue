@@ -16,7 +16,7 @@ const sendResetLink = async () => {
 </script>
 <template>
     <form @submit.prevent="sendResetLink()">
-        <h1 class="is-title">{{ $t('resetPassword.resetPassword') }}</h1>
+        <h1 class="title">{{ $t('resetPassword.resetPassword') }}</h1>
         <div class="field">
             <label class="label" for="email">{{ $t('field.eMail') }}</label>
             <div class="control">

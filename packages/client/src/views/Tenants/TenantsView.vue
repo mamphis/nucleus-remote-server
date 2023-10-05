@@ -11,7 +11,7 @@ const tenants = await request.$get<ApiTenant[]>('tenants');
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1 class="is-title">{{ $t('tenants.tenants') }}</h1>
+                <h1 class="title">{{ $t('tenants.tenants') }}</h1>
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
                 <button class="button" v-if="hasPermission(user, 'create:tenant')" @click="$router.push('/new-tenant')">
@@ -19,7 +19,7 @@ const tenants = await request.$get<ApiTenant[]>('tenants');
             </div>
         </div>
         <div class="column is-full">
-            <table class="table">
+            <table class="table is-fullwidth">
                 <thead>
                     <tr>
                         <th>{{ $t('field.name') }}</th>

@@ -20,7 +20,7 @@ const readNotification = async (notification: ApiNotification) => {
 <template>
     <form @submit.prevent="" class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full">
-            <h1 class="is-title">{{ $t('notifications.notifications') }}</h1>
+            <h1 class="title">{{ $t('notifications.notifications') }}</h1>
         </div>
         <div class="column is-full">
             <div class="field is-grouped">
