@@ -1,4 +1,5 @@
 using nucleus_remote_client;
+using nucleus_remote_client.Lib;
 
 var builder = Host.CreateApplicationBuilder(args);
 

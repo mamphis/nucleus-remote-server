@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace nucleus_remote_client
+namespace nucleus_remote_client.Lib
 {
     internal class Installer
     {
@@ -38,7 +38,7 @@ namespace nucleus_remote_client
             psi.RedirectStandardError = true;
             psi.RedirectStandardOutput = true;
             var proc = Process.Start(psi);
-            
+
             proc.WaitForExit();
 
             Console.WriteLine(proc.StandardOutput.ReadToEnd());

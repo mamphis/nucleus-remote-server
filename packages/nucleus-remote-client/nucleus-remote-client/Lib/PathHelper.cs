@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace nucleus_remote_client
+namespace nucleus_remote_client.Lib
 {
     internal class PathHelper
     {
@@ -15,11 +15,11 @@ namespace nucleus_remote_client
                 throw new ArgumentNullException("path");
             }
 
-            var parts = path.Split(new char[] {'/', '\\'});
+            var parts = path.Split(new char[] { '/', '\\' });
 
-            if (Enum.TryParse<Environment.SpecialFolder>(parts[0], true, out Environment.SpecialFolder result))
+            if (Enum.TryParse(parts[0], true, out Environment.SpecialFolder result))
             {
-                var paths = new List<string>{ Environment.GetFolderPath(result) };
+                var paths = new List<string> { Environment.GetFolderPath(result) };
                 paths.AddRange(parts.Skip(1));
                 return Path.Combine(paths.ToArray());
             }
