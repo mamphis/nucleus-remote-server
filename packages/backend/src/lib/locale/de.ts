@@ -11,6 +11,7 @@ const translations = {
     'error.401.invalidUsernamePassword': 'Ungültiger Benutzername oder Passwort',
     'error.401.pendingVerification': 'Ausstehende Überprüfung',
     'error.403.cannotChangeUsersPermission': 'Sie dürfen die Berechtigungen der Benutzer nicht ändern.',
+    'error.403.featureNotEnabled': 'Das Feature ist nicht aktiviert.',
     'error.403.forbidden': 'Verboten',
     'error.403.maxClientsPerTenant': 'Maximale Anzahl von Clients pro Mandant erreicht.',
     'error.403.missingScopes': 'Ihnen fehlen die folgenden Berechtigungen, um dies zu tun: {0}.',

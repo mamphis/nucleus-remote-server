@@ -73,7 +73,7 @@ const updateFeatureFlag = async (featureId: string, enabled: boolean) => {
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
-                <h1 class="is-title">{{ $t('editTenant.editTenant') }}</h1>
+                <h1 class="title">{{ $t('editTenant.editTenant') }}</h1>
             </div>
         </div>
         <form @submit.prevent="updateTenant()" class="column is-full" v-if="!isErrorResponse(tenant)">
@@ -115,7 +115,7 @@ const updateFeatureFlag = async (featureId: string, enabled: boolean) => {
         <div class="column is-full">
             <div class="columns is-multiline">
                 <div class="column is-full">
-                    <h2 class="is-title">{{ $t('editTenant.featureFlags') }}</h2>
+                    <h2 class="title">{{ $t('editTenant.featureFlags') }}</h2>
                 </div>
                 <div class="column is-full">
                     <div class="columns is-multiline">

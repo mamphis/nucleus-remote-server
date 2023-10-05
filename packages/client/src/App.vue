@@ -74,7 +74,7 @@ const { unreadNotifications } = storeToRefs(notificationStore());
         </nav>
     </header>
     <Suspense>
-        <div class="content">
+        <div class="router-view">
             <RouterView />
         </div>
     </Suspense>
@@ -131,7 +131,7 @@ nav a.nav-end {
     margin-left: auto;
 }
 
-.content {
+.router-view {
     height: calc(100% - var(--header-height));
     display: flex;
     overflow-x: hidden;

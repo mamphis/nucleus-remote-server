@@ -7,6 +7,7 @@ import { ZodError, z } from "zod";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
 import { createNotification } from "../../../lib/notification";
+import clientInstalledApps from "./clientInstalledApps";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -344,6 +345,8 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
+
+    router.use('/:clientId/installedApps', clientInstalledApps(db));
 
     return router;
 }

@@ -77,7 +77,7 @@ const changePassword = async () => {
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
         <div class="column is-full">
-            <h1 class="is-title">{{ $t('editProfile.editProfile') }}</h1>
+            <h1 class="title">{{ $t('editProfile.editProfile') }}</h1>
         </div>
         <form @submit.prevent="updateUser();" class="column is-full" v-if="!isErrorResponse(user)">
             <div class="field">

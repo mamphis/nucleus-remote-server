@@ -6,6 +6,7 @@ import { JsonWebTokenError, sign, verify, TokenExpiredError } from 'jsonwebtoken
 import { Logger } from './logger';
 import { isProduction } from './util';
 import { $t } from "./locale/locale";
+import db from "./db";
 
 interface User {
     id: string;
@@ -64,6 +65,17 @@ function getPermissions(user: AuthUser | User): string[] {
 export function hasPermission(user: AuthUser | User, ...requiredPermissions: string[]) {
     const userToCheck = user;
     return requiredPermissions.every(p => getPermissions(userToCheck).some(up => up.endsWith(p)));
+}
+
+export async function isFeatureEnabled(user: AuthUser | User, featureId: string): Promise<boolean> {
+    const feature = await db.featureFlag.findFirst({
+        where: {
+            tenantId: user.tenantId,
+            id: featureId,
+        }
+    });
+
+    return feature?.enabled ?? false;
 }
 
 const auth = <Route extends string>(...scopes: string[]): core.RequestHandler<core.RouteParameters<Route>, any, any, any, AuthLocals> => {

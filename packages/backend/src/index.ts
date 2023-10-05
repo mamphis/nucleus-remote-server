@@ -30,7 +30,6 @@ const start = async () => {
 
         db.tenant.findMany().then(tenants => {
             tenants.forEach(t => {
-                createNotification('Low', 'notification.serverRestart', t.id);
                 seedFeatureFlags(db, t);
             });
         });

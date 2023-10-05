@@ -21,7 +21,7 @@ export class Server {
     @Logger.enter()
     configure() {
         this.app.use(cors({ origin: "*" }))
-        this.app.use(json());
+        this.app.use(json({ limit: '5Mb' }));
 
         this.app.use((_req, res, next) => {
             res.set('Cache-Control', 'no-store');
@@ -68,12 +68,14 @@ export class Server {
 
             if (err instanceof PrismaClientKnownRequestError) {
                 const prismaError = handlePrismaClientKnownRequestError(req, err);
-                return res.status(prismaError.status).json({ type: prismaError.type, code: err.code, error: prismaError.name, message: prismaError.message, data: [
-                    {
-                        message: prismaError.message,
-                        path: prismaError.path
-                    }
-                ] });
+                return res.status(prismaError.status).json({
+                    type: prismaError.type, code: err.code, error: prismaError.name, message: prismaError.message, data: [
+                        {
+                            message: prismaError.message,
+                            path: prismaError.path
+                        }
+                    ]
+                });
             }
 
             const internalServerError = InternalServerError();
