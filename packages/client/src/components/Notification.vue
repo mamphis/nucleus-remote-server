@@ -2,8 +2,6 @@
 import { eventStore, type NotificationType } from '@/stores/eventBus';
 import { ref } from 'vue';
 
-
-
 const { onSendNofification } = eventStore();
 let notifications = ref<Notification[]>([]);
 let notificationId = 0;

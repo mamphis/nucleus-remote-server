@@ -42,6 +42,7 @@ const translations: Record<string, string> = {
     'editTask.editTask': 'Aufgabe bearbeiten',
     'editTask.updateSuccessful': 'Die Aufgabe wurde erfolgreich aktualisiert',
     'editTenant.editTenant': 'Mandant bearbeiten',
+    'editTenant.featureFlags': 'Feature Flags',
     'editTenant.updateSuccessful': 'Der Mandant wurde erfolgreich aktualisiert',
     'editUser.editUser': 'Benutzer bearbeiten',
     'editUser.updateSuccessful': 'Der Benutzer wurde erfolgreich aktualisiert',

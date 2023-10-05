@@ -5,6 +5,7 @@ import { NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth, hasPermission } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
+import tenantFeatures from "./tenantFeatures";
 
 const tenantSelect: Prisma.TenantSelect = {
     id: true,
@@ -69,7 +70,6 @@ export default function (db: PrismaClient) {
                 maxClients: tenant.maxClients,
             });
         }
-
     });
 
     router.delete('/:id', auth('delete:tenant'), async (req, res: AuthResponse, next) => {
@@ -128,6 +128,8 @@ export default function (db: PrismaClient) {
             return next(e);
         }
     });
+
+    router.use('/:tenantId/features', tenantFeatures(db));
 
     return router;
 }
