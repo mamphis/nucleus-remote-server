@@ -1,20 +1,20 @@
-﻿namespace nucleus_remote_client
+﻿namespace nucleus_remote_client.Lib
 {
     using System.Runtime.InteropServices;
     using System.Security;
     using System.ComponentModel;
 
-    using LSA_HANDLE = IntPtr;
+    using LSA_HANDLE = nint;
 
     [StructLayout(LayoutKind.Sequential)]
     struct LSA_OBJECT_ATTRIBUTES
     {
         internal int Length;
-        internal IntPtr RootDirectory;
-        internal IntPtr ObjectName;
+        internal LSA_HANDLE RootDirectory;
+        internal LSA_HANDLE ObjectName;
         internal int Attributes;
-        internal IntPtr SecurityDescriptor;
-        internal IntPtr SecurityQualityOfService;
+        internal LSA_HANDLE SecurityDescriptor;
+        internal LSA_HANDLE SecurityQualityOfService;
     }
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     struct LSA_UNICODE_STRING
@@ -27,42 +27,42 @@
     sealed class Win32Sec
     {
         [DllImport("advapi32", CharSet = CharSet.Unicode, SetLastError = true),
-        SuppressUnmanagedCodeSecurityAttribute]
+        SuppressUnmanagedCodeSecurity]
         internal static extern uint LsaOpenPolicy(
         LSA_UNICODE_STRING[] SystemName,
         ref LSA_OBJECT_ATTRIBUTES ObjectAttributes,
         int AccessMask,
-        out IntPtr PolicyHandle
+        out LSA_HANDLE PolicyHandle
         );
 
         [DllImport("advapi32", CharSet = CharSet.Unicode, SetLastError = true),
-        SuppressUnmanagedCodeSecurityAttribute]
+        SuppressUnmanagedCodeSecurity]
         internal static extern uint LsaAddAccountRights(
         LSA_HANDLE PolicyHandle,
-        IntPtr pSID,
+        LSA_HANDLE pSID,
         LSA_UNICODE_STRING[] UserRights,
         int CountOfRights
         );
 
         [DllImport("advapi32", CharSet = CharSet.Unicode, SetLastError = true),
-        SuppressUnmanagedCodeSecurityAttribute]
+        SuppressUnmanagedCodeSecurity]
         internal static extern int LsaLookupNames2(
         LSA_HANDLE PolicyHandle,
         uint Flags,
         uint Count,
         LSA_UNICODE_STRING[] Names,
-        ref IntPtr ReferencedDomains,
-        ref IntPtr Sids
+        ref LSA_HANDLE ReferencedDomains,
+        ref LSA_HANDLE Sids
         );
 
         [DllImport("advapi32")]
         internal static extern int LsaNtStatusToWinError(int NTSTATUS);
 
         [DllImport("advapi32")]
-        internal static extern int LsaClose(IntPtr PolicyHandle);
+        internal static extern int LsaClose(LSA_HANDLE PolicyHandle);
 
         [DllImport("advapi32")]
-        internal static extern int LsaFreeMemory(IntPtr Buffer);
+        internal static extern int LsaFreeMemory(LSA_HANDLE Buffer);
 
     }
     public sealed class LsaWrapper : IDisposable
@@ -71,13 +71,13 @@
         struct LSA_TRUST_INFORMATION
         {
             internal LSA_UNICODE_STRING Name;
-            internal IntPtr Sid;
+            internal LSA_HANDLE Sid;
         }
         [StructLayout(LayoutKind.Sequential)]
         struct LSA_TRANSLATED_SID2
         {
             internal SidNameUse Use;
-            internal IntPtr Sid;
+            internal LSA_HANDLE Sid;
             internal int DomainIndex;
             uint Flags;
         }
@@ -113,7 +113,7 @@
         const uint STATUS_INSUFFICIENT_RESOURCES = 0xc000009a;
         const uint STATUS_NO_MEMORY = 0xc0000017;
 
-        IntPtr lsaHandle;
+        LSA_HANDLE lsaHandle;
 
         public LsaWrapper() : this(null)
         { }
@@ -121,13 +121,13 @@
         public LsaWrapper(string systemName)
         {
             LSA_OBJECT_ATTRIBUTES lsaAttr;
-            lsaAttr.RootDirectory = IntPtr.Zero;
-            lsaAttr.ObjectName = IntPtr.Zero;
+            lsaAttr.RootDirectory = LSA_HANDLE.Zero;
+            lsaAttr.ObjectName = LSA_HANDLE.Zero;
             lsaAttr.Attributes = 0;
-            lsaAttr.SecurityDescriptor = IntPtr.Zero;
-            lsaAttr.SecurityQualityOfService = IntPtr.Zero;
+            lsaAttr.SecurityDescriptor = LSA_HANDLE.Zero;
+            lsaAttr.SecurityQualityOfService = LSA_HANDLE.Zero;
             lsaAttr.Length = Marshal.SizeOf(typeof(LSA_OBJECT_ATTRIBUTES));
-            lsaHandle = IntPtr.Zero;
+            lsaHandle = LSA_HANDLE.Zero;
             LSA_UNICODE_STRING[] system = null;
             if (systemName != null)
             {
@@ -143,7 +143,7 @@
             {
                 throw new UnauthorizedAccessException();
             }
-            if ((ret == STATUS_INSUFFICIENT_RESOURCES) || (ret == STATUS_NO_MEMORY))
+            if (ret == STATUS_INSUFFICIENT_RESOURCES || ret == STATUS_NO_MEMORY)
             {
                 throw new OutOfMemoryException();
             }
@@ -152,7 +152,7 @@
 
         public void AddPrivileges(string account, string privilege)
         {
-            IntPtr pSid = GetSIDInformation(account);
+            LSA_HANDLE pSid = GetSIDInformation(account);
             LSA_UNICODE_STRING[] privileges = new LSA_UNICODE_STRING[1];
             privileges[0] = InitLsaString(privilege);
             uint ret = Win32Sec.LsaAddAccountRights(lsaHandle, pSid, privileges, 1);
@@ -162,7 +162,7 @@
             {
                 throw new UnauthorizedAccessException();
             }
-            if ((ret == STATUS_INSUFFICIENT_RESOURCES) || (ret == STATUS_NO_MEMORY))
+            if (ret == STATUS_INSUFFICIENT_RESOURCES || ret == STATUS_NO_MEMORY)
             {
                 throw new OutOfMemoryException();
             }
@@ -172,10 +172,10 @@
 
         public void Dispose()
         {
-            if (lsaHandle != IntPtr.Zero)
+            if (lsaHandle != LSA_HANDLE.Zero)
             {
                 Win32Sec.LsaClose(lsaHandle);
-                lsaHandle = IntPtr.Zero;
+                lsaHandle = LSA_HANDLE.Zero;
             }
             GC.SuppressFinalize(this);
         }
@@ -185,14 +185,14 @@
         }
         // helper functions
 
-        IntPtr GetSIDInformation(string account)
+        LSA_HANDLE GetSIDInformation(string account)
         {
             LSA_UNICODE_STRING[] names = new LSA_UNICODE_STRING[1];
             LSA_TRANSLATED_SID2 lts;
-            IntPtr tsids = IntPtr.Zero;
-            IntPtr tdom = IntPtr.Zero;
+            LSA_HANDLE tsids = LSA_HANDLE.Zero;
+            LSA_HANDLE tdom = LSA_HANDLE.Zero;
             names[0] = InitLsaString(account);
-            lts.Sid = IntPtr.Zero;
+            lts.Sid = LSA_HANDLE.Zero;
             Console.WriteLine("String account: {0}", names[0].Length);
             int ret = Win32Sec.LsaLookupNames2(lsaHandle, 0, 1, names, ref tdom, ref
             tsids);

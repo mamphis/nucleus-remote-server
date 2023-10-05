@@ -1,5 +1,7 @@
 ﻿
 
+using nucleus_remote_client.Lib;
+
 namespace nucleus_remote_client.Tasks
 {
     internal class Delete : ITask
