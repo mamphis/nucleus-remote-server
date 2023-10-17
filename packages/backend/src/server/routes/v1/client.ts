@@ -22,27 +22,30 @@ export default function (db: PrismaClient) {
 
     router.get('/configuration', auth('create:client'), async (req, res: AuthResponse, next) => {
         const { privateKey, publicKey } = await getKeyPair();
+        const [key, client] = await db.$transaction(async (tx) => {
+            // Save public key in database
+            const key = await tx.key.create({
+                data: {
+                    publicKey,
+                }
+            });
 
-        // Save public key in database
-        const key = await db.key.create({
-            data: {
-                publicKey,
-            }
-        });
+            const id = randomUUID();
+            const client = await tx.client.create({
+                data: {
+                    appVersion: '',
+                    hostname: '',
+                    id,
+                    os: '',
+                    username: '',
+                    tenantId: res.locals.user.tenantId,
+                    active: false,
+                    lastPing: new Date(0),
+                    keyId: key.id,
+                }
+            });
 
-        const id = randomUUID();
-        await db.client.create({
-            data: {
-                appVersion: '',
-                hostname: '',
-                id,
-                os: '',
-                username: '',
-                tenantId: req.params.tenantId,
-                active: false,
-                lastPing: new Date(0),
-                keyId: key.id,
-            }
+            return [key, client];
         });
 
         res.send(JSON.stringify({
@@ -54,8 +57,8 @@ export default function (db: PrismaClient) {
             },
             "HostSettings": {
                 "BaseUrl": `${req.header('x-forwarded-proto') ?? req.protocol}://${req.get('host')}/api/v1/`,
-                "Id": id,
-                "TenantId": req.params.tenantId,
+                "Id": client.id,
+                "TenantId": res.locals.user.tenantId,
                 "KeyId": key.id,
                 "PrivateKey": privateKey,
             }
