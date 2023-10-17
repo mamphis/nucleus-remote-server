@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import request, { assertNotErrorResponse, isErrorResponse, isValidationError } from '@/lib/request';
 import router from '@/router';
-import type { ApiTask } from '@/types/task';
+import { outputTypes, type OutputType, type ApiTask } from '@/types/task';
 import { ref } from 'vue';
 import { typeMap } from './tasks';
 import { hasPermission } from '@/lib/permission';
@@ -20,21 +20,16 @@ const type = ref(task.type);
 const content = ref(task.content);
 const active = ref(task.active);
 const runOnce = ref(task.runOnce);
+const output = ref(task.output);
 
-const errors = ref<{
-    name: string,
-    type: string,
-    active: string,
-    runOnce: string,
-    content: string,
-    general: string,
-}>({
+const errors = ref({
     name: '',
     type: '',
     content: '',
     general: '',
     active: '',
     runOnce: '',
+    output: '',
 });
 
 const clearError = () => {
@@ -53,6 +48,7 @@ const updateTask = async () => {
             content: content.value,
             active: active.value,
             runOnce: runOnce.value,
+            output: output.value,
         });
 
         clearError();
@@ -128,6 +124,18 @@ const deleteTask = async () => {
                         </label>
                     </div>
                     <p v-if="!!errors.runOnce" class="help is-danger">{{ errors.runOnce }}</p>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="">{{ $t('field.output') }}</label>
+                    <span class="select">
+                        <select v-model="output">
+                            <option v-for="(option) in outputTypes" :value="option" :key="option">
+                                {{ $t('task.outputType.' + option) }}
+                            </option>
+                        </select>
+                    </span>
+                    <p v-if="!!errors.output" class="help is-danger">{{ errors.output }}</p>
                 </div>
 
                 <component :is="typeMap[type].component" v-model="content"></component>

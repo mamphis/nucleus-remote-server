@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, $Enums } from "@prisma/client";
 import { Router } from "express";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { ZodError, z } from "zod";
@@ -35,6 +35,7 @@ export default function (db: PrismaClient) {
         const schema = z.object({
             name: z.string(),
             type: z.string(),
+            output: z.enum(['All', 'OnlyError', 'Special']),
             configurationId: z.string().uuid(),
         });
 
@@ -61,6 +62,7 @@ export default function (db: PrismaClient) {
             content: z.string(),
             active: z.boolean().optional().default(false),
             runOnce: z.boolean().optional().default(false),
+            output: z.enum(['All', 'OnlyError', 'Special']),
         });
 
         try {

@@ -18,11 +18,12 @@ const { sendNotification } = eventStore();
 const { clientId } = router.currentRoute.value.params;
 const response = await request.$get<ApiClient>(`clients/${clientId}`);
 const tasks = await request.$get<ApiTask[]>(`clients/${clientId}/tasks?design=true`);
-const logs = await request.$get<ApiClientLog[]>(`clients/${clientId}/logs`);
+const logsResponse = await request.$get<ApiClientLog[]>(`clients/${clientId}/logs`);
 const details = await request.$get<ApiClientDetail[]>(`clients/${clientId}/details`);
 assertNotErrorResponse<ApiTask[]>(tasks);
-assertNotErrorResponse<ApiClientLog[]>(logs);
 assertNotErrorResponse<ApiClientDetail[]>(details);
+
+const logs = logsResponse.assertNotError().toRef();
 const client = response.assertNotError().toRef();
 const featuresResponse = await request.$get<ApiFeatureFlag[]>(`tenants/${client.value.tenantId}/features`);
 const features = featuresResponse.assertNotError().toRef();
@@ -70,6 +71,10 @@ const updateClient = async () => {
     }
 };
 
+const reloadLogs = async () => {
+    logs.value = (await request.$get<ApiClientLog[]>(`clients/${clientId}/logs`)).assertNotError();
+}
+
 const selected = ref('dashboard');
 </script>
 
@@ -104,7 +109,6 @@ const selected = ref('dashboard');
             </aside>
         </div>
         <div class="column content-container">
-
             <form v-if="selected == 'dashboard'" @submit.prevent="updateClient()"
                 class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
                 <div class="column is-full">
@@ -196,11 +200,12 @@ const selected = ref('dashboard');
             </form>
 
             <div v-if="selected == 'logs'" class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
-                <div class="column is-full">
+                <div class="column is-full is-flex is-justify-content-space-between">
                     <h1 class="title">{{ $t('editClient.logs') }}</h1>
+                    <span><a @click.prevent="reloadLogs()" class="button">{{ $t('button.reload') }}</a></span>
                 </div>
                 <div class="column is-full field is-grouped">
-                    <table class="table is-striped">
+                    <table class="table is-striped is-fullwidth">
                         <thead>
                             <tr>
                                 <th>{{ $t('field.level') }}</th>
@@ -211,16 +216,16 @@ const selected = ref('dashboard');
                         <tbody>
                             <tr v-for="log in logs" :key="log.id">
                                 <td>{{ log.level }}</td>
-                                <td>{{ log.message }}</td>
+                                <td style="white-space: pre-wrap; font-family: monospace;">{{ log.message }}</td>
                                 <td>{{ formatDate(log.timestamp) }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-
-            <InstalledApps class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100"
-                v-if="selected == 'f-1.0.8-installed_apps'" />
+            <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
+                <InstalledApps v-if="selected == 'f-1.0.8-installed_apps'" />
+            </div>
         </div>
     </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import router from '@/router';
-import type { ApiTask } from '@/types/task';
+import { outputTypes, type OutputType, type ApiTask } from '@/types/task';
 import { ref } from 'vue';
 import request, { isErrorResponse, isValidationError } from '../../lib/request';
 import { typeMap } from './tasks';
@@ -9,26 +9,30 @@ const { configurationId } = router.currentRoute.value.params;
 
 const name = ref('');
 const type = ref('');
+const output = ref<OutputType>('All');
 
-const errors = ref<{
-    name: string,
-    type: string,
-    general: string,
-}>({
+const errors = ref({
     name: '',
     type: '',
     general: '',
+    output: '',
 });
 
 const clearError = () => {
     errors.value.name = '';
     errors.value.type = '';
     errors.value.general = '';
+    errors.value.output = '';
 }
 
 const createNewTask = async () => {
     if (name.value && type.value) {
-        const response = await request.$post<ApiTask>(`tasks`, { name: name.value, type: type.value, configurationId });
+        const response = await request.$post<ApiTask>(`tasks`, {
+            name: name.value,
+            type: type.value,
+            configurationId,
+            output: output.value,
+        });
 
         clearError();
         if (isValidationError(response)) {
@@ -71,6 +75,17 @@ const createNewTask = async () => {
                             <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label }}</option>
                         </select>
                     </span>
+                    <p v-if="!!errors.type" class="help is-danger">{{ errors.type }}</p>
+                </div>
+                <div class="field">
+                    <label class="label" for="">{{ $t('field.output') }}</label>
+                    <span class="select">
+                        <select v-model="output">
+                            <option v-for="(option) in outputTypes" :value="option" :key="option">{{ $t('task.outputType.' +
+                                option) }}</option>
+                        </select>
+                    </span>
+                    <p v-if="!!errors.output" class="help is-danger">{{ errors.output }}</p>
                 </div>
                 <div class="field">
                     <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
@@ -80,8 +95,9 @@ const createNewTask = async () => {
                         <button type="submit" class="button is-link">{{ $t('button.submit') }}</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
-                        }}</button>
+                        <button type="reset" class="button is-link is-light" @click="$router.back()">
+                            {{ $t('button.cancel') }}
+                        </button>
                     </div>
                 </div>
             </form>
