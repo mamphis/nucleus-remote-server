@@ -30,6 +30,35 @@ export default function (db: PrismaClient) {
                 }
             });
 
+            const tenant = await tx.tenant.findFirstOrThrow({
+                where: { id: res.locals.user.tenantId, }, select: {
+                    _count: {
+                        select: {
+                            // Only get active Clients
+                            client: {
+                                where: {
+                                    active: true
+                                }
+                            }
+                        }
+                    },
+                    id: true,
+                    maxClients: true,
+                }
+            });
+
+            const groups = await tx.group.findMany({
+                where: {
+                    tenantId: res.locals.user.tenantId,
+                    isDefault: true,
+                },
+                select: {
+                    id: true
+                },
+            });
+
+            let active = tenant._count.client < tenant.maxClients;
+
             const id = randomUUID();
             const client = await tx.client.create({
                 data: {
@@ -39,9 +68,12 @@ export default function (db: PrismaClient) {
                     os: '',
                     username: '',
                     tenantId: res.locals.user.tenantId,
-                    active: false,
+                    active,
                     lastPing: new Date(0),
                     keyId: key.id,
+                    group: {
+                        connect: groups
+                    }
                 }
             });
 
@@ -98,18 +130,7 @@ export default function (db: PrismaClient) {
             // Check if the tenant exist
             const tenant = await db.tenant.findFirst({
                 where: { id: clientData.tenantId, }, select: {
-                    _count: {
-                        select: {
-                            // Only get active Clients
-                            client: {
-                                where: {
-                                    active: true
-                                }
-                            }
-                        }
-                    },
                     id: true,
-                    maxClients: true,
                 }
             });
             if (!tenant) {
@@ -120,28 +141,6 @@ export default function (db: PrismaClient) {
             var existingClient = await db.client.findFirst({ where: { id: clientData.id } });
             if (existingClient && existingClient.tenantId != clientData.tenantId) {
                 return next(BadRequest($t(req, 'error.400.invalidClient', clientData.id)));
-            }
-
-            let active = false;
-            let groups: Array<{ id: string }> = [];
-
-            if (!existingClient) {
-                // New Client wants to be registered to a tenant. Check if it shell be active
-                if (tenant.maxClients > tenant._count.client) {
-                    active = true;
-                } else {
-                    createNotification('Medium', 'notification.maxClientReached', tenant.id);
-                }
-
-                groups = await db.group.findMany({
-                    where: {
-                        tenantId: tenant.id,
-                        isDefault: true,
-                    },
-                    select: {
-                        id: true
-                    },
-                });
             }
 
             // Check if the hostname is the same. Otherwise it may be a duplicate configuration
