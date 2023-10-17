@@ -8,6 +8,7 @@ import { AuthResponse, auth } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
 import { createNotification } from "../../../lib/notification";
 import clientInstalledApps from "./clientInstalledApps";
+import { getKeyPair } from "../../../lib/util";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -19,10 +20,30 @@ export default function (db: PrismaClient) {
         res.json(clients);
     });
 
-    router.get('/configuration/:tenantId', async (req, res, next) => {
-        res.attachment('appsettings.json');
-        res.type('application/json');
-        res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+    router.get('/configuration', auth('create:client'), async (req, res: AuthResponse, next) => {
+        const { privateKey, publicKey } = await getKeyPair();
+
+        // Save public key in database
+        const key = await db.key.create({
+            data: {
+                publicKey,
+            }
+        });
+
+        const id = randomUUID();
+        await db.client.create({
+            data: {
+                appVersion: '',
+                hostname: '',
+                id,
+                os: '',
+                username: '',
+                tenantId: req.params.tenantId,
+                active: false,
+                lastPing: new Date(0),
+                keyId: key.id,
+            }
+        });
 
         res.send(JSON.stringify({
             "Logging": {
@@ -33,8 +54,10 @@ export default function (db: PrismaClient) {
             },
             "HostSettings": {
                 "BaseUrl": `${req.header('x-forwarded-proto') ?? req.protocol}://${req.get('host')}/api/v1/`,
-                "Id": randomUUID(),
+                "Id": id,
                 "TenantId": req.params.tenantId,
+                "KeyId": key.id,
+                "PrivateKey": privateKey,
             }
         }, undefined, 4));
     });
@@ -125,20 +148,12 @@ export default function (db: PrismaClient) {
                 }
             }
 
-            const client = await db.client.upsert({
+            const client = await db.client.update({
                 where: {
                     id: clientData.id,
                     tenantId: clientData.tenantId,
                 },
-                create: {
-                    ...clientData,
-                    group: {
-                        connect: groups
-                    },
-                    lastPing: new Date(),
-                    active,
-                },
-                update: {
+                data: {
                     ...clientData,
                     lastPing: new Date(),
                 }
