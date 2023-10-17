@@ -18,7 +18,7 @@ namespace nucleus_remote_client.Tasks
         public string? IconLocation { get; set; }
         public bool OverrideExisting { get; set; }
 
-        public Task Run(HostSettings hostSettings)
+        public Task Run(HostSettings hostSettings, TaskContainer taskContainer)
         {
             if (this.LinkDirectory == null)
             {

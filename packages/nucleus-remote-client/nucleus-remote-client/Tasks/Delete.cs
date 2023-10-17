@@ -10,7 +10,7 @@ namespace nucleus_remote_client.Tasks
         public bool Recursive { get; set; }
         public bool IgnoreIfMissing { get; set; }
 
-        public Task Run(HostSettings hostSettings)
+        public Task Run(HostSettings hostSettings, TaskContainer taskContainer)
         {
             var path = PathHelper.GetPath(Path);
             if (!System.IO.Path.Exists(path))
