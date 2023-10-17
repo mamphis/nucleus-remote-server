@@ -225,18 +225,15 @@ export default function (db: PrismaClient) {
                 name: true,
                 type: true,
                 content: true,
+                output: true,
             }
         });
 
         return res.json(tasks);
     });
+
     router.get('/:clientId/features', async (req, res, next) => {
         const client = await db.client.findFirst({ where: { id: req.params.clientId } });
-        const design = req.query.design === 'true';
-        if (client && !client.active && !design) {
-            // If the client is not active. Simply ignore the tasks it should execute otherwise
-            return res.json([]);
-        }
 
         if (!client) {
             return res.json([]);
@@ -244,7 +241,7 @@ export default function (db: PrismaClient) {
 
         const features = await db.featureFlag.findMany({
             where: {
-               tenantId: client.tenantId
+                tenantId: client.tenantId
             }
         });
 
@@ -282,7 +279,7 @@ export default function (db: PrismaClient) {
                 orderBy: {
                     timestamp: 'desc'
                 },
-                take: 20
+                take: 50
             });
 
             return res.json(clientLog);

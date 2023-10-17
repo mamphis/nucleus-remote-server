@@ -14,7 +14,7 @@ namespace nucleus_remote_client.Tasks
         public bool Override { get; set; }
         public bool IgnoreIfExists { get; set; }
 
-        public async Task Run(HostSettings hostSettings)
+        public async Task Run(HostSettings hostSettings, TaskContainer taskContainer)
         {
             var path = PathHelper.GetPath(Destination);
             if (File.Exists(path))

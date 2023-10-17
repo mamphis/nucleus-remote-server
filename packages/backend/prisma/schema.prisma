@@ -62,13 +62,20 @@ model Configuration {
   tenantId String?
 }
 
+enum OutputOption {
+  All
+  OnlyError
+  Special
+}
+
 model Task {
-  id      String  @id() @default(uuid())
+  id      String       @id() @default(uuid())
   name    String
   type    String
-  active  Boolean @default(false)
-  runOnce Boolean @default(false)
-  content String  @default("")
+  active  Boolean      @default(false)
+  runOnce Boolean      @default(false)
+  content String       @default("")
+  output  OutputOption @default(All)
 
   configuration   Configuration? @relation(fields: [configurationId], references: [id], onDelete: Cascade)
   configurationId String?

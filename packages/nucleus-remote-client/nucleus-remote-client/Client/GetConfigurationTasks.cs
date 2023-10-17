@@ -13,7 +13,7 @@ namespace nucleus_remote_client.Client
 {
     internal class GetConfigurationTasks : IClient
     {
-        private static readonly HashSet<string> RunnedTasks = new HashSet<string>();
+        private static readonly HashSet<string> RunnedTasks = new();
 
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
@@ -35,14 +35,17 @@ namespace nucleus_remote_client.Client
                 try
                 {
                     ITask task = this.GetTask(taskContainer);
-                    await task.Run(hostSettings);
-                    
-                    await SendLog.Info(hostSettings, $"Execution of task {taskContainer.name} was successful.");
+                    await task.Run(hostSettings, taskContainer);
+                    if (taskContainer.output == OutputType.All)
+                    {
+                        await SendLog.Info(hostSettings, $"[Task {taskContainer.name}]: Execution was successful.");
+                    }
+
                     RunnedTasks.Add(taskContainer.id);
                 }
                 catch (Exception ex)
                 {
-                    await SendLog.Error(hostSettings, $"Task {taskContainer.name}: " + ex.Message);
+                    await SendLog.Error(hostSettings, $"[Task {taskContainer.name}]: " + ex.Message);
                 }
             }
         }
