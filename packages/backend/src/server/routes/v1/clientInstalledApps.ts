@@ -46,7 +46,7 @@ export default function (db: PrismaClient) {
                 });
             }
 
-            res.end();
+            res.status(204).end();
         } catch (e: unknown) {
             return next(e);
         }

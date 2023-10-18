@@ -96,13 +96,8 @@ namespace nucleus_remote_client.Client
                     }
                 }
             }
-
-            HttpClient client = new()
-            {
-                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-            };
-
-            var _response = await client.PutAsJsonAsync($"clients/{hostSettings.Id}/installedApps", installed);
+            var client = ClientHelper.GetHttpClient(hostSettings);
+            var _response = await client.PutAsJsonAsync($"c2/{hostSettings.Id}/installedApps", installed);
             if (!_response.IsSuccessStatusCode)
             {
                 await SendLog.Error(hostSettings, await _response.Content.ReadAsStringAsync());

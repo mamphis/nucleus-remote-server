@@ -17,12 +17,8 @@ namespace nucleus_remote_client.Client
 
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
-            HttpClient client = new()
-            {
-                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-            };
-
-            var tasks = await client.GetFromJsonAsync<TaskContainer[]>($"clients/{hostSettings.Id}/tasks");
+            var client = ClientHelper.GetHttpClient(hostSettings);
+            var tasks = await client.GetFromJsonAsync<TaskContainer[]>($"c2/{hostSettings.Id}/tasks");
 
             if (tasks == null)
             {

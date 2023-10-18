@@ -11,5 +11,7 @@ namespace nucleus_remote_client.Lib
         public string? BaseUrl { get; set; }
         public string? Id { get; set; }
         public string? TenantId { get; set; }
+        public string? KeyId { get; set; }
+        public string? PrivateKey { get; set; } 
     }
 }
