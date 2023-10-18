@@ -2,7 +2,7 @@
 import { Locals, NextFunction, Request, RequestHandler, Response, Router } from "express";
 import type * as core from 'express-serve-static-core';
 import { BadRequest, Forbidden, Unauthorized } from 'http-errors';
-import { JsonWebTokenError, sign, verify, TokenExpiredError } from 'jsonwebtoken';
+import { JsonWebTokenError, sign, verify, TokenExpiredError, decode } from 'jsonwebtoken';
 import { Logger } from './logger';
 import { isProduction } from './util';
 import { $t } from "./locale/locale";
@@ -21,16 +21,32 @@ interface AuthUser {
     tenantId: string;
     permissions: string[];
 }
+interface AuthClient {
+    clientId: string;
+    tenantId: string;
+    keyId: string;
+}
 
 interface AuthLocals extends Record<string, any> {
     user: AuthUser;
+}
+interface ClientAuthLocals extends Record<string, any> {
+    client: AuthClient;
 }
 
 export interface AuthResponse extends Response {
     locals: AuthLocals
 }
 
+export interface ClientAuthResponse extends Response {
+    locals: ClientAuthLocals
+}
+
 interface AuthRequest<Route extends string> extends core.Request<core.RouteParameters<Route>, any, any, any, AuthLocals> {
+
+}
+
+interface ClientAuthRequest<Route extends string> extends core.Request<core.RouteParameters<Route>, any, any, any, ClientAuthLocals> {
 
 }
 
@@ -122,6 +138,58 @@ const auth = <Route extends string>(...scopes: string[]): core.RequestHandler<co
 
 }
 
+const clientAuth = <Route extends string>(): core.RequestHandler<core.RouteParameters<Route>, any, any, any, ClientAuthLocals> => {
+    return async (req: ClientAuthRequest<Route>, res: ClientAuthResponse, next: NextFunction) => {
+        const auth = req.headers.authorization;
+
+        if (!auth) {
+            return next(BadRequest($t(req, 'error.400.missingAuthHeader')));
+        }
+
+        // Bearer ey.....
+        const [method, value] = auth.split(' ');
+        if (method !== 'Bearer') {
+            return next(BadRequest($t(req, 'error.400.missingAuthHeader')));
+        }
+
+        try {
+            const data = decode(value);
+            if (!data || typeof data === 'string') {
+                return next(Unauthorized('Invalid token'));
+            }
+
+            const client = data as AuthClient;
+            // get the key from the database
+            const key = await db.key.findFirst({
+                where: {
+                    id: client.keyId,
+                }
+            });
+
+            if (!key) {
+                return next(Unauthorized('Invalid token'));
+            }
+
+            const payload = verify(value, key.publicKey);
+            res.locals.client = client;
+            return next();
+        } catch (e: unknown) {
+            if (e instanceof TokenExpiredError) {
+                return next(Unauthorized('Token expired'));
+            }
+
+            if (e instanceof JsonWebTokenError) {
+                return next(Unauthorized(e.message));
+            }
+
+            return next(e);
+        }
+    };
+
+}
+
+
+
 const refresh = (token: string) => {
     try {
         const payload = verify(token, jwtSecret);
@@ -140,6 +208,7 @@ const refresh = (token: string) => {
 
 export {
     auth,
+    clientAuth,
     getToken,
     getRefreshToken,
     refresh,

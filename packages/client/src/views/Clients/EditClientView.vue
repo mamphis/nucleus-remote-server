@@ -17,7 +17,7 @@ const { sendNotification } = eventStore();
 
 const { clientId } = router.currentRoute.value.params;
 const response = await request.$get<ApiClient>(`clients/${clientId}`);
-const tasks = await request.$get<ApiTask[]>(`clients/${clientId}/tasks?design=true`);
+const tasks = await request.$get<ApiTask[]>(`clients/${clientId}/tasks`);
 const logsResponse = await request.$get<ApiClientLog[]>(`clients/${clientId}/logs`);
 const details = await request.$get<ApiClientDetail[]>(`clients/${clientId}/details`);
 assertNotErrorResponse<ApiTask[]>(tasks);
@@ -223,8 +223,8 @@ const selected = ref('dashboard');
                     </table>
                 </div>
             </div>
-            <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
-                <InstalledApps v-if="selected == 'f-1.0.8-installed_apps'" />
+            <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100" v-if="selected == 'f-1.0.8-installed_apps'">
+                <InstalledApps />
             </div>
         </div>
     </div>

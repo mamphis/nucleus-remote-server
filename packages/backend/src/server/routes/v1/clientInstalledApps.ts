@@ -4,14 +4,14 @@ import { randomUUID } from "crypto";
 import { Router } from "express";
 import { BadRequest, Forbidden, UnprocessableEntity, NotFound } from 'http-errors';
 import { ZodError, z } from "zod";
-import { AuthResponse, auth, isFeatureEnabled } from "../../../lib/auth";
+import { AuthResponse, ClientAuthResponse, auth, clientAuth, isFeatureEnabled } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
 import { createNotification } from "../../../lib/notification";
 
 export default function (db: PrismaClient) {
     const router = Router({ mergeParams: true });
 
-    router.put(`/`, async (req, res, next) => {
+    router.put(`/`, clientAuth(), async (req, res: ClientAuthResponse, next) => {
         const schema = z.array(z.object({
             name: z.string(),
             version: z.string(),
@@ -20,7 +20,7 @@ export default function (db: PrismaClient) {
             installDate: z.coerce.date(),
         }));
 
-        const { clientId } = req.params as any;
+        const { clientId } = res.locals.client;
         try {
             const installedApps = schema.parse(req.body);
             const client = await db.client.findFirst({ where: { id: clientId } });
