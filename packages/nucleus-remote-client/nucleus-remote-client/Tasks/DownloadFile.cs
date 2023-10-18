@@ -9,13 +9,23 @@ namespace nucleus_remote_client.Tasks
 {
     internal class DownloadFile : ITask
     {
-        public string RemoteUrl { get; set; }
-        public string Destination { get; set; }
+        public string? RemoteUrl { get; set; }
+        public string? Destination { get; set; }
         public bool Override { get; set; }
         public bool IgnoreIfExists { get; set; }
 
         public async Task Run(HostSettings hostSettings, TaskContainer taskContainer)
         {
+            if (Destination == null)
+            {
+                throw new MemberAccessException("The destination is not set.");
+            }
+
+            if (RemoteUrl == null)
+            {
+                throw new MemberAccessException("The remote url is not set.");
+            }
+
             var path = PathHelper.GetPath(Destination);
             if (File.Exists(path))
             {
@@ -30,7 +40,7 @@ namespace nucleus_remote_client.Tasks
                 }
             }
 
-            HttpClient client = new HttpClient();
+            HttpClient client = new();
 
             var data = await client.GetByteArrayAsync(RemoteUrl);
             await File.WriteAllBytesAsync(path, data);

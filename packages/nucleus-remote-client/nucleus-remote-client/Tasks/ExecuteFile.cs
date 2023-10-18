@@ -11,20 +11,25 @@ namespace nucleus_remote_client.Tasks
 {
     internal class ExecuteFile : ITask
     {
-        public string File { get; set; }
+        public string? File { get; set; }
         public string? Arguments { get; set; }
         public bool HideWindow { get; set; }
         public bool StartIfProcessIsRunning { get; set; }
 
-        private static Dictionary<int, string> StartedProcesses = new Dictionary<int, string>();
+        private static readonly Dictionary<int, string> StartedProcesses = new();
 
-        public async Task Run(HostSettings hostSettings, TaskContainer taskContainer)
+        public Task Run(HostSettings hostSettings, TaskContainer taskContainer)
         {
+            if (File == null)
+            {
+                throw new MemberAccessException("The file is not set.");
+            }
+
             var path = PathHelper.GetPath(File);
 
             if (string.IsNullOrEmpty(path))
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (StartedProcesses.ContainsValue(path) && !this.StartIfProcessIsRunning)
@@ -35,25 +40,29 @@ namespace nucleus_remote_client.Tasks
                     var existingProc = procs.FirstOrDefault(p => p.Id == item.Key);
                     if (existingProc != null && !existingProc.HasExited)
                     {
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     StartedProcesses.Remove(item.Key);
                 }
             }
 
-            var psi = new ProcessStartInfo(path, this.Arguments ?? "");
-            psi.CreateNoWindow = this.HideWindow;
+            var psi = new ProcessStartInfo(path, this.Arguments ?? "")
+            {
+                CreateNoWindow = this.HideWindow
+            };
 
-            var output = taskContainer.output == OutputType.Special;
+            var output = taskContainer.Output == OutputType.Special;
 
             psi.RedirectStandardOutput = output;
             psi.RedirectStandardError = output;
             psi.UseShellExecute = false;
 
-            var proc = new Process();
-            proc.StartInfo = psi;
-            proc.EnableRaisingEvents = output;
+            var proc = new Process
+            {
+                StartInfo = psi,
+                EnableRaisingEvents = output
+            };
 
             var processName = "";
             if (output)
@@ -61,13 +70,13 @@ namespace nucleus_remote_client.Tasks
                 string outputData = "";
                 string errorData = "";
 
-                var log = async (string type, string data) =>
+                async Task log(string type, string data)
                 {
                     if (!string.IsNullOrWhiteSpace(data))
                     {
-                        await SendLog.Info(hostSettings, $"[Task {taskContainer.name}]: Process {proc.Id} (${processName}) {type}> {data}");
+                        await SendLog.Info(hostSettings, $"[Task {taskContainer.Name}]: Process {proc.Id} (${processName}) {type}> {data}");
                     }
-                };
+                }
 
                 proc.OutputDataReceived += (sender, args) => outputData += args.Data + "\n";
                 proc.ErrorDataReceived += (sender, args) => errorData += args.Data + "\n";
@@ -77,7 +86,7 @@ namespace nucleus_remote_client.Tasks
                     var exitCode = proc.ExitCode;
                     await log("O", outputData);
                     await log("E", errorData);
-                    await SendLog.Info(hostSettings, $"[Task {taskContainer.name}]: Process {proc.Id} (${processName}) exited with exit code {exitCode}");
+                    await SendLog.Info(hostSettings, $"[Task {taskContainer.Name}]: Process {proc.Id} (${processName}) exited with exit code {exitCode}");
                 };
             }
 
@@ -94,7 +103,7 @@ namespace nucleus_remote_client.Tasks
             }
 
             ExecuteFile.StartedProcesses.Add(proc.Id, path);
-
+            return Task.CompletedTask;
         }
     }
 }

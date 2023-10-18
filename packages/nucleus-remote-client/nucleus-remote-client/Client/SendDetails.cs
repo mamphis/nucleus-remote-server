@@ -33,14 +33,14 @@ namespace nucleus_remote_client.Client
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
             var client = ClientHelper.GetHttpClient(hostSettings);
-            var _response = await client.PostAsJsonAsync($"c2/{hostSettings.Id}/details", new
+            _ = await client.PostAsJsonAsync($"c2/{hostSettings.Id}/details", new
             {
                 pid = this.Pid,
                 memory = this.Memory,
                 runTime = this.RunTime,
                 processorTime = this.ProcessorTime,
                 cwd = this.Cwd,
-                SystemStartupTime = this.SystemStartupTime,
+                this.SystemStartupTime,
             });
         }
     }

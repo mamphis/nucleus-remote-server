@@ -49,7 +49,7 @@ namespace nucleus_remote_client
             }
         }
 
-        private async Task Try(IClient client, HostSettings hostSettings)
+        private async Task Try(IClient client, HostSettings _)
         {
             try
             {
@@ -61,19 +61,23 @@ namespace nucleus_remote_client
             }
         }
 
-        private void StartUpdater()
+        private static void StartUpdater()
         {
 #if DEBUG
             return;
 #endif
 
+#pragma warning disable CS0162 // Unreachable code detected
             var updaterPath = Path.GetFullPath("nucleus-remote-updater.exe");
             if (Path.Exists(updaterPath))
             {
-                var psi = new ProcessStartInfo(updaterPath);
-                psi.CreateNoWindow = true;
+                var psi = new ProcessStartInfo(updaterPath)
+                {
+                    CreateNoWindow = true
+                };
                 Process? proc = Process.Start(psi);
             }
+#pragma warning restore CS0162 // Unreachable code detected
         }
     }
 }

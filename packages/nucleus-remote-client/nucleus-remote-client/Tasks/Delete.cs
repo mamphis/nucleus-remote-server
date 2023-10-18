@@ -12,6 +12,11 @@ namespace nucleus_remote_client.Tasks
 
         public Task Run(HostSettings hostSettings, TaskContainer taskContainer)
         {
+            if (Path == null)
+            {
+                throw new ArgumentNullException("The path is not set.");
+            }
+
             var path = PathHelper.GetPath(Path);
             if (!System.IO.Path.Exists(path))
             {

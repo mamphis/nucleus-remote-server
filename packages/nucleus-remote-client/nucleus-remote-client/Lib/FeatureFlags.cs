@@ -34,7 +34,7 @@ namespace nucleus_remote_client.Lib
             }
             catch (Exception e)
             {
-                SendLog.Error(hostSettings, e.Message);
+                await SendLog.Error(hostSettings, e.Message);
             }
         }
 

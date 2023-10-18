@@ -34,10 +34,18 @@ namespace nucleus_remote_client.Lib
 
             Console.WriteLine(args.Aggregate((a, b) => a + " " + b));
 
-            var psi = new ProcessStartInfo("sc.exe", args);
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardOutput = true;
+            var psi = new ProcessStartInfo("sc.exe", args)
+            {
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
             var proc = Process.Start(psi);
+
+            if (proc == null)
+            {
+                Console.WriteLine("Failed to start process");
+                Environment.Exit(1);
+            }
 
             proc.WaitForExit();
 
@@ -57,10 +65,17 @@ namespace nucleus_remote_client.Lib
 
             Console.WriteLine(args.Aggregate((a, b) => a + " " + b));
 
-            var psi = new ProcessStartInfo("sc.exe", args);
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardOutput = true;
+            var psi = new ProcessStartInfo("sc.exe", args)
+            {
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
             var proc = Process.Start(psi);
+            if (proc == null)
+            {
+                Console.WriteLine("Failed to start process");
+                Environment.Exit(1);
+            }
 
             proc.WaitForExit();
 
@@ -70,10 +85,8 @@ namespace nucleus_remote_client.Lib
 
         internal static void GrantUserToLogonAsService()
         {
-            using (LsaWrapper lsa = new LsaWrapper())
-            {
-                lsa.AddPrivileges(Environment.UserDomainName + "\\" + Environment.UserName, "SeServiceLogonRight");
-            }
+            using LsaWrapper lsa = new();
+            lsa.AddPrivileges(Environment.UserDomainName + "\\" + Environment.UserName, "SeServiceLogonRight");
         }
 
         private static string GetEntryLocation()

