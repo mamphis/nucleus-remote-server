@@ -25,13 +25,8 @@ namespace nucleus_remote_client.Client
             Console.WriteLine($"> {this.Message}");
             try
             {
-
-                HttpClient client = new()
-                {
-                    BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-                };
-
-                var _response = await client.PostAsJsonAsync($"clients/{hostSettings.Id}/logs", new
+                var client = ClientHelper.GetHttpClient(hostSettings);
+                var _response = await client.PostAsJsonAsync($"c2/{hostSettings.Id}/logs", new
                 {
                     level = this.Level,
                     message = this.Message,

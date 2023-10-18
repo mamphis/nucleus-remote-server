@@ -17,14 +17,20 @@ namespace nucleus_remote_client.Tasks
 
     internal class TaskContainer
     {
-        public string id { get; set; }
-        public string? name { get; set; }
-        public string? type { get; set; }
-        public string? content { get; set; }
-
+        [JsonPropertyName("id")]
+        public string? Id { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
+        [JsonPropertyName("type")]
+        public string? Type { get; set; }
+        [JsonPropertyName("content")]
+        public string? Content { get; set; }
+        [JsonPropertyName("output")]
         [JsonConverter(typeof(JsonStringEnumConverter<OutputType>))]
-        public OutputType output { get; set; }
-        public bool active { get; set; }
-        public bool runOnce { get; set; }
+        public OutputType Output { get; set; }
+        [JsonPropertyName("active")]
+        public bool Active { get; set; }
+        [JsonPropertyName("runOnce")]
+        public bool RunOnce { get; set; }
     }
 }

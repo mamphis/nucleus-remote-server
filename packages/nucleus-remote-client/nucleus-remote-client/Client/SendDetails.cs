@@ -23,7 +23,7 @@ namespace nucleus_remote_client.Client
         {
             var proc = Process.GetCurrentProcess();
             this.Pid = proc.Id;
-            this.Memory = (proc.PrivateMemorySize64 / 1024.0 / 1024.0).ToString("0.00 Mb"); 
+            this.Memory = (proc.PrivateMemorySize64 / 1024.0 / 1024.0).ToString("0.00 Mb");
             this.ProcessorTime = proc.TotalProcessorTime;
             this.RunTime = DateTime.Now - proc.StartTime;
             this.Cwd = Environment.CurrentDirectory;
@@ -32,19 +32,15 @@ namespace nucleus_remote_client.Client
 
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
-            HttpClient client = new()
-            {
-                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-            };
-
-            var _response = await client.PostAsJsonAsync($"clients/{hostSettings.Id}/details", new
+            var client = ClientHelper.GetHttpClient(hostSettings);
+            _ = await client.PostAsJsonAsync($"c2/{hostSettings.Id}/details", new
             {
                 pid = this.Pid,
                 memory = this.Memory,
                 runTime = this.RunTime,
-                processorTime  = this.ProcessorTime,
+                processorTime = this.ProcessorTime,
                 cwd = this.Cwd,
-                SystemStartupTime = this.SystemStartupTime,
+                this.SystemStartupTime,
             });
         }
     }

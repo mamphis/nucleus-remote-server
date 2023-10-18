@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { generateKeyPair, randomBytes } from "crypto";
 
 class Utils {
     randomString(length: number) {
@@ -14,6 +14,28 @@ class Utils {
     isProduction() {
         return process.env.NODE_ENV === 'production';
     }
+}
+
+type KeyPair = {
+    publicKey: string;
+    privateKey: string;
+}
+
+export const getKeyPair = async () => {
+    return new Promise<KeyPair>((res, rej) => generateKeyPair('rsa', {
+        modulusLength: 4096,
+        publicKeyEncoding: {
+            type: 'spki',
+            format: 'pem'
+        },
+        privateKeyEncoding: {
+            type: 'pkcs8',
+            format: 'pem'
+        }
+    }, (err, publicKey, privateKey) => {
+        if (err) return rej(err);
+        res({ publicKey, privateKey });
+    }));
 }
 
 const util = new Utils();

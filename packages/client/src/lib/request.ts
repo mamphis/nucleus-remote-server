@@ -58,11 +58,15 @@ type SuccessResponse<T> = T & {
     toRef: () => Ref<UnwrapRef<T>>;
 };
 
-type Response<T> = (ErrorResponse | T) & {
+type ApiResponse<T> = (ErrorResponse | T) & {
     assertNotError: () => SuccessResponse<T>;
 };
 
-const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): Promise<Response<T>> => {
+// create a signature for raw responses
+
+async function request<T>(raw: false, method: RequestMethod, apiRoute: string, body?: any): Promise<ApiResponse<T>>;
+async function request(raw: true, method: RequestMethod, apiRoute: string, body?: any): Promise<Response>;
+async function request<T>(raw: boolean, method: RequestMethod, apiRoute: string, body?: any): Promise<ApiResponse<T> | Response> {
     const user = userStore();
     const { baseApiUrl } = settingsStore();
     if (!user.token) {
@@ -76,12 +80,13 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
         method
     }
 
-    if (!['GET', 'DELETE'].includes(method)) {
+    if (!['GET', 'DELETE'].includes(method) && body) {
         requestInit.headers = Object.assign(requestInit.headers ?? {}, { 'content-type': 'application/json' });
         requestInit.body = JSON.stringify(body);
     }
 
     const response = await fetch(new URL(normalizeApiRoute(apiRoute), baseApiUrl), requestInit);
+
     const makeResponse = (response: unknown) => {
         const obj = response as T | ErrorResponse ?? {};
 
@@ -103,21 +108,38 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
             },
         });
 
-        return obj as Response<T>;
+        return obj as ApiResponse<T>;
     }
+
     if (!response.ok) {
         const errorResponse = await response.json();
 
         if (response.status === 401 && errorResponse.message === 'Token expired') {
             await user.refreshSession();
-            return request<T>(method, apiRoute, body);
+            if (!raw) {
+                return request<T>(raw, method, apiRoute, body);
+            } else {
+                return request(raw, method, apiRoute, body);
+            }
+        }
+
+        if (raw) {
+            return response;
         }
 
         return makeResponse(errorResponse);
     }
 
     if (response.status === 204) {
+        if (raw) {
+            return response;
+        }
+
         return makeResponse(undefined);
+    }
+
+    if (raw) {
+        return response;
     }
 
     const result = await response.json();
@@ -125,11 +147,12 @@ const request = async <T>(method: RequestMethod, apiRoute: string, body?: any): 
 };
 
 export default {
-    $get: <T>(apiRoute: string) => request<T>('GET', apiRoute),
-    $post: <T>(apiRoute: string, body: any) => request<T>('POST', apiRoute, body),
-    $patch: <T>(apiRoute: string, body: any) => request<T>('PATCH', apiRoute, body),
-    $put: <T>(apiRoute: string, body: any) => request<T>('PUT', apiRoute, body),
-    $delete: (apiRoute: string) => request<undefined>('DELETE', apiRoute),
+    $get: <T>(apiRoute: string) => request<T>(false, 'GET', apiRoute),
+    $post: <T>(apiRoute: string, body: any) => request<T>(false, 'POST', apiRoute, body),
+    $patch: <T>(apiRoute: string, body: any) => request<T>(false, 'PATCH', apiRoute, body),
+    $put: <T>(apiRoute: string, body: any) => request<T>(false, 'PUT', apiRoute, body),
+    $delete: (apiRoute: string) => request<undefined>(false, 'DELETE', apiRoute),
+    $raw: (method: RequestMethod, apiRoute: string, body?: any) => request(true, method, apiRoute, body),
 };
 
 export {

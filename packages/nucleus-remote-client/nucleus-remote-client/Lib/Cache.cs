@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace nucleus_remote_client.Lib
 {
-    internal class Cache<TKey, TValue>
+    internal class Cache<TKey, TValue> where TKey : notnull
     {
         public TimeSpan ValidTime { get; private set; }
-        private Dictionary<TKey, TValue> values = new Dictionary<TKey, TValue>();
+        private readonly Dictionary<TKey, TValue> values = new();
 
         public Cache(TimeSpan validTime)
         {

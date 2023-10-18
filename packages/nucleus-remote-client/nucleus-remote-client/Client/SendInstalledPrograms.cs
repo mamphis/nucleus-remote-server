@@ -51,7 +51,7 @@ namespace nucleus_remote_client.Client
             string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             string registry_key_32 = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
 
-            InstalledProgram GetInstalledProgram(string subkeyName, RegistryKey subkey)
+            static InstalledProgram GetInstalledProgram(string subkeyName, RegistryKey subkey)
             {
                 return new InstalledProgram(
                     subkey.GetValue("DisplayName")?.ToString() ?? subkeyName,
@@ -62,19 +62,17 @@ namespace nucleus_remote_client.Client
 
             }
 
-            List<InstalledProgram> installed = new List<InstalledProgram>();
+            List<InstalledProgram> installed = new();
             using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(registry_key))
             {
                 if (key != null)
                 {
                     foreach (string subkey_name in key.GetSubKeyNames())
                     {
-                        using (RegistryKey? subkey = key.OpenSubKey(subkey_name))
+                        using RegistryKey? subkey = key.OpenSubKey(subkey_name);
+                        if (subkey != null)
                         {
-                            if (subkey != null)
-                            {
-                                installed.Add(GetInstalledProgram(subkey_name, subkey));
-                            }
+                            installed.Add(GetInstalledProgram(subkey_name, subkey));
                         }
                     }
                 }
@@ -86,23 +84,16 @@ namespace nucleus_remote_client.Client
                 {
                     foreach (string subkey_name in key.GetSubKeyNames())
                     {
-                        using (RegistryKey? subkey = key.OpenSubKey(subkey_name))
+                        using RegistryKey? subkey = key.OpenSubKey(subkey_name);
+                        if (subkey != null)
                         {
-                            if (subkey != null)
-                            {
-                                installed.Add(GetInstalledProgram(subkey_name, subkey));
-                            }
+                            installed.Add(GetInstalledProgram(subkey_name, subkey));
                         }
                     }
                 }
             }
-
-            HttpClient client = new()
-            {
-                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-            };
-
-            var _response = await client.PutAsJsonAsync($"clients/{hostSettings.Id}/installedApps", installed);
+            var client = ClientHelper.GetHttpClient(hostSettings);
+            var _response = await client.PutAsJsonAsync($"c2/{hostSettings.Id}/installedApps", installed);
             if (!_response.IsSuccessStatusCode)
             {
                 await SendLog.Error(hostSettings, await _response.Content.ReadAsStringAsync());

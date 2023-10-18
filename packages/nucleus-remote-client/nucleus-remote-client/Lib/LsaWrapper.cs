@@ -1,9 +1,9 @@
 ﻿namespace nucleus_remote_client.Lib
 {
+#pragma warning disable 
+    using System.ComponentModel;
     using System.Runtime.InteropServices;
     using System.Security;
-    using System.ComponentModel;
-
     using LSA_HANDLE = nint;
 
     [StructLayout(LayoutKind.Sequential)]
@@ -63,7 +63,6 @@
 
         [DllImport("advapi32")]
         internal static extern int LsaFreeMemory(LSA_HANDLE Buffer);
-
     }
     public sealed class LsaWrapper : IDisposable
     {
@@ -118,7 +117,7 @@
         public LsaWrapper() : this(null)
         { }
         // // local system if systemName is null
-        public LsaWrapper(string systemName)
+        public LsaWrapper(string? systemName)
         {
             LSA_OBJECT_ATTRIBUTES lsaAttr;
             lsaAttr.RootDirectory = LSA_HANDLE.Zero;
@@ -128,11 +127,16 @@
             lsaAttr.SecurityQualityOfService = LSA_HANDLE.Zero;
             lsaAttr.Length = Marshal.SizeOf(typeof(LSA_OBJECT_ATTRIBUTES));
             lsaHandle = LSA_HANDLE.Zero;
-            LSA_UNICODE_STRING[] system = null;
+            LSA_UNICODE_STRING[]? system = null;
             if (systemName != null)
             {
                 system = new LSA_UNICODE_STRING[1];
                 system[0] = InitLsaString(systemName);
+            }
+
+            if (system == null)
+            {
+                throw new ArgumentNullException("systemName");
             }
 
             uint ret = Win32Sec.LsaOpenPolicy(system, ref lsaAttr,
@@ -194,12 +198,17 @@
             names[0] = InitLsaString(account);
             lts.Sid = LSA_HANDLE.Zero;
             Console.WriteLine("String account: {0}", names[0].Length);
-            int ret = Win32Sec.LsaLookupNames2(lsaHandle, 0, 1, names, ref tdom, ref
-            tsids);
+            int ret = Win32Sec.LsaLookupNames2(lsaHandle, 0, 1, names, ref tdom, ref tsids);
             if (ret != 0)
                 throw new Win32Exception(Win32Sec.LsaNtStatusToWinError(ret));
-            lts = (LSA_TRANSLATED_SID2)Marshal.PtrToStructure(tsids,
-            typeof(LSA_TRANSLATED_SID2));
+
+            var obj = Marshal.PtrToStructure(tsids, typeof(LSA_TRANSLATED_SID2));
+            if (obj == null)
+            {
+                throw new Exception("Unable to get SID information");
+            }
+
+            lts = (LSA_TRANSLATED_SID2)obj;
             Win32Sec.LsaFreeMemory(tsids);
             Win32Sec.LsaFreeMemory(tdom);
             return lts.Sid;
@@ -217,4 +226,5 @@
             return lus;
         }
     }
+#pragma warning restore
 }

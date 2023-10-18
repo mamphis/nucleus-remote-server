@@ -24,6 +24,14 @@ model Tenant {
   featureFlag   FeatureFlag[]
 }
 
+model Key {
+  id        String   @id() @default(uuid())
+  publicKey String
+  createdAt DateTime @default(now())
+
+  clients Client[]
+}
+
 model Client {
   id         String   @id()
   username   String
@@ -34,11 +42,13 @@ model Client {
   active     Boolean  @default(true)
 
   tenant        Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId      String
+  key           Key             @relation(fields: [keyId], references: [id])
   group         Group[]
   clientLog     ClientLog[]
   clientDetail  ClientDetail[]
   installedApps InstalledApps[]
+  tenantId      String
+  keyId         String
 }
 
 model Group {

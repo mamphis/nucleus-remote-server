@@ -17,12 +17,8 @@ namespace nucleus_remote_client.Client
 
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
-            HttpClient client = new()
-            {
-                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-            };
-
-            var tasks = await client.GetFromJsonAsync<TaskContainer[]>($"clients/{hostSettings.Id}/tasks");
+            var client = ClientHelper.GetHttpClient(hostSettings);
+            var tasks = await client.GetFromJsonAsync<TaskContainer[]>($"c2/{hostSettings.Id}/tasks");
 
             if (tasks == null)
             {
@@ -30,34 +26,42 @@ namespace nucleus_remote_client.Client
                 return;
             }
 
-            foreach (var taskContainer in tasks.Where(task => this.Runnable(task)))
+            foreach (var taskContainer in tasks.Where(task => Runnable(task)))
             {
                 try
                 {
-                    ITask task = this.GetTask(taskContainer);
+                    ITask task = GetTask(taskContainer);
                     await task.Run(hostSettings, taskContainer);
-                    if (taskContainer.output == OutputType.All)
+                    if (taskContainer.Output == OutputType.All)
                     {
-                        await SendLog.Info(hostSettings, $"[Task {taskContainer.name}]: Execution was successful.");
+                        await SendLog.Info(hostSettings, $"[Task {taskContainer.Name}]: Execution was successful.");
                     }
 
-                    RunnedTasks.Add(taskContainer.id);
+                    if (taskContainer.Id != null)
+                    {
+                        RunnedTasks.Add(taskContainer.Id);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    await SendLog.Error(hostSettings, $"[Task {taskContainer.name}]: " + ex.Message);
+                    await SendLog.Error(hostSettings, $"[Task {taskContainer.Name}]: " + ex.Message);
                 }
             }
         }
 
-        private bool Runnable(TaskContainer taskContainer)
+        private static bool Runnable(TaskContainer taskContainer)
         {
-            if (!taskContainer.active)
+            if (!taskContainer.Active)
             {
                 return false;
             }
 
-            if (taskContainer.runOnce && RunnedTasks.Contains(taskContainer.id))
+            if (taskContainer.Id == null)
+            {
+                return false;
+            }
+
+            if (taskContainer.RunOnce && RunnedTasks.Contains(taskContainer.Id))
             {
                 return false;
             }
@@ -65,39 +69,34 @@ namespace nucleus_remote_client.Client
             return true;
         }
 
-        private ITask GetTask(TaskContainer taskContainer)
+        private static ITask GetTask(TaskContainer taskContainer)
         {
 
-            if (string.IsNullOrEmpty(taskContainer.content))
+            if (string.IsNullOrEmpty(taskContainer.Content))
             {
-                throw new Exception($"Task '{taskContainer.name}' of type {taskContainer.type} has no content.");
+                throw new Exception($"Task '{taskContainer.Name}' of type {taskContainer.Type} has no content.");
             }
 
-            switch (taskContainer.type)
+            return taskContainer.Type switch
             {
-                case "CreateShortcut":
-                    return GetTask<CreateShortcut>(taskContainer);
-                case "Delete":
-                    return GetTask<Delete>(taskContainer);
-                case "DownloadFile":
-                    return GetTask<DownloadFile>(taskContainer);
-                case "ExecuteFile":
-                    return GetTask<ExecuteFile>(taskContainer);
-                default:
-                    throw new Exception($"Cannot parse task, because the type '{taskContainer.type}' is unknown");
-            }
+                "CreateShortcut" => GetTask<CreateShortcut>(taskContainer),
+                "Delete" => GetTask<Delete>(taskContainer),
+                "DownloadFile" => GetTask<DownloadFile>(taskContainer),
+                "ExecuteFile" => GetTask<ExecuteFile>(taskContainer),
+                _ => throw new Exception($"Cannot parse task, because the type '{taskContainer.Type}' is unknown"),
+            };
         }
 
-        private T GetTask<T>(TaskContainer taskContainer)
+        private static T GetTask<T>(TaskContainer taskContainer)
         {
             var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-            var task = JsonSerializer.Deserialize<T>(taskContainer.content, options);
-            if (task == null)
+            if (taskContainer.Content == null)
             {
-                throw new Exception($"Cannot deserialze task '{taskContainer.name}'.");
+                throw new Exception($"Cannot deserialze task '{taskContainer.Name}' because the content is null.");
             }
 
-            return task;
+            var task = JsonSerializer.Deserialize<T>(taskContainer.Content, options);
+            return task == null ? throw new Exception($"Cannot deserialze task '{taskContainer.Name}'.") : task;
         }
     }
 }

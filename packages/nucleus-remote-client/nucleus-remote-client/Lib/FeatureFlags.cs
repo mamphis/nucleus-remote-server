@@ -18,12 +18,8 @@ namespace nucleus_remote_client.Lib
         {
             try
             {
-                HttpClient client = new()
-                {
-                    BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
-                };
-
-                var features = await client.GetFromJsonAsync<FeatureFlag[]>($"clients/{hostSettings.Id}/features");
+                var client = ClientHelper.GetHttpClient(hostSettings);
+                var features = await client.GetFromJsonAsync<FeatureFlag[]>($"c2/{hostSettings.Id}/features");
 
                 if (features == null)
                 {
@@ -38,7 +34,7 @@ namespace nucleus_remote_client.Lib
             }
             catch (Exception e)
             {
-                SendLog.Error(hostSettings, e.Message);
+                await SendLog.Error(hostSettings, e.Message);
             }
         }
 
