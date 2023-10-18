@@ -15,9 +15,11 @@
   },
   "dependencies": {
     "bulma": "^0.9.4",
+    "chart.js": "^4.4.0",
     "fuzzysort": "^2.0.4",
     "pinia": "^2.1.4",
     "vue": "^3.3.4",
+    "vue-chartjs": "^5.2.0",
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
