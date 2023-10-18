@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { Router } from "express";
 import { BadRequest } from 'http-errors';
+import { $t } from '../../../lib/locale/locale';
 import mailer from '../../../lib/mailer';
 import { randomString } from '../../../lib/util';
-import { $t } from '../../../lib/locale/locale';
 
 export default function (db: PrismaClient) {
     const router = Router();

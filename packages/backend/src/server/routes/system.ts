@@ -4,8 +4,8 @@ import { readFile } from "fs/promises";
 import { NotFound } from 'http-errors';
 import { join } from "path";
 import db from "../../lib/db";
-import mailer from "../../lib/mailer";
 import { $t } from "../../lib/locale/locale";
+import mailer from "../../lib/mailer";
 
 const router = Router();
 

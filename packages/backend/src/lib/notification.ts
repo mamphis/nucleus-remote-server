@@ -1,8 +1,8 @@
-import { $Enums, Notification } from "@prisma/client"
-import db from "./db";
+import { $Enums, Notification } from "@prisma/client";
 import { Request } from "express";
-import { $t } from "./locale/locale";
+import db from "./db";
 import { ValidKeys } from "./locale/en";
+import { $t } from "./locale/locale";
 
 const createNotification = async (severity: $Enums.NotificationSeverity, message: ValidKeys, tenantId: string, ...args: string[]) => {
     await db.notification.create({
@@ -23,5 +23,5 @@ const parseNotificationText = (notification: Pick<Notification, 'message'>, req:
 
 export {
     createNotification,
-    parseNotificationText,
+    parseNotificationText
 };

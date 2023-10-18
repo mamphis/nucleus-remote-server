@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { z } from "zod";
 import { BadRequest, Forbidden } from 'http-errors';
-import { type AuthResponse, auth, hasPermission } from "../../../lib/auth";
-import { $t } from "../../../lib/locale/locale";
+import { z } from "zod";
+import { auth, hasPermission, type AuthResponse } from "../../../lib/auth";
 import { ValidKeys } from "../../../lib/locale/en";
+import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router({ mergeParams: true });

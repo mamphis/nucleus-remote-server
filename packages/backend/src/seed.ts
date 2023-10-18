@@ -89,7 +89,6 @@ const seed = async (db: PrismaClient) => {
 
 export {
     needSeed,
-    seed,
-    seedFeatureFlags,
-    seedAdmin,
+    seed, seedAdmin, seedFeatureFlags
 };
+

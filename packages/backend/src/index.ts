@@ -8,14 +8,13 @@ import { needSeed, seed, seedAdmin, seedFeatureFlags } from "./seed";
 Logger.info('Production Environment:', isProduction());
 
 import { PrismaClientInitializationError } from '@prisma/client/runtime/library';
-import mailer from './lib/mailer';
-import init from './lib/tasks';
-import { Server } from './server/server';
 import i18next from 'i18next';
 import { z } from 'zod';
 import { zodI18nMap } from 'zod-i18n-map';
 import deTranslations from 'zod-i18n-map/locales/de/zod.json';
-import { createNotification } from './lib/notification';
+import mailer from './lib/mailer';
+import init from './lib/tasks';
+import { Server } from './server/server';
 
 const port = Number(process.env.PORT);
 

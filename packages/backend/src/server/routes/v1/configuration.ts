@@ -1,8 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Router } from "express";
-import { NotFound, UnprocessableEntity } from 'http-errors';
-import z, { ZodError } from 'zod';
+import { NotFound } from 'http-errors';
+import z from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
 

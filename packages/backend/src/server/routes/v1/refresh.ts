@@ -1,10 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { hash } from 'bcrypt';
 import { Router } from "express";
 import { BadRequest, NotFound } from 'http-errors';
 import { getRefreshToken, getToken, refresh } from '../../../lib/auth';
 import { $t } from '../../../lib/locale/locale';
-import { decode } from 'jsonwebtoken';
 
 export default function (db: PrismaClient) {
     const router = Router();

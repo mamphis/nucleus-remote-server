@@ -1,9 +1,8 @@
-import { PrismaClient, $Enums } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
+import { NotFound } from 'http-errors';
+import { z } from "zod";
 import { AuthResponse, auth } from "../../../lib/auth";
-import { ZodError, z } from "zod";
-import { NotFound, UnprocessableEntity } from 'http-errors';
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {

@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from "@prisma/client/runtime/library";
+import { compare, hash } from "bcrypt";
 import { Router } from "express";
-import { Forbidden, BadRequest, NotFound, UnprocessableEntity } from 'http-errors';
+import { BadRequest, Forbidden, NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
+import { $t } from "../../../lib/locale/locale";
 import mailer from "../../../lib/mailer";
 import { randomString } from "../../../lib/util";
-import { compare, hash } from "bcrypt";
-import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router();

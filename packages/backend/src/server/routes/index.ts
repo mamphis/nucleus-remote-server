@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { NotFound } from 'http-errors';
-import v1 from './v1';
 import { $t } from "../../lib/locale/locale";
+import v1 from './v1';
 
 const router = Router();
 

@@ -4,9 +4,9 @@ import { Router } from "express";
 import { Forbidden, NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
 import { AuthResponse, auth } from "../../../lib/auth";
+import { $t } from "../../../lib/locale/locale";
 import mailer from "../../../lib/mailer";
 import { randomString } from "../../../lib/util";
-import { $t } from "../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router();

@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client"
-import { Logger } from "./logger";
+import { PrismaClient } from "@prisma/client";
 import { schedule } from 'node-cron';
+import { Logger } from "./logger";
 
 const removeDanglingTasks = async () => {
     const db = new PrismaClient();

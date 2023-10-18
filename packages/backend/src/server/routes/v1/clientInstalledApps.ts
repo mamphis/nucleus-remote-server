@@ -1,12 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { randomUUID } from "crypto";
 import { Router } from "express";
-import { BadRequest, Forbidden, UnprocessableEntity, NotFound } from 'http-errors';
-import { ZodError, z } from "zod";
+import { Forbidden, NotFound } from 'http-errors';
+import { z } from "zod";
 import { AuthResponse, ClientAuthResponse, auth, clientAuth, isFeatureEnabled } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
-import { createNotification } from "../../../lib/notification";
 
 export default function (db: PrismaClient) {
     const router = Router({ mergeParams: true });
