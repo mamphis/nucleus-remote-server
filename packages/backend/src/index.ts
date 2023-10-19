@@ -13,15 +13,18 @@ import { z } from 'zod';
 import { zodI18nMap } from 'zod-i18n-map';
 import deTranslations from 'zod-i18n-map/locales/de/zod.json';
 import mailer from './lib/mailer';
-import init from './lib/tasks';
+import initTasks from './lib/tasks';
 import { Server } from './server/server';
 
 const port = Number(process.env.PORT);
 
 const start = async () => {
+    const timer = Logger.timer('server-start')
     try {
         const db = new PrismaClient();
+        timer.log('PrismaClient initialized');
         await db.$connect();
+        timer.log('Database connected');
         if (await needSeed(db)) {
             Logger.info('Empty database found. Seeding database.');
             await seed(db);
@@ -33,9 +36,11 @@ const start = async () => {
             });
         });
 
+        timer.log('Database seeded');
         db.user.findFirstOrThrow({ where: { permission: { some: { scope: 'special:admin' } } } }).then(admin => {
             seedAdmin(db, admin);
         });
+        timer.log('Admin seeded');
     } catch (e: unknown) {
         if (e instanceof PrismaClientInitializationError) {
             Logger.fatal(e.message);
@@ -43,11 +48,12 @@ const start = async () => {
         }
     }
 
-    await mailer.init();
-
+    timer.log('Database ready');
+    mailer.init();
+    timer.log('Mailer ready');
     const server = new Server(port);
     server.configure();
-
+    timer.log('Server configured');
     i18next.init({
         lng: 'de',
         resources: {
@@ -55,15 +61,18 @@ const start = async () => {
         },
     });
     z.setErrorMap(zodI18nMap);
-
+    timer.log('i18n ready');
     await server.start().catch(e => {
         if (e.code === 'EADDRINUSE') {
             Logger.fatal('Cannot start server because the port is already in use: ' + port);
             process.exit(1);
         }
     });
+    timer.log('Server started');
 
-    init();
+    initTasks();
+    timer.log('Tasks initialized');
+    timer.stop();
 }
 
 start();

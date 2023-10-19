@@ -5,7 +5,7 @@ const translations: Record<string, string> = {
     'button.submit': 'Invia',
     'clients.clients': 'Client',
     'configurations.configurations': 'Configurazioni',
-    'configurations.newConfigurtion': 'Nuova Configurazione',
+    'configurations.newConfiguration': 'Nuova Configurazione',
     'createShortcutTask.arguments': 'Argomenti',
     'createShortcutTask.linkDirectory': 'Cartella Link',
     'createShortcutTask.linkName': 'Nome Link',

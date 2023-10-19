@@ -17,7 +17,7 @@ const configurations = await request.$get<ApiConfiguration[]>('configurations');
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
                 <button class="button" v-if="hasPermission(user, 'create:configuration')"
                     @click="$router.push('/new-configuration')">
-                    {{ $t('configurations.newConfigurtion') }}</button>
+                    {{ $t('configurations.newConfiguration') }}</button>
             </div>
         </div>
         <div class="column is-full">

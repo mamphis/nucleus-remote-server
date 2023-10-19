@@ -24,6 +24,22 @@ export class Logger {
         channel(message, ...args);
     }
 
+    static timer = (name: string) => {
+        const start = new Date();
+        return {
+            log: (msg: string) => {
+                const end = new Date();
+                const time = end.getTime() - start.getTime();
+                Logger.verbose(`${name}: ${time}ms: ${msg}`);
+            },
+            stop: () => {
+                const end = new Date();
+                const time = end.getTime() - start.getTime();
+                Logger.verbose(`${name}: ${time}ms: end`);
+            }
+        }
+    }
+
     static verbose = this.log.bind(this, '[v]', console.log);
     static debug = this.log.bind(this, '[d]', console.log);
     static info = this.log.bind(this, '[i]', console.log);

@@ -120,6 +120,7 @@ class Mailer {
     private uiBaseUrl = '';
 
     async init() {
+        const timer  = Logger.timer('mailer-init');
         const host = process.env.MAIL_HOST;
         const port = Number(process.env.MAIL_PORT);
         const secure = process.env.MAIL_IS_SECURE?.toLowerCase() === 'true';
@@ -133,7 +134,7 @@ class Mailer {
         }
 
         this.uiBaseUrl = baseUrl;
-
+        timer.log('Mailer configured');
         this.transporter = nodemailer.createTransport({
             host,
             auth: {
@@ -143,11 +144,13 @@ class Mailer {
             port,
             secure,
         });
-
+        timer.log('Mailer created');
         await this.transporter.verify().catch(err => {
             Logger.warn('Cannot initialize mailer because transporter cannot verify: ', err);
             this.transporter = undefined;
         });
+        timer.log('Mailer verified');
+        timer.stop();
     }
 
     async sendRegistrationMail(user: Pick<User, 'email' | 'onetimePassword' | 'username'>) {
