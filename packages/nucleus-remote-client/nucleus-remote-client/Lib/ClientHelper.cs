@@ -37,9 +37,9 @@ namespace nucleus_remote_client.Lib
                   new Claim("clientId", hostSettings.Id??""),
                   new Claim("tenantId", hostSettings.TenantId??""),
                   new Claim("keyId", hostSettings.KeyId??""),
+                  new Claim("iat", now.ToBinary().ToString()),
               },
               expires: now.AddMinutes(5),
-              notBefore: now,
               signingCredentials: signingCredentials
             );
 
