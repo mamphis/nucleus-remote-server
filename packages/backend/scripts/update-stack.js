@@ -22,9 +22,8 @@ const start = async () => {
     console.log('PORTAINER_STACK_WEBHOOK:', url);
 
     // make a post request using the https request method and using the agent
-    const req = request({
+    const req = request(url, {
         method: 'POST',
-        url,
         rejectUnauthorized: false,
     }, (response) => {
         console.log('Status Code:', response.statusCode);
