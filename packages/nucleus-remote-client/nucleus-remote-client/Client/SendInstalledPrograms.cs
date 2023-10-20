@@ -40,14 +40,14 @@ namespace nucleus_remote_client.Client
                 RegistryKey = registryKey;
             }
         }
-        [SupportedOSPlatform("windows")]
-        public async Task ExecuteAsync(HostSettings hostSettings)
-        {
-            if (!await FeatureFlags.IsFeatureEnabled(hostSettings, "f-1.0.8-installed_apps"))
-            {
-                return;
-            }
 
+
+        [SupportedOSPlatformGuard("windows")]
+        private readonly bool _isWindows = OperatingSystem.IsWindows();
+
+        [SupportedOSPlatform("windows")]
+        private static async Task WindowsSendInstalledPrograms(HostSettings hostSettings)
+        {
             string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             string registry_key_32 = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
 
@@ -97,6 +97,19 @@ namespace nucleus_remote_client.Client
             if (!_response.IsSuccessStatusCode)
             {
                 await SendLog.Error(hostSettings, await _response.Content.ReadAsStringAsync());
+            }
+        }
+
+        public async Task ExecuteAsync(HostSettings hostSettings)
+        {
+            if (!await FeatureFlags.IsFeatureEnabled(hostSettings, "f-1.0.8-installed_apps"))
+            {
+                return;
+            }
+
+            if (_isWindows)
+            {
+                await WindowsSendInstalledPrograms(hostSettings);
             }
         }
 

@@ -4,6 +4,7 @@ using nucleus_remote_client.Lib;
 using nucleus_remote_client.Tasks;
 using System.Diagnostics;
 using System.Runtime.Versioning;
+using System.Timers;
 
 namespace nucleus_remote_client
 {
@@ -18,18 +19,47 @@ namespace nucleus_remote_client
             _hostSettings = hostSettings.Value;
         }
 
-        [SupportedOSPlatformGuard("windows")]
-        private readonly bool _isWindows = OperatingSystem.IsWindows();
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            if (_hostSettings.PrivateKey == null)
+            {
+                // Download the new settingsFile
+                var client = ClientHelper.GetHttpClient(_hostSettings);
+                try
+                {
+                    var appSettingsContent = await client.GetStringAsync($"c2/{_hostSettings.Id}/upgrade", stoppingToken);
+
+                    File.WriteAllText("appsettings.json", appSettingsContent);
+                    // Restart this application
+                    Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? throw new InvalidOperationException());
+                    Environment.Exit(0);
+                }
+                catch (HttpRequestException)
+                {
+                    Thread.Sleep(10000);
+                    Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? throw new InvalidOperationException());
+                    Environment.Exit(0);
+                }
+            }
+
+            var timer = new System.Timers.Timer();
+            timer.AutoReset = true;
+            timer.Interval = TimeSpan.FromMinutes(30).TotalMilliseconds;
+            timer.Elapsed += async (sender, e) =>
+            {
+                if (!stoppingToken.IsCancellationRequested)
+                {
+                    await Try(new SendInstalledPrograms(), _hostSettings);
+                    StartUpdater();
+                }
+            };
+
+            timer.Start();
+
             StartUpdater();
             var pinger = new SendPing();
-            var executer = new GetConfigurationTasks();
-            if (_isWindows)
-            {
-                await new SendInstalledPrograms().ExecuteAsync(_hostSettings);
-            }
+            var executer = new GetConfigurationTasks(); 
+            await Try(new SendInstalledPrograms(), _hostSettings);
 
             while (!stoppingToken.IsCancellationRequested)
             {

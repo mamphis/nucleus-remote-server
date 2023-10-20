@@ -16,6 +16,9 @@ namespace nucleus_remote_client.Client
         public int Pid { get; set; }
         public string Cwd { get; set; }
         public DateTime SystemStartupTime { get; set; }
+
+        private string[] IpAddresses;
+
         public string Memory { get; set; }
         public TimeSpan ProcessorTime { get; set; }
         public TimeSpan RunTime { get; set; }
@@ -28,6 +31,12 @@ namespace nucleus_remote_client.Client
             this.RunTime = DateTime.Now - proc.StartTime;
             this.Cwd = Environment.CurrentDirectory;
             this.SystemStartupTime = DateTime.Now.AddMilliseconds(-Environment.TickCount64);
+            // Get all ip addresses
+            this.IpAddresses = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
+                .SelectMany(x => x.GetIPProperties().UnicastAddresses)
+                .Where(x => x.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                .Select(x => x.Address.ToString())
+                .ToArray();
         }
 
         public async Task ExecuteAsync(HostSettings hostSettings)
@@ -41,6 +50,11 @@ namespace nucleus_remote_client.Client
                 processorTime = this.ProcessorTime,
                 cwd = this.Cwd,
                 this.SystemStartupTime,
+                ipAddress = string.Join(", ", this.IpAddresses),
+                elevated = Environment.IsPrivilegedProcess.ToString(),
+                ram = Environment.SystemPageSize / 1024.0 / 1024.0 / 1024.0 + " Gb",
+                arch = Environment.Is64BitOperatingSystem ? "x64" : "x86",
+                drives = string.Join(", ", Environment.GetLogicalDrives()),
             });
         }
     }
