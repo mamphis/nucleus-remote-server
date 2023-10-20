@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
     "docker:build": "docker build . -t docker.home.int/nrs-backend:$(npm pkg get version | sed 's/\"//g') -t docker.home.int/nrs-backend:latest",
     "docker:push": " docker push --all-tags docker.home.int/nrs-backend",
-    "docker:deploy": "npm run patch && npm run docker:build && npm run docker:push",
+    "docker:deploy": "npm run patch && npm run docker:build && npm run docker:push && npm run portainer:pull",
     "portainer:pull": "node scripts/update-stack.js",
     "patch": "npm version patch --git-tag-version=false"
   },

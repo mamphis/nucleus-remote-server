@@ -169,7 +169,7 @@ const deleteGroup = async () => {
                     </div>
                     <a class="panel-block" v-for="client in group.client" :key="client.id">
                         <div class="control is-expanded" @click="$router.push(`/clients/${client.id}`)">
-                            {{ client.username }} - {{ client.hostname }}
+                            <input type="checkbox" :checked="client.active" disabled>&nbsp;{{ client.username }} - {{ client.hostname }}
                         </div>
                         <button class="button is-danger is-small" @mousedown="removeSelectedClient(client)">
                             x

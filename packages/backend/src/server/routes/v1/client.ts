@@ -5,7 +5,7 @@ import { Forbidden } from 'http-errors';
 import { z } from "zod";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
-import { getKeyPair } from "../../../lib/util";
+import { generateConfigurationFile, getKeyPair } from "../../../lib/util";
 import clientInstalledApps from "./clientInstalledApps";
 
 export default function (db: PrismaClient) {
@@ -78,21 +78,7 @@ export default function (db: PrismaClient) {
             return [key, client];
         });
 
-        res.send(JSON.stringify({
-            "Logging": {
-                "LogLevel": {
-                    "Default": "Information",
-                    "Microsoft.Hosting.Lifetime": "Information"
-                }
-            },
-            "HostSettings": {
-                "BaseUrl": `${req.header('x-forwarded-proto') ?? req.protocol}://${req.get('host')}/api/v1/`,
-                "Id": client.id,
-                "TenantId": res.locals.user.tenantId,
-                "KeyId": key.id,
-                "PrivateKey": privateKey,
-            }
-        }, undefined, 4));
+        res.send(generateConfigurationFile(req, client.id, res.locals.user.tenantId, key.id, privateKey));
     });
 
     router.get('/:clientId', auth('read:client'), async (req, res: AuthResponse, next) => {
