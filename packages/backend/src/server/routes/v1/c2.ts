@@ -43,7 +43,9 @@ export default function (db: PrismaClient) {
 
             // Check if the hostname is the same. Otherwise it may be a duplicate configuration
             if (existingClient) {
-                if (existingClient.hostname !== clientData.hostname) {
+                if (existingClient.hostname === '') {
+                    await createNotification('Medium', 'notification.clientFirstTimeSeen', tenant.id, clientData.hostname);
+                } else if (existingClient.hostname !== clientData.hostname) {
                     await createNotification('High', 'notification.differentHostname', tenant.id, existingClient.hostname, clientData.hostname);
                 }
             }

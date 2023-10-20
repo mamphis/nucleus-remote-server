@@ -28,6 +28,7 @@ const translations = {
     'error.prisma.invalidInput': 'Die Eingabe "{0}" ist nicht gültig.',
     'error.prisma.timeout': 'Die Verbindung zur Datenbank wurde beendet, da sie zeitlich überschritten wurde.',
     'features.installed-apps': 'Anzeige der Installierten Anwendungen des Clients.',
+    'clientFirstTimeSeen': 'Der Client hat sich zum ersten mal am System angemeldet. Hostname: {0}',
     'notification.differentHostname': 'Ein Client mit einem anderen Hostnamen wurde mit der gleichen ID verbunden. Ursprünglicher Hostname: {0}, neuer Hostname: {1}',
     'notification.maxClientReached': 'Das Client-Limit ist erreicht. Der neue Client wird hinzugefügt, aber deaktiviert.',
     'notification.serverRestart': 'Der Server wurde neu gestartet.',

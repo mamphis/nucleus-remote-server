@@ -30,6 +30,7 @@ const translations = {
     'error.prisma.invalidInput': 'The input "{0}" is not valid.',
     'error.prisma.timeout': 'A connection to the database has been timed out.',
     'features.installed-apps': 'View installed Applications for the client',
+    'notification.clientFirstTimeSeen': 'The client has logged on to the system for the first time. Hostname: {0}',
     'notification.differentHostname': 'A client from a different hostname has been connected with the same id. Original Hostname: {0}, New Hostname: {1}',
     'notification.maxClientReached': 'The client limit is reached. The new Client will be added, but deactivated.',
     'notification.serverRestart': 'The server was restarted.',
