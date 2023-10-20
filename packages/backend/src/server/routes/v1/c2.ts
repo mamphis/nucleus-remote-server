@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { BadRequest } from 'http-errors';
+import { BadRequest, NotFound, Forbidden } from 'http-errors';
 import { z } from "zod";
 import { ClientAuthResponse, clientAuth } from "../../../lib/auth";
+import { generateConfigurationFile, getIpFromRequest, getKeyPair } from "../../../lib/util";
 import { $t } from "../../../lib/locale/locale";
 import { createNotification } from "../../../lib/notification";
 import clientInstalledApps from "./clientInstalledApps";
@@ -175,6 +176,37 @@ export default function (db: PrismaClient) {
         } catch (e: unknown) {
             return next(e);
         }
+    });
+
+    router.get('/:clientId/upgrade', async (req, res, next) => {
+        // get the client
+        const client = await db.client.findFirst({
+            where: {
+                id: req.params.clientId,
+            },
+        });
+
+        if (!client) {
+            return next(NotFound($t(req, 'error.404.noClientFound', req.params.clientId)));
+        }
+
+        // Check if client still has the default key
+        if (client.keyId !== 'default') {
+            createNotification('High', 'notification.clientAlreadyUpdated', client.tenantId, getIpFromRequest(req));
+            return next(Forbidden($t(req, 'error.403.clientAlreadyUpdated', req.params.clientId)));
+        }
+
+        // Generate a new KeyPair
+        const { privateKey, publicKey } = await getKeyPair();
+        // Genarate a key and save the public key
+        const key = await db.key.create({
+            data: {
+                publicKey,
+                clients: { connect: { id: client.id } },
+            }
+        });
+
+        res.send(generateConfigurationFile(req, client.id, client.tenantId, key.id, privateKey));
     });
 
     router.use('/:clientId/installedApps', clientInstalledApps(db));

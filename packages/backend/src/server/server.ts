@@ -9,6 +9,7 @@ import system from './routes/system';
 
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
 import { handlePrismaClientKnownRequestError } from '../lib/locale/prismaError';
+import { getIpFromRequest } from '../lib/util';
 
 export class Server {
     private app: Application;
@@ -32,9 +33,11 @@ export class Server {
             const start = new Date().getTime();
             next();
             res.on('finish', () => {
-                Logger.debug(`Request from ${req.socket.remoteAddress} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, `${new Date().getTime() - start}ms`);
+                Logger.debug(`Request from ${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, `${new Date().getTime() - start}ms`);
             });
-
+            res.on('error', (err) => {
+                Logger.error(`Request from ${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, err);
+            });
         });
 
         this.app.use('/api', api);
