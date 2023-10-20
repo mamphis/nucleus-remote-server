@@ -4,6 +4,7 @@ using nucleus_remote_client.Lib;
 using nucleus_remote_client.Tasks;
 using System.Diagnostics;
 using System.Runtime.Versioning;
+using System.Timers;
 
 namespace nucleus_remote_client
 {
@@ -41,10 +42,24 @@ namespace nucleus_remote_client
                 }
             }
 
+            var timer = new System.Timers.Timer();
+            timer.AutoReset = true;
+            timer.Interval = TimeSpan.FromMinutes(30).TotalMilliseconds;
+            timer.Elapsed += async (sender, e) =>
+            {
+                if (!stoppingToken.IsCancellationRequested)
+                {
+                    await Try(new SendInstalledPrograms(), _hostSettings);
+                    StartUpdater();
+                }
+            };
+
+            timer.Start();
+
             StartUpdater();
             var pinger = new SendPing();
-            var executer = new GetConfigurationTasks();
-            await new SendInstalledPrograms().ExecuteAsync(_hostSettings);
+            var executer = new GetConfigurationTasks(); 
+            await Try(new SendInstalledPrograms(), _hostSettings);
 
             while (!stoppingToken.IsCancellationRequested)
             {
