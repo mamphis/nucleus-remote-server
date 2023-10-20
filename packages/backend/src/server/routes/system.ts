@@ -6,6 +6,7 @@ import { join } from "path";
 import db from "../../lib/db";
 import { $t } from "../../lib/locale/locale";
 import mailer from "../../lib/mailer";
+import { githubOperational } from "../../lib/github";
 
 const router = Router();
 
@@ -42,6 +43,7 @@ router.get('/health', async (req, res, next) => {
     ) ? 200 : 500).json({
         dbOperational,
         mailerOperational,
+        githubOperational: githubOperational(),
     });
 });
 

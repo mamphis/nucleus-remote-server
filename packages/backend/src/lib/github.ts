@@ -1,5 +1,7 @@
 import { Logger } from "./logger";
-
+export const githubOperational = () => {
+    return !!process.env.GITHUB_PAT;
+}
 export const createIssue = async (user: { username: string }, body: string): Promise<false | { id: number; number: number }> => {
     const pat = process.env.GITHUB_PAT;
     if (!pat) {
