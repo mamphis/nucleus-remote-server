@@ -14,13 +14,22 @@ namespace nucleus_remote_client.Lib
                 BaseAddress = new Uri(hostSettings.BaseUrl ?? ""),
             };
 
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GetAuthToken(hostSettings));
+            var token = GetAuthToken(hostSettings);
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
 
             return client;
         }
 
         private static string GetAuthToken(HostSettings hostSettings)
         {
+            if (string.IsNullOrEmpty(hostSettings.PrivateKey))
+            {
+                return "";
+            }
+
             using var rsa = RSA.Create();
             rsa.ImportFromPem(hostSettings.PrivateKey);
 

@@ -18,18 +18,33 @@ namespace nucleus_remote_client
             _hostSettings = hostSettings.Value;
         }
 
-        [SupportedOSPlatformGuard("windows")]
-        private readonly bool _isWindows = OperatingSystem.IsWindows();
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            if (_hostSettings.PrivateKey == null)
+            {
+                // Download the new settingsFile
+                var client = ClientHelper.GetHttpClient(_hostSettings);
+                try
+                {
+                    var appSettingsContent = await client.GetStringAsync($"c2/{_hostSettings.Id}/upgrade", stoppingToken);
+
+                    File.WriteAllText("appsettings.json", appSettingsContent);
+                    // Restart this application
+                    Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? throw new InvalidOperationException());
+                    Environment.Exit(0);
+                }
+                catch (HttpRequestException)
+                {
+                    Thread.Sleep(10000);
+                    Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? throw new InvalidOperationException());
+                    Environment.Exit(0);
+                }
+            }
+
             StartUpdater();
             var pinger = new SendPing();
             var executer = new GetConfigurationTasks();
-            if (_isWindows)
-            {
-                await new SendInstalledPrograms().ExecuteAsync(_hostSettings);
-            }
+            await new SendInstalledPrograms().ExecuteAsync(_hostSettings);
 
             while (!stoppingToken.IsCancellationRequested)
             {
