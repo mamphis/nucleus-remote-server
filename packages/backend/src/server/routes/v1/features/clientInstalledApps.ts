@@ -2,13 +2,17 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { Forbidden, NotFound } from 'http-errors';
 import { z } from "zod";
-import { AuthResponse, ClientAuthResponse, auth, clientAuth, isFeatureEnabled } from "../../../lib/auth";
-import { $t } from "../../../lib/locale/locale";
+import { AuthResponse, ClientAuthResponse, auth, clientAuth, isFeatureEnabled } from "../../../../lib/auth";
+import { $t } from "../../../../lib/locale/locale";
 
 export default function (db: PrismaClient) {
     const router = Router({ mergeParams: true });
 
     router.put(`/`, clientAuth(), async (req, res: ClientAuthResponse, next) => {
+        if (!await isFeatureEnabled(res.locals.client, 'f-1.0.8-installed_apps')) {
+            return next(Forbidden($t(req, 'error.403.featureNotEnabled')))
+        }
+
         const schema = z.array(z.object({
             name: z.string(),
             version: z.string(),

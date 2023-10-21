@@ -6,7 +6,9 @@ import { ClientAuthResponse, clientAuth } from "../../../lib/auth";
 import { generateConfigurationFile, getIpFromRequest, getKeyPair } from "../../../lib/util";
 import { $t } from "../../../lib/locale/locale";
 import { createNotification } from "../../../lib/notification";
-import clientInstalledApps from "./clientInstalledApps";
+import clientInstalledApps from "./features/clientInstalledApps";
+import clientLocalDrives from "./features/clientLocalDrives";
+import { Logger } from "../../../lib/logger";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -142,21 +144,29 @@ export default function (db: PrismaClient) {
         const { clientId } = res.locals.client;
         try {
             const clientDetailsData = schema.parse(req.body);
-            await db.client.update({
-                where: {
-                    id: clientId,
-                },
-                data: {
-                    clientDetail: {
-                        set: Object.entries(clientDetailsData).map((value) => ({
+            for (const key in clientDetailsData) {
+                if (Object.prototype.hasOwnProperty.call(clientDetailsData, key)) {
+                    const value = clientDetailsData[key];
+                    await db.clientDetail.upsert({
+                        where: {
                             key_clientId: {
                                 clientId,
-                                key: value[0],
-                            }, value: value[1].toString()
-                        })),
-                    }
+                                key,
+                            }
+                        },
+                        create: {
+                            key,
+                            clientId,
+                            value: value.toString(),
+                        },
+                        update: {
+                            key,
+                            clientId,
+                            value: value.toString(),
+                        }
+                    });
                 }
-            });
+            }
 
             const clientDetails = await db.clientDetail.findMany({
                 where: {
@@ -203,5 +213,6 @@ export default function (db: PrismaClient) {
 
     router.use('/:clientId/installedApps', clientInstalledApps(db));
 
+    router.use('/:clientId/localDrives', clientLocalDrives(db));
     return router;
 }

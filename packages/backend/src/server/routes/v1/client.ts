@@ -6,7 +6,8 @@ import { z } from "zod";
 import { AuthResponse, auth } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
 import { generateConfigurationFile, getKeyPair } from "../../../lib/util";
-import clientInstalledApps from "./clientInstalledApps";
+import clientInstalledApps from "./features/clientInstalledApps";
+import clientLocalDrives from "./features/clientLocalDrives";
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -207,6 +208,7 @@ export default function (db: PrismaClient) {
     });
 
     router.use('/:clientId/installedApps', clientInstalledApps(db));
+    router.use('/:clientId/localDrives', clientLocalDrives(db));
 
     return router;
 }

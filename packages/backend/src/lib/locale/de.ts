@@ -28,6 +28,7 @@ const translations = {
     'error.prisma.invalidId': 'Die ID "{0}" ist nicht gültig.',
     'error.prisma.invalidInput': 'Die Eingabe "{0}" ist nicht gültig.',
     'error.prisma.timeout': 'Die Verbindung zur Datenbank wurde beendet, da sie zeitlich überschritten wurde.',
+    'features.drive-monitor': 'Anzeige der lokalen Laufwerke des Clients.',
     'features.installed-apps': 'Anzeige der Installierten Anwendungen des Clients.',
     'clientFirstTimeSeen': 'Der Client hat sich zum ersten mal am System angemeldet. Hostname: {0}',
     'notification.clientAlreadyUpdated': 'Ein Client hat versucht sich erneut zu updated. IP: {0}, Client {1}',

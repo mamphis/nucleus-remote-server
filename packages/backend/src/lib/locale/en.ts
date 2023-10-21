@@ -30,6 +30,7 @@ const translations = {
     'error.prisma.invalidId': 'The id "{0}" is not valid.',
     'error.prisma.invalidInput': 'The input "{0}" is not valid.',
     'error.prisma.timeout': 'A connection to the database has been timed out.',
+    'features.drive-monitor': 'View local drives for the client',
     'features.installed-apps': 'View installed Applications for the client',
     'notification.clientAlreadyUpdated': 'The client has already been updated. IP: {0}, Client {1}',
     'notification.clientFirstTimeSeen': 'The client has logged on to the system for the first time. Hostname: {0}',

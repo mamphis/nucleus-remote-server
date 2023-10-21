@@ -9,6 +9,7 @@ const needSeed = async (db: PrismaClient): Promise<boolean> => {
 const seedFeatureFlags = async (db: PrismaClient, tenant: { id: string; }) => {
     const features: Array<{ id: string, name: string }> = [
         { id: 'f-1.0.8-installed_apps', name: 'features.installed-apps' },
+        { id: 'f-1.0.12-drive_monitor', name: 'features.drive-monitor' },
     ];
 
     return Promise.all(features.map(f => {

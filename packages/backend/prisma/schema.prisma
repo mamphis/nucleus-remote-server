@@ -50,6 +50,7 @@ model Client {
   installedApps InstalledApps[]
   tenantId      String
   keyId         String
+  localDrive    LocalDrive[]
 }
 
 model Group {
@@ -175,6 +176,33 @@ model InstalledApps {
   client Client @relation(fields: [clientId], references: [id])
 
   @@id([clientId, name])
+}
+
+model LocalDrive {
+  clientId         String
+  driveLetter      String
+  driveDescription String
+  driveType        String
+  driveFileSystem  String
+  driveSize        BigInt
+  driveFreeSpace   BigInt
+
+  client            Client              @relation(fields: [clientId], references: [id])
+  localDriveHistory LocalDriveHistory[]
+
+  @@id([clientId, driveLetter])
+}
+
+model LocalDriveHistory {
+  clientId       String
+  timestamp      DateTime @default(now())
+  driveLetter    String
+  driveSize      BigInt
+  driveFreeSpace BigInt
+
+  localDrive LocalDrive @relation(fields: [clientId, driveLetter], references: [clientId, driveLetter])
+
+  @@id([clientId, driveLetter, timestamp])
 }
 
 model History {

@@ -83,7 +83,7 @@ export function hasPermission(user: AuthUser | User, ...requiredPermissions: str
     return requiredPermissions.every(p => getPermissions(userToCheck).some(up => up.endsWith(p)));
 }
 
-export async function isFeatureEnabled(user: AuthUser | User, featureId: string): Promise<boolean> {
+export async function isFeatureEnabled(user: { tenantId: string }, featureId: string): Promise<boolean> {
     const feature = await db.featureFlag.findFirst({
         where: {
             tenantId: user.tenantId,
