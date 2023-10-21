@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { schedule } from 'node-cron';
-import { Logger } from "./logger";
 import db from "./db";
+import { Logger } from "./logger";
 
 const removeDanglingTasks = async () => {
     const tasksBefore = await db.task.count();
@@ -66,11 +65,28 @@ const saveHistoricData = async () => {
     Logger.info(`Task "saveHistoricData" has run. Saved ${activeClients.length} active clients and ${totalClients.length} total clients.`);
 }
 
+const cleanupUnusedKeys = async () => {
+    const { count } = await db.key.deleteMany({
+        where: {
+            clients: {
+                none: {},
+            },
+            id: {
+                not: 'default',
+            },
+        }
+    });
+
+    Logger.info(`Task "cleanupUnusedKeys" has run. Removed ${count} unused keys.`);
+}
+
 const init = () => {
     // Run every second day at 03:00 in the morning
     schedule("0 3 * * */2", removeDanglingTasks, { name: 'removeDanglingTasks', runOnInit: true });
     // Run every day at 23:55 in the evening
     schedule('55 23 * * *', saveHistoricData, { name: 'saveHistoricData' });
+    // Run every second day at 03:00 in the morning
+    schedule("0 3 * * */2", cleanupUnusedKeys, { name: 'cleanupUnusedKeys', runOnInit: true });
 }
 
 export default init;
