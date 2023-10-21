@@ -1,7 +1,6 @@
 import { configDotenv } from 'dotenv';
 configDotenv();
 
-import { PrismaClient } from "@prisma/client";
 import { Logger } from './lib/logger';
 import { isProduction } from './lib/util';
 import { needSeed, seed, seedAdmin, seedFeatureFlags } from "./seed";
@@ -12,6 +11,7 @@ import i18next from 'i18next';
 import { z } from 'zod';
 import { zodI18nMap } from 'zod-i18n-map';
 import deTranslations from 'zod-i18n-map/locales/de/zod.json';
+import db from './lib/db';
 import mailer from './lib/mailer';
 import initTasks from './lib/tasks';
 import { Server } from './server/server';
@@ -21,7 +21,6 @@ const port = Number(process.env.PORT);
 const start = async () => {
     const timer = Logger.timer('server-start')
     try {
-        const db = new PrismaClient();
         timer.log('PrismaClient initialized');
         await db.$connect();
         timer.log('Database connected');

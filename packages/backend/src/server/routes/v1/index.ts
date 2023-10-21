@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { NotFound } from 'http-errors';
+import db from "../../../lib/db";
 import { $t } from "../../../lib/locale/locale";
 import c2 from "./c2";
 import clients from './client';
@@ -19,7 +19,6 @@ import users from './user';
 import verify from './verify';
 
 const router = Router();
-const db = new PrismaClient();
 
 router.use('/login', login(db));
 router.use('/verify', verify(db));
