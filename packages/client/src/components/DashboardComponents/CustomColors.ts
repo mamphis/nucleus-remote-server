@@ -16,7 +16,7 @@ const customColorPlugin: (colors: ColorDefinition[]) => Plugin = (colors: ColorD
             if (typeof color === 'string') {
                 dataset.borderColor = color;
                 if (color.startsWith('rgb')) {
-                    let intensity  = 0.1;
+                    let intensity  = 0.2;
                     
                     if (controller instanceof DoughnutController) {
                         intensity = 0.5;

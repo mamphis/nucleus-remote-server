@@ -192,8 +192,8 @@ export default function (db: PrismaClient) {
 
         // Check if client still has the default key
         if (client.keyId !== 'default') {
-            createNotification('High', 'notification.clientAlreadyUpdated', client.tenantId, getIpFromRequest(req));
-            return next(Forbidden($t(req, 'error.403.clientAlreadyUpdated', req.params.clientId)));
+            createNotification('High', 'notification.clientAlreadyUpdated', client.tenantId, getIpFromRequest(req), client.id);
+            return next(Forbidden($t(req, 'error.403.clientAlreadyUpdated', client.id)));
         }
 
         // Generate a new KeyPair

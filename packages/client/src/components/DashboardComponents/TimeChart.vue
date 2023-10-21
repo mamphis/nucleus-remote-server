@@ -7,7 +7,7 @@ import { computed } from 'vue';
 import customColors from './CustomColors';
 const colors: string[] = [
     'rgb(255, 99, 132)',
-    'rgb(75, 192, 192)',
+    'rgb(52, 220, 192)',
     'rgb(54, 162, 235)',
     'rgb(255, 159, 64)',
     'rgb(153, 102, 255)',
