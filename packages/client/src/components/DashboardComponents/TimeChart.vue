@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import type { TimeSeriesPoint } from '@/types/dashboard';
-import { CategoryScale, Chart, Legend, LineElement, LinearScale, Colors, PointElement, Title, Tooltip } from 'chart.js';
+import { CategoryScale, Chart, Legend, LineElement, LinearScale, PointElement, Title, Tooltip, Filler } from 'chart.js';
 import { Line } from 'vue-chartjs';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { computed } from 'vue';
-Chart.register(zoomPlugin, Colors, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale);
+import customColors from './CustomColors';
+const colors: string[] = [
+    'rgb(255, 99, 132)',
+    'rgb(75, 192, 192)',
+    'rgb(54, 162, 235)',
+    'rgb(255, 159, 64)',
+    'rgb(153, 102, 255)',
+]
+Chart.register(zoomPlugin, Title, Tooltip, Legend, Filler, customColors(colors), LineElement, PointElement, CategoryScale, LinearScale);
 
 const props = defineProps<{
     timeSeries: Array<{ data: TimeSeriesPoint[], label: string }>,
@@ -33,16 +41,20 @@ const chartOptions = {
                 mode: 'xy',
 
             }, limits: {
-                y: { min: 0, max: 'original' }
+                y: { min: -2, max: 'original' }
             },
             zoom: {
                 wheel: {
                     enabled: true,
+                    modifierKey: 'ctrl',
                 },
                 pinch: {
                     enabled: true
                 },
-
+                drag: {
+                    enabled: true,
+                    modifierKey: 'ctrl',
+                },
                 mode: 'xy',
             }
         }
@@ -62,8 +74,9 @@ const data = computed(() => ({
     datasets: sortedTimeSeries.value.map(timeSeries => ({
         label: timeSeries.label,
         data: timeSeries.data.map(point => point.value),
-        fill: false,
-        tension: 0.1
+        fill: true,
+        tension: 0.2,
+        pointRadius: 2,
     }))
 }));
 
