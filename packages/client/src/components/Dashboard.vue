@@ -34,4 +34,11 @@ const dashboardData = dashboardResponse.assertNotError().toRef();
     flex: 1 auto;
     width: 30%;
 }
+
+@media screen and (max-width: 1024px) {
+    .dashboard-container>div {
+        width: 100%;
+    }
+    
+}
 </style>

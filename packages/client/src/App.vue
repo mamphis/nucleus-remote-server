@@ -6,6 +6,7 @@ import { hasPermission } from './lib/permission';
 import { notificationStore } from './stores/notification';
 import userStore from './stores/user';
 import Notification from '@/components/Notification.vue';
+import router from './router';
 const burgerActive = ref(false);
 
 const { user, isLoggedIn } = storeToRefs(userStore());
@@ -17,24 +18,23 @@ const hasTenantUser = computed(() => hasPermission(user.value, ':tenant-user'));
 const hasUser = computed(() => hasPermission(user.value, ':user'));
 
 const { unreadNotifications } = storeToRefs(notificationStore());
+
+router.beforeEach((to, from, next) => {
+    burgerActive.value = false;
+    next();
+});
 </script>
 
 <template>
     <Notification />
     <header>
         <nav class="navbar has-shadow">
-            <div class="navbar-brand">
+            <div class="navbar-brand is-flex-grow-1">
                 <a class="navbar-item" href="/">
                     <img src="@/assets/Logo.png" height="28">
                 </a>
-
-                <a role="button" class="navbar-burger" :class="{ 'is-active': burgerActive }" aria-label="menu"
-                    aria-expanded="false" @click="burgerActive = !burgerActive" data-target="navbarBasicExample">
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                </a>
             </div>
+
             <div class="navbar-menu" :class="{ 'is-active': burgerActive }">
                 <div class="navbar-start">
                     <RouterLink class="navbar-item" to="/">{{ $t('navbar.home') }}</RouterLink>
@@ -71,6 +71,13 @@ const { unreadNotifications } = storeToRefs(notificationStore());
                     <RouterLink v-if="isLoggedIn" class="navbar-item" to="/logout">{{ $t('navbar.logout') }}</RouterLink>
                 </div>
             </div>
+
+            <a role="button" class="navbar-burger" :class="{ 'is-active': burgerActive }" aria-label="menu"
+                @click="burgerActive = !burgerActive">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
         </nav>
     </header>
     <Suspense>
@@ -131,10 +138,15 @@ nav a.nav-end {
     margin-left: auto;
 }
 
+.navbar-menu.is-active {
+    position: absolute;
+    right: 0;
+}
+
 .router-view {
     height: calc(100% - var(--header-height));
     display: flex;
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: auto;
 }
 </style>
