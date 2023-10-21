@@ -142,29 +142,21 @@ export default function (db: PrismaClient) {
         const { clientId } = res.locals.client;
         try {
             const clientDetailsData = schema.parse(req.body);
-            for (const key in clientDetailsData) {
-                if (Object.prototype.hasOwnProperty.call(clientDetailsData, key)) {
-                    const value = clientDetailsData[key];
-                    await db.clientDetail.upsert({
-                        where: {
+            await db.client.update({
+                where: {
+                    id: clientId,
+                },
+                data: {
+                    clientDetail: {
+                        set: Object.entries(clientDetailsData).map((value) => ({
                             key_clientId: {
                                 clientId,
-                                key,
-                            }
-                        },
-                        create: {
-                            key,
-                            clientId,
-                            value: value.toString(),
-                        },
-                        update: {
-                            key,
-                            clientId,
-                            value: value.toString(),
-                        }
-                    });
+                                key: value[0],
+                            }, value: value[1].toString()
+                        })),
+                    }
                 }
-            }
+            });
 
             const clientDetails = await db.clientDetail.findMany({
                 where: {
