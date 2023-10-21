@@ -1,5 +1,5 @@
 import { schedule } from 'node-cron';
-import db from "./db";
+import db, { getMetrics } from "./db";
 import { Logger } from "./logger";
 
 const removeDanglingTasks = async () => {
@@ -80,6 +80,22 @@ const cleanupUnusedKeys = async () => {
     Logger.info(`Task "cleanupUnusedKeys" has run. Removed ${count} unused keys.`);
 }
 
+const saveQueryMetrics = async () => {
+    // Get the metrics
+    const metrics = getMetrics();
+    // Save the metrics
+    await db.queryMetrics.createMany({
+        data: [...metrics.entries()].map(([query, metrics]) => {
+            return {
+                query,
+                ...metrics,
+            }
+        })
+    });
+
+    Logger.info(`Task "saveQueryMetrics" has run. Saved ${metrics.size} query metrics.`);
+}
+
 const init = () => {
     // Run every second day at 03:00 in the morning
     schedule("0 3 * * */2", removeDanglingTasks, { name: 'removeDanglingTasks', runOnInit: true });
@@ -87,6 +103,8 @@ const init = () => {
     schedule('55 23 * * *', saveHistoricData, { name: 'saveHistoricData' });
     // Run every second day at 03:00 in the morning
     schedule("0 3 * * */2", cleanupUnusedKeys, { name: 'cleanupUnusedKeys', runOnInit: true });
+    // Run every 30 seconds
+    schedule("*/30 * * * * *", saveQueryMetrics, { name: 'saveQueryMetrics' });
 }
 
 export default init;

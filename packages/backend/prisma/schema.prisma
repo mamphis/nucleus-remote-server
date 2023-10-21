@@ -186,3 +186,12 @@ model History {
   tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tenantId String
 }
+
+model QueryMetrics {
+  bucketId    String   @id() @default(uuid())
+  bucketTime  DateTime @default(now())
+  query       String
+  hitCount    Int
+  avgDuration Int
+  maxDuration Int
+}
