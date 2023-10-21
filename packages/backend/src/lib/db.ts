@@ -17,6 +17,10 @@ type Metrics = {
 const queryMetrics = new Map<string, Metrics>();
 
 const updateMetrics = (query: string, duration: number) => {
+    if (query.startsWith('INSERT INTO') && query.includes('"QueryMetrics"')) {
+        return;
+    }
+    
     const metrics = queryMetrics.get(query);
     if (metrics) {
         metrics.hitCount++;

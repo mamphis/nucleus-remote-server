@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import type { TimeSeriesPoint } from '@/types/dashboard';
-import { CategoryScale, Chart, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
+import { CategoryScale, Chart, Legend, LineElement, LinearScale, Colors, PointElement, Title, Tooltip } from 'chart.js';
 import { Line } from 'vue-chartjs';
-Chart.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale)
+import zoomPlugin from 'chartjs-plugin-zoom';
+Chart.register(zoomPlugin, Colors, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale);
 
 const props = defineProps<{
     timeSeries: Array<{ data: TimeSeriesPoint[], label: string }>,
     color?: string,
     options?: {
         min?: number,
+        showTime?: boolean,
         stepSize?: number,
     },
 }>()
 
-const options = {
+const chartOptions = {
     responsive: true,
     scales: {
         y: {
@@ -22,15 +24,36 @@ const options = {
                 stepSize: props.options?.stepSize ?? 1,
             }
         }
+    },
+    plugins: {
+        zoom: {
+            pan: {
+                enabled: true,
+                mode: 'xy',
+
+            }, limits: {
+                y: { min: 0, max: 'original' }
+            },
+            zoom: {
+                wheel: {
+                    enabled: true,
+                },
+                pinch: {
+                    enabled: true
+                },
+
+                mode: 'xy',
+            }
+        }
     }
-};
+} as any;
 const sortedTimeSeries = props.timeSeries.map(timeSeries => ({
     label: timeSeries.label,
     data: timeSeries.data.sort((a, b) => a.date.localeCompare(b.date))
 }));
 // get all timestamps and parse them as label
 const labels = [...new Set(sortedTimeSeries.flatMap(timeSeries => timeSeries.data.map(point => point.date)))]
-    .map(timestamp => new Date(timestamp)).map(date => date.toLocaleDateString());
+    .map(timestamp => new Date(timestamp)).map(date => props?.options?.showTime ? date.toLocaleTimeString() : date.toLocaleDateString());
 
 const data = {
     labels,
@@ -45,5 +68,5 @@ const data = {
 </script>
 
 <template>
-    <Line :data="data" :options="options" />
+    <Line :data="data" :options="chartOptions" />
 </template>

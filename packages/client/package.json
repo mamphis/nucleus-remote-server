@@ -16,6 +16,7 @@
   "dependencies": {
     "bulma": "^0.9.4",
     "chart.js": "^4.4.0",
+    "chartjs-plugin-zoom": "^2.0.1",
     "fuzzysort": "^2.0.4",
     "pinia": "^2.1.4",
     "vue": "^3.3.4",

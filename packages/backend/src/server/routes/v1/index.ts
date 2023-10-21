@@ -2,6 +2,7 @@ import { Router } from "express";
 import { NotFound } from 'http-errors';
 import db from "../../../lib/db";
 import { $t } from "../../../lib/locale/locale";
+import admin from "./admin";
 import c2 from "./c2";
 import clients from './client';
 import configurations from './configuration';
@@ -35,6 +36,7 @@ router.use('/misc', misc(db));
 router.use('/notifications', notification(db));
 router.use('/c2', c2(db));
 router.use('/dashboard', dashboard(db));
+router.use('/admin', admin(db));
 
 router.use((req, _res, next) => {
     next(NotFound($t(req, 'error.404.invalidApiRoute', 'v1', req.baseUrl)));

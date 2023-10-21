@@ -26,6 +26,7 @@ import EditProfileView from '@/views/EditProfileView.vue';
 import IssueView from '@/views/IssueView.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
 import NotificationView from '@/views/NotificationView.vue';
+import AdminView from '@/views/Admin/AdminView.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -250,6 +251,15 @@ const router = createRouter({
                 permissions: ['read:task'],
             }
         },
+        {
+            path: '/admin',
+            name: 'Admin',
+            component: AdminView,
+            meta: {
+                authorized: true,
+                permissions: ['special:admin']
+            }
+        }
     ]
 });
 
