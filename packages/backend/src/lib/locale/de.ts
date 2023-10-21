@@ -10,7 +10,7 @@ const translations = {
     'error.400.invalidTenantIdFormat' : 'Ungültiges Id Format: {0}.',
     'error.401.invalidUsernamePassword': 'Ungültiger Benutzername oder Passwort',
     'error.401.pendingVerification': 'Ausstehende Überprüfung',
-    'error.403.cannotChangeUsersPermission': 'Sie dürfen die Berechtigungen der Benutzer nicht ändern.',
+    'error.403.cannotChangeUsersPermission': 'Sie dürfen die Berechtigungen des Benutzers nicht ändern.',
     'error.403.clientAlreadyUpdated': 'Der Client wurde bereits aktualisiert.',
     'error.403.featureNotEnabled': 'Das Feature ist nicht aktiviert.',
     'error.403.forbidden': 'Verboten',

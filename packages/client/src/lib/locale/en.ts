@@ -156,6 +156,7 @@ const translations: Record<string, string> = {
     'permission.delete': 'Delete',
     'permission.group': 'Group',
     'permission.read': 'Read',
+    'permission.special': 'Special',
     'permission.task': 'Task',
     'permission.tenant-user': 'Tenant User',
     'permission.tenant': 'Tenant',

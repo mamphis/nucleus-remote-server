@@ -4,7 +4,7 @@ import { compare, hash } from "bcrypt";
 import { Router } from "express";
 import { BadRequest, Forbidden, NotFound, UnprocessableEntity } from 'http-errors';
 import z, { ZodError } from 'zod';
-import { AuthResponse, auth } from "../../../lib/auth";
+import { AuthResponse, auth, hasPermission } from "../../../lib/auth";
 import { $t } from "../../../lib/locale/locale";
 import mailer from "../../../lib/mailer";
 import { randomString } from "../../../lib/util";
@@ -190,7 +190,9 @@ export default function (db: PrismaClient) {
             read: z.boolean(),
             update: z.boolean(),
             del: z.boolean(),
-        });
+        }).or(z.object({
+            special: z.boolean(),
+        }));
 
         try {
             const updater = await db.user.findFirstOrThrow({
@@ -204,36 +206,43 @@ export default function (db: PrismaClient) {
             }
 
             const permissionData = schema.parse(req.body);
-            const updatePermission = async (allowed: boolean, scope: string) => {
-                if (allowed) {
+            if ('special' in permissionData) {
+                if (hasPermission(res.locals.user, 'special:admin')) {
+                    const type = permissionData.special ? 'connect' : 'disconnect';
+
                     await db.permission.update({
                         where: {
-                            scope,
+                            scope: 'special:admin',
                         },
                         data: {
-                            scope,
+                            scope: 'special:admin',
                             user: {
-                                connect: {
-                                    id: req.params.userId
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    await db.permission.update({
-                        where: {
-                            scope,
-                        },
-                        data: {
-                            scope,
-                            user: {
-                                disconnect: {
+                                [type]: {
                                     id: req.params.userId
                                 }
                             }
                         }
                     });
                 }
+                return;
+            }
+
+            const updatePermission = async (allowed: boolean, scope: string) => {
+                const type = allowed ? 'connect' : 'disconnect';
+
+                await db.permission.update({
+                    where: {
+                        scope,
+                    },
+                    data: {
+                        scope,
+                        user: {
+                            [type]: {
+                                id: req.params.userId
+                            }
+                        }
+                    }
+                });
             }
 
             await updatePermission(permissionData.create, `create:${permissionData.permission}`);

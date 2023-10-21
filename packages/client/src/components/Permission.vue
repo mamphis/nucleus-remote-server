@@ -15,8 +15,8 @@ const read = ref(hasPermission(props.user, `read:${props.permission}`));
 const update = ref(hasPermission(props.user, `update:${props.permission}`));
 const del = ref(hasPermission(props.user, `delete:${props.permission}`));
 let debounce: number | undefined = undefined;
-
-watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate, oRead, oUpdate, oDelete]) => {
+const error = ref('');
+watch([create, read, update, del], ([nCreate, _nRead, nUpdate, nDelete], [oCreate, oRead, oUpdate, oDelete]) => {
     if (nCreate) {
         update.value = true;
     }
@@ -44,6 +44,9 @@ watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate
                 read.value = oRead;
                 update.value = oUpdate;
                 del.value = oDelete;
+
+                error.value = response.message;
+                setTimeout(() => error.value = '', 5000);
             }
             nextTick(() => debounce = undefined);
         }, 100);
@@ -57,10 +60,10 @@ watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate
         <div class="control is-expanded">
             <label class="label">{{ $t('permission.' + permission) }}</label>
         </div>
-        <button class="button is-small is-rounded" type="button"
-            @click="read = update = del = create = false">{{ $t('button.clear') }}</button>
+        <button class="button is-small is-rounded" type="button" @click="read = update = del = create = false">{{
+            $t('button.clear') }}</button>
     </div>
-    <div class="field is-grouped is-grouped-centered">
+    <div class="field is-grouped is-grouped-centered mb-0">
         <div class="control">
             <label class="checkbox">
                 <input v-model="create" type="checkbox">
@@ -85,5 +88,8 @@ watch([create, read, update, del], ([nCreate, nRead, nUpdate, nDelete], [oCreate
                 {{ $t('permission.read') }}
             </label>
         </div>
+    </div>
+    <div class="field is-grouped">
+        <p v-if="!!error" class="help is-danger">{{ error }}</p>
     </div>
 </template>
