@@ -3,6 +3,7 @@ import type { TimeSeriesPoint } from '@/types/dashboard';
 import { CategoryScale, Chart, Legend, LineElement, LinearScale, Colors, PointElement, Title, Tooltip } from 'chart.js';
 import { Line } from 'vue-chartjs';
 import zoomPlugin from 'chartjs-plugin-zoom';
+import { computed } from 'vue';
 Chart.register(zoomPlugin, Colors, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale);
 
 const props = defineProps<{
@@ -47,23 +48,24 @@ const chartOptions = {
         }
     }
 } as any;
-const sortedTimeSeries = props.timeSeries.map(timeSeries => ({
+const sortedTimeSeries = computed(() => props.timeSeries.map(timeSeries => ({
     label: timeSeries.label,
     data: timeSeries.data.sort((a, b) => a.date.localeCompare(b.date))
-}));
-// get all timestamps and parse them as label
-const labels = [...new Set(sortedTimeSeries.flatMap(timeSeries => timeSeries.data.map(point => point.date)))]
-    .map(timestamp => new Date(timestamp)).map(date => props?.options?.showTime ? date.toLocaleTimeString() : date.toLocaleDateString());
+})));
 
-const data = {
-    labels,
-    datasets: sortedTimeSeries.map(timeSeries => ({
+// get all timestamps and parse them as label
+const labels = computed(() => [...new Set(sortedTimeSeries.value.flatMap(timeSeries => timeSeries.data.map(point => point.date)))]
+    .map(timestamp => new Date(timestamp)).map(date => props?.options?.showTime ? date.toLocaleTimeString() : date.toLocaleDateString()));
+
+const data = computed(() => ({
+    labels: labels.value,
+    datasets: sortedTimeSeries.value.map(timeSeries => ({
         label: timeSeries.label,
         data: timeSeries.data.map(point => point.value),
         fill: false,
         tension: 0.1
     }))
-};
+}));
 
 </script>
 

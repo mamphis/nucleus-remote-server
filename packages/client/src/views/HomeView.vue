@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import Dashboard from '@/components/Dashboard.vue';
+import userStore from '@/stores/user';
+import { storeToRefs } from 'pinia';
+
+const { isLoggedIn } = storeToRefs(userStore());
 </script>
 
 <template>
@@ -8,7 +12,7 @@ import Dashboard from '@/components/Dashboard.vue';
             <h1 class="title">{{ $t('home.title') }}</h1>
         </div>
         <div class="is-flex-grow-1">
-            <Dashboard />
+            <Dashboard v-if="isLoggedIn" />
         </div>
     </div>
 </template>

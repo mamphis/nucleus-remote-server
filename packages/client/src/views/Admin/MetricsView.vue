@@ -65,6 +65,12 @@ const changeSortOrder = (sortKey: SortKey<AdditianlSortKey>) => {
     }
 }
 
+setInterval(() => {
+    request.$get<ApiQueryMetrics>('admin/metrics').then((response) => {
+        metrics.value = response.assertNotError();
+    });
+}, 30000);
+
 </script>
 
 <template>
