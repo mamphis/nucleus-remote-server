@@ -20,13 +20,14 @@ namespace nucleus_remote_client.Client
             this.Level = level;
             this.Message = message;
         }
-        public async Task ExecuteAsync(HostSettings hostSettings)
+
+        public async Task<HttpResponseMessage?> ExecuteAsync(HostSettings hostSettings)
         {
             Console.WriteLine($"> {this.Message}");
             try
             {
                 var client = ClientHelper.GetHttpClient(hostSettings);
-                var _response = await client.PostAsJsonAsync($"c2/{hostSettings.Id}/logs", new
+                return await client.PostAsJsonAsync($"c2/{hostSettings.Id}/logs", new
                 {
                     level = this.Level,
                     message = this.Message,
@@ -36,6 +37,8 @@ namespace nucleus_remote_client.Client
             {
                 Console.WriteLine($">>> {ex.Message}");
             }
+
+            return null;
         }
 
         public static async Task Info(HostSettings hostSettings, string message)

@@ -42,24 +42,30 @@ namespace nucleus_remote_client
                 }
             }
 
-            var timer = new System.Timers.Timer();
-            timer.AutoReset = true;
-            timer.Interval = TimeSpan.FromMinutes(30).TotalMilliseconds;
-            timer.Elapsed += async (sender, e) =>
+            var timer = new System.Timers.Timer
+            {
+                AutoReset = true,
+                Interval = TimeSpan.FromMinutes(30).TotalMilliseconds,
+            };
+
+            async void Elapsed(object? sender, EventArgs _)
             {
                 if (!stoppingToken.IsCancellationRequested)
                 {
-                    await Try(new SendInstalledPrograms(), _hostSettings);
+                    await Try(new SendLocalDrives());
+                    await Try(new SendInstalledPrograms());
                     StartUpdater();
                 }
-            };
+            }
 
+            timer.Elapsed += Elapsed;
             timer.Start();
 
-            StartUpdater();
+            Elapsed(null, EventArgs.Empty);
+
             var pinger = new SendPing();
-            var executer = new GetConfigurationTasks(); 
-            await Try(new SendInstalledPrograms(), _hostSettings);
+            var executer = new GetConfigurationTasks();
+            await Try(new SendInstalledPrograms());
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -68,9 +74,9 @@ namespace nucleus_remote_client
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 }
 
-                await Try(executer, _hostSettings);
-                await Try(pinger, _hostSettings);
-                await Try(new SendDetails(), _hostSettings);
+                await Try(executer);
+                await Try(pinger);
+                await Try(new SendDetails());
 #if DEBUG
                 await Task.Delay(10000, stoppingToken);
 #else
@@ -79,11 +85,20 @@ namespace nucleus_remote_client
             }
         }
 
-        private async Task Try(IClient client, HostSettings _)
+        private async Task Try(IClient client)
         {
             try
             {
-                await client.ExecuteAsync(_hostSettings);
+                var response = await client.ExecuteAsync(_hostSettings);
+                if (response != null)
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        await SendLog.Error(_hostSettings, content);
+                    }
+                }
             }
             catch (Exception e)
             {

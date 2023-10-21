@@ -9,6 +9,6 @@ namespace nucleus_remote_client.Client
 {
     internal interface IClient
     {
-        Task ExecuteAsync(HostSettings hostSettings);
+        Task<HttpResponseMessage?> ExecuteAsync(HostSettings hostSettings);
     }
 }

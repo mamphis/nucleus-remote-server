@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using nucleus_remote_client.Client.Models;
 using nucleus_remote_client.Lib;
 using nucleus_remote_client.Tasks;
 using System.Net.Http.Json;
@@ -10,43 +11,11 @@ namespace nucleus_remote_client.Client
 {
     internal class SendInstalledPrograms : IClient
     {
-        struct InstalledProgram
-        {
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-            [JsonPropertyName("version")]
-            public string Version { get; set; }
-            [JsonPropertyName("registryKey")]
-            public string RegistryKey { get; set; }
-            [JsonPropertyName("publisher")]
-            public string Publisher { get; set; }
-            [JsonPropertyName("installDate")]
-            public DateTime InstallDate { get; set; }
-            public InstalledProgram(string name, string? version, string? publisher, string? installDate, string registryKey)
-            {
-                Name = name;
-                Version = version ?? "- unknown -";
-                Publisher = publisher ?? "- unknown -";
-
-                if (DateTime.TryParseExact(installDate, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateTime result))
-                {
-                    InstallDate = result;
-                }
-                else
-                {
-                    InstallDate = DateTime.MinValue;
-                }
-
-                RegistryKey = registryKey;
-            }
-        }
-
-
         [SupportedOSPlatformGuard("windows")]
         private readonly bool _isWindows = OperatingSystem.IsWindows();
 
         [SupportedOSPlatform("windows")]
-        private static async Task WindowsSendInstalledPrograms(HostSettings hostSettings)
+        private static async Task<HttpResponseMessage> WindowsSendInstalledPrograms(HostSettings hostSettings)
         {
             string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             string registry_key_32 = @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
@@ -93,24 +62,22 @@ namespace nucleus_remote_client.Client
                 }
             }
             var client = ClientHelper.GetHttpClient(hostSettings);
-            var _response = await client.PutAsJsonAsync($"c2/{hostSettings.Id}/installedApps", installed);
-            if (!_response.IsSuccessStatusCode)
-            {
-                await SendLog.Error(hostSettings, await _response.Content.ReadAsStringAsync());
-            }
+            return await client.PutAsJsonAsync($"c2/{hostSettings.Id}/installedApps", installed);
         }
 
-        public async Task ExecuteAsync(HostSettings hostSettings)
+        public async Task<HttpResponseMessage?> ExecuteAsync(HostSettings hostSettings)
         {
             if (!await FeatureFlags.IsFeatureEnabled(hostSettings, "f-1.0.8-installed_apps"))
             {
-                return;
+                return null;
             }
 
             if (_isWindows)
             {
-                await WindowsSendInstalledPrograms(hostSettings);
+                return await WindowsSendInstalledPrograms(hostSettings);
             }
+
+            return null;
         }
 
     }
