@@ -1,7 +1,22 @@
 import { hasPermission } from '@/lib/permission';
 import userStore from '@/stores/user';
+import AdminView from '@/views/Admin/AdminView.vue';
+import ClientsView from '@/views/Clients/ClientsView.vue';
+import EditClientView from '@/views/Clients/EditClientView.vue';
+import ConfigurationsView from '@/views/Configurations/ConfigurationsView.vue';
+import EditConfigurationView from '@/views/Configurations/EditConfigurationView.vue';
+import NewConfigurationView from '@/views/Configurations/NewConfigurationView.vue';
+import EditProfileView from '@/views/EditProfileView.vue';
+import EditGroupView from '@/views/Groups/EditGroupView.vue';
+import GroupsView from '@/views/Groups/GroupsView.vue';
+import NewGroupView from '@/views/Groups/NewGroupView.vue';
 import HomeView from '@/views/HomeView.vue';
+import IssueView from '@/views/IssueView.vue';
 import LoginView from '@/views/LoginView.vue';
+import NotificationView from '@/views/NotificationView.vue';
+import ResetPassword from '@/views/ResetPassword.vue';
+import EditTaskView from '@/views/Tasks/EditTaskView.vue';
+import NewTaskView from '@/views/Tasks/NewTaskView.vue';
 import EditTenantUserView from '@/views/TenantUsers/EditTenantUserView.vue';
 import NewTenantUserView from '@/views/TenantUsers/NewTenantUserView.vue';
 import TenantUsersView from '@/views/TenantUsers/TenantUsersView.vue';
@@ -12,21 +27,6 @@ import EditUserView from '@/views/Users/EditUserView.vue';
 import NewUserView from '@/views/Users/NewUserView.vue';
 import UsersView from '@/views/Users/UsersView.vue';
 import VerifyView from '@/views/VerifyView.vue';
-import EditGroupView from '@/views/Groups/EditGroupView.vue';
-import NewGroupView from '@/views/Groups/NewGroupView.vue';
-import GroupsView from '@/views/Groups/GroupsView.vue';
-import EditConfigurationView from '@/views/Configurations/EditConfigurationView.vue';
-import NewConfigurationView from '@/views/Configurations/NewConfigurationView.vue';
-import ConfigurationsView from '@/views/Configurations/ConfigurationsView.vue';
-import ClientsView from '@/views/Clients/ClientsView.vue'
-import NewTaskView from '@/views/Tasks/NewTaskView.vue';
-import EditTaskView from '@/views/Tasks/EditTaskView.vue';
-import EditClientView from '@/views/Clients/EditClientView.vue';
-import EditProfileView from '@/views/EditProfileView.vue';
-import IssueView from '@/views/IssueView.vue';
-import ResetPassword from '@/views/ResetPassword.vue';
-import NotificationView from '@/views/NotificationView.vue';
-import AdminView from '@/views/Admin/AdminView.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -264,7 +264,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    const { user } = userStore();
+    const { user, logout } = userStore();
 
     if (!to.meta.authorized) {
         // No Auth required. Feel free to go
@@ -272,8 +272,14 @@ router.beforeEach((to, from, next) => {
     }
 
     if (to.meta.authorized && !user) {
-        // Auth required but user is not logged in. -> go to last Route
-        return next(from);
+        // Auth required but user is not logged in.
+        // Check if from needed authorization
+        if (!from.meta.authorized) {
+            return next(from);
+        }
+        // log user out and go to home page
+        logout();
+        return next('/');
     }
 
 
