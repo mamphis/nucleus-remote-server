@@ -7,7 +7,7 @@ import { ref, computed } from 'vue';
 import type { TimeSeriesPoint } from '@/types/dashboard';
 import { $t } from '@/lib/locale/locale';
 
-const metricsResponse = await request.$get<ApiQueryMetrics>('admin/metrics');
+const metricsResponse = await request.$get<ApiQueryMetrics>('admin/sqlMetrics');
 const metrics = metricsResponse.assertNotError().toRef();
 
 type AdditianlSortKey = 'load';
@@ -66,7 +66,7 @@ const changeSortOrder = (sortKey: SortKey<AdditianlSortKey>) => {
 }
 
 setInterval(() => {
-    request.$get<ApiQueryMetrics>('admin/metrics').then((response) => {
+    request.$get<ApiQueryMetrics>('admin/sqlMetrics').then((response) => {
         metrics.value = response.assertNotError();
     });
 }, 30000);

@@ -5,7 +5,7 @@ import { AuthResponse, auth } from "../../../lib/auth";
 export default function (db: PrismaClient) {
     const router = Router();
 
-    router.get('/metrics', auth('special:admin'), async (req, res: AuthResponse, next) => {
+    router.get('/sqlMetrics', auth('special:admin'), async (req, res: AuthResponse, next) => {
 
         const statementMetrics = await db.queryMetrics.groupBy({
             by: 'query',
