@@ -2,8 +2,8 @@
 import type { SortKey, SortOrder } from '@/types/metrics';
 
 const { sortOrder, metric } = defineProps<{
-    sortOrder: SortOrder<any>,
-    metric: SortKey<any>,
+    sortOrder: SortOrder<any, any>,
+    metric: SortKey<any, any>,
 }>();
 
 </script>
