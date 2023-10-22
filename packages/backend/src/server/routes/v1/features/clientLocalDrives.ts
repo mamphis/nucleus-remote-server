@@ -4,7 +4,6 @@ import { Forbidden, NotFound } from 'http-errors';
 import { z } from "zod";
 import { AuthResponse, ClientAuthResponse, auth, clientAuth, isFeatureEnabled } from "../../../../lib/auth";
 import { $t } from "../../../../lib/locale/locale";
-import { Logger } from "../../../../lib/logger";
 
 export default function (db: PrismaClient) {
     const router = Router({ mergeParams: true });
@@ -59,7 +58,7 @@ export default function (db: PrismaClient) {
         }
     });
 
-    router.get('/:clientId', auth('read:client'), async (req, res: AuthResponse, next) => {
+    router.get('/', auth('read:client'), async (req, res: AuthResponse, next) => {
         if (!await isFeatureEnabled(res.locals.user, 'f-1.0.12-drive_monitor')) {
             return next(Forbidden($t(req, 'error.403.featureNotEnabled')))
         }
@@ -68,7 +67,7 @@ export default function (db: PrismaClient) {
 
             const drives = await db.localDrive.findMany({
                 where: {
-                    clientId: req.params.clientId
+                    clientId: req.params.clientId // merged param...
                 },
             });
 
@@ -78,7 +77,10 @@ export default function (db: PrismaClient) {
                 },
             });
 
-            return res.json({ drives, history });
+            return res.json({
+                drives: drives.map(d => ({ ...d, driveSize: Number(d.driveSize), driveFreeSpace: Number(d.driveFreeSpace) })),
+                history: history.map(h => ({ ...h, driveSize: Number(h.driveSize), driveFreeSpace: Number(h.driveFreeSpace) })),
+            });
         } catch (e: unknown) {
             return next(e);
         }

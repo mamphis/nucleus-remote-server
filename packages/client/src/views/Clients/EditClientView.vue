@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import InstalledApps from './features/InstalledApps.vue';
+import { $t } from '@/lib/locale/locale';
 import { hasPermission } from '@/lib/permission';
 import request, { assertNotErrorResponse, isErrorResponse, isValidationError } from '@/lib/request';
 import { formatDate } from '@/lib/utils';
 import router from '@/router';
+import { eventStore } from '@/stores/eventBus';
 import type { ApiClient } from '@/types/client';
+import type { ApiClientDetail } from '@/types/clientDetail';
 import type { ApiClientLog } from '@/types/clientLog';
+import type { ApiFeatureFlag } from '@/types/featureFlag';
 import type { ApiTask } from '@/types/task';
 import { ref } from 'vue';
-import { eventStore } from '@/stores/eventBus';
-import { $t } from '@/lib/locale/locale';
-import type { ApiClientDetail } from '@/types/clientDetail';
-import type { ApiFeatureFlag } from '@/types/featureFlag';
+import InstalledApps from './features/InstalledApps.vue';
+import LocalDrives from './features/LocalDrives.vue';
 
 const { sendNotification } = eventStore();
 
@@ -104,6 +105,11 @@ const selected = ref('dashboard');
                         <a v-if="features.find(f => f.id == 'f-1.0.8-installed_apps')?.enabled ?? false"
                             :class="{ 'is-active': selected == 'f-1.0.8-installed_apps' }"
                             @click.prevent="selected = 'f-1.0.8-installed_apps'">Installed Apps</a>
+                    </li>
+                    <li>
+                        <a v-if="features.find(f => f.id == 'f-1.0.12-drive_monitor')?.enabled ?? false"
+                            :class="{ 'is-active': selected == 'f-1.0.12-drive_monitor' }"
+                            @click.prevent="selected = 'f-1.0.12-drive_monitor'">Drive Monitor</a>
                     </li>
                 </ul>
             </aside>
@@ -225,6 +231,9 @@ const selected = ref('dashboard');
             </div>
             <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100" v-if="selected == 'f-1.0.8-installed_apps'">
                 <InstalledApps />
+            </div>
+            <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100" v-if="selected == 'f-1.0.12-drive_monitor'">
+                <LocalDrives />
             </div>
         </div>
     </div>
