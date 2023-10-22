@@ -73,7 +73,11 @@ export default function (db: PrismaClient) {
 
             const history = await db.localDriveHistory.findMany({
                 where: {
-                    clientId: req.params.clientId
+                    clientId: req.params.clientId,
+                    // Limit to 7 days
+                    timestamp: {
+                        gte: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
+                    }
                 },
             });
 

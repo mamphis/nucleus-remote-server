@@ -12,6 +12,11 @@ export default function (db: PrismaClient) {
             _sum: { hitCount: true },
             _avg: { avgDuration: true },
             _max: { maxDuration: true },
+            where: {
+                bucketTime: {
+                    gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                }
+            }
         });
 
         const histogram = await db.queryMetrics.groupBy({
@@ -19,6 +24,11 @@ export default function (db: PrismaClient) {
             _sum: { hitCount: true },
             _avg: { avgDuration: true },
             _max: { maxDuration: true },
+            where: {
+                bucketTime: {
+                    gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                }
+            }
         });
 
         const queryMetrics = {
