@@ -23,7 +23,7 @@ namespace nucleus_remote_client.Lib
             if (Has(key)) { return; }
 
             values.Add(key, value);
-            Timer timer = new Timer((state) =>
+            Timer timer = new((state) =>
             {
                 values.Remove(key);
             }, null, this.ValidTime, Timeout.InfiniteTimeSpan);
