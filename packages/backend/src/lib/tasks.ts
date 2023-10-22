@@ -107,4 +107,8 @@ const init = () => {
     schedule("*/30 * * * * *", saveQueryMetrics, { name: 'saveQueryMetrics' });
 }
 
+process.on('beforeExit', () => {
+    saveQueryMetrics();
+})
+
 export default init;

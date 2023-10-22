@@ -84,32 +84,33 @@ const selected = ref('dashboard');
         <div class="column is-2">
             <aside class="menu">
                 <p class="menu-label">
-                    General
+                    {{ $t('editClient.nav.general') }}
                 </p>
 
                 <ul class="menu-list">
                     <li>
-                        <a :class="{ 'is-active': selected == 'dashboard' }"
-                            @click.prevent="selected = 'dashboard'">Dashboard</a>
+                        <a :class="{ 'is-active': selected == 'dashboard' }" @click.prevent="selected = 'dashboard'">{{
+                            $t('editClient.nav.dashboard') }}</a>
                     </li>
                     <li>
-                        <a :class="{ 'is-active': selected == 'logs' }" @click.prevent="selected = 'logs'">Logs</a>
+                        <a :class="{ 'is-active': selected == 'logs' }" @click.prevent="selected = 'logs'">{{
+                            $t('editClient.nav.logs') }}</a>
                     </li>
                 </ul>
                 <p class="menu-label" v-if="features.some(f => f.enabled)">
-                    Features
+                    {{ $t('editClient.nav.features') }}
                 </p>
 
                 <ul class="menu-list">
                     <li>
                         <a v-if="features.find(f => f.id == 'f-1.0.8-installed_apps')?.enabled ?? false"
                             :class="{ 'is-active': selected == 'f-1.0.8-installed_apps' }"
-                            @click.prevent="selected = 'f-1.0.8-installed_apps'">Installed Apps</a>
+                            @click.prevent="selected = 'f-1.0.8-installed_apps'">{{ $t('editClient.nav.installedApps') }}</a>
                     </li>
                     <li>
                         <a v-if="features.find(f => f.id == 'f-1.0.12-drive_monitor')?.enabled ?? false"
                             :class="{ 'is-active': selected == 'f-1.0.12-drive_monitor' }"
-                            @click.prevent="selected = 'f-1.0.12-drive_monitor'">Drive Monitor</a>
+                            @click.prevent="selected = 'f-1.0.12-drive_monitor'">{{ $t('editClient.nav.driveMonitor') }}</a>
                     </li>
                 </ul>
             </aside>
@@ -229,10 +230,12 @@ const selected = ref('dashboard');
                     </table>
                 </div>
             </div>
-            <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100" v-if="selected == 'f-1.0.8-installed_apps'">
+            <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100"
+                v-if="selected == 'f-1.0.8-installed_apps'">
                 <InstalledApps />
             </div>
-            <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100" v-if="selected == 'f-1.0.12-drive_monitor'">
+            <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100"
+                v-if="selected == 'f-1.0.12-drive_monitor'">
                 <LocalDrives />
             </div>
         </div>
