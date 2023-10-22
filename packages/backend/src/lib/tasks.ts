@@ -1,6 +1,7 @@
 import { schedule } from 'node-cron';
-import db, { getMetrics } from "./db";
+import db, { getQueryMetrics } from "./db";
 import { Logger } from "./logger";
+import { getRouteMetrics, getStatusMetrics } from '../server/server';
 
 const removeDanglingTasks = async () => {
     const tasksBefore = await db.task.count();
@@ -80,12 +81,12 @@ const cleanupUnusedKeys = async () => {
     Logger.info(`Task "cleanupUnusedKeys" has run. Removed ${count} unused keys.`);
 }
 
-const saveQueryMetrics = async () => {
+const saveMetrics = async () => {
     // Get the metrics
-    const metrics = getMetrics();
+    const queryMetrics = getQueryMetrics();
     // Save the metrics
     await db.queryMetrics.createMany({
-        data: [...metrics.entries()].map(([query, metrics]) => {
+        data: [...queryMetrics.entries()].map(([query, metrics]) => {
             return {
                 query,
                 ...metrics,
@@ -93,7 +94,31 @@ const saveQueryMetrics = async () => {
         })
     });
 
-    Logger.info(`Task "saveQueryMetrics" has run. Saved ${metrics.size} query metrics.`);
+    Logger.debug(`Task "saveQueryMetrics" has run. Saved ${queryMetrics.size} query metrics.`);
+
+    const routeMetrics = getRouteMetrics();
+    await db.requestMetrics.createMany({
+        data: [...routeMetrics.entries()].map(([requestPath, metrics]) => {
+            return {
+                requestPath,
+                ...metrics,
+            }
+        })
+    });
+
+    Logger.debug(`Task "saveRequestMetrics" has run. Saved ${routeMetrics.size} request metrics.`);
+
+    const statusMetrics = getStatusMetrics();
+    await db.statusCodeMetrics.createMany({
+        data: [...statusMetrics.entries()].map(([statusCode, metrics]) => {
+            return {
+                statusCode,
+                ...metrics,
+            }
+        })
+    });
+
+    Logger.debug(`Task "saveStatusCodeMetrics" has run. Saved ${statusMetrics.size} status code metrics.`);
 }
 
 const init = () => {
@@ -104,11 +129,11 @@ const init = () => {
     // Run every second day at 03:00 in the morning
     schedule("0 3 * * */2", cleanupUnusedKeys, { name: 'cleanupUnusedKeys', runOnInit: true });
     // Run every 30 seconds
-    schedule("*/30 * * * * *", saveQueryMetrics, { name: 'saveQueryMetrics' });
+    schedule("*/30 * * * * *", saveMetrics, { name: 'saveQueryMetrics' });
 }
 
 process.on('beforeExit', () => {
-    saveQueryMetrics();
+    saveMetrics();
 })
 
 export default init;

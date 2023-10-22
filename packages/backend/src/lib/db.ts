@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Logger } from "./logger";
+import { MetricCounter } from "./metricCounter";
 
 const db = new PrismaClient({
     log: [
@@ -8,42 +9,12 @@ const db = new PrismaClient({
         { level: 'error', emit: 'event' },
     ]
 });
-type Metrics = {
-    hitCount: number;
-    avgDuration: number;
-    maxDuration: number;
-}
 
-const queryMetrics = new Map<string, Metrics>();
-
-const updateMetrics = (query: string, duration: number) => {
-    if (query.startsWith('INSERT INTO') && query.includes('"QueryMetrics"')) {
-        return;
-    }
-    
-    const metrics = queryMetrics.get(query);
-    if (metrics) {
-        metrics.hitCount++;
-        metrics.avgDuration += (duration - metrics.avgDuration) / metrics.hitCount;
-        metrics.maxDuration = Math.max(metrics.maxDuration, duration);
-    } else {
-        queryMetrics.set(query, {
-            hitCount: 1,
-            avgDuration: duration,
-            maxDuration: duration,
-        });
-    }
-}
-
-export const getMetrics = () => {
-    // make a copy of the query metrics, clear the original and return the copy
-    const copy = new Map(queryMetrics);
-    queryMetrics.clear();
-    return copy;
-}
+const metrics = new MetricCounter<string>((key) => key.startsWith('INSERT INTO') && key.includes('Metrics"'));
+export const getQueryMetrics = metrics.getMetrics.bind(metrics);
 
 db.$on('query', (e) => {
-    updateMetrics(e.query, e.duration);
+    metrics.addMetric(e.query, e.duration);
 });
 
 db.$on('warn', (e) => {

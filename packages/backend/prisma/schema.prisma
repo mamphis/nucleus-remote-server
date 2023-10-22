@@ -223,3 +223,21 @@ model QueryMetrics {
   avgDuration Int
   maxDuration Int
 }
+
+model RequestMetrics {
+  bucketId    String   @id() @default(uuid())
+  bucketTime  DateTime @default(now())
+  requestPath String
+  hitCount    Int
+  avgDuration Int
+  maxDuration Int
+}
+
+model StatusCodeMetrics {
+  bucketId    String   @id() @default(uuid())
+  bucketTime  DateTime @default(now())
+  statusCode  Int
+  hitCount    Int
+  avgDuration Int
+  maxDuration Int
+}
