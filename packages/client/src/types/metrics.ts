@@ -1,15 +1,19 @@
-type StatementMetrics = {
+type Metrics = {
     hitCount: number;
     avgDuration: number;
     maxDuration: number;
+}
+
+export type StatementMetrics = Metrics & {
     query: string;
 };
 
-export type Histogram = {
-    hitCount: number;
-    avgDuration: number;
-    maxDuration: number;
+export type Histogram = Metrics & {
     bucketTime: string
+}
+
+export type RequestMetrics = Metrics & {
+    requestPath: string;
 }
 
 export type ApiQueryMetrics = {
@@ -17,6 +21,10 @@ export type ApiQueryMetrics = {
         statementMetrics: StatementMetrics[];
         histogram: Histogram[];
     },
+}
+
+export type ApiRequestMetrics = {
+    requestMetrics: RequestMetrics[];
 }
 
 export type ApiStatistics = {
@@ -30,5 +38,5 @@ export type ApiStatistics = {
 }
 
 type SortDirection = 'asc' | 'desc';
-export type SortKey<T> = keyof StatementMetrics | T;
-export type SortOrder<T> = [SortKey<T> | undefined, SortDirection | undefined];
+export type SortKey<K, T> = keyof K | T;
+export type SortOrder<K, T> = [SortKey<K, T> | undefined, SortDirection | undefined];

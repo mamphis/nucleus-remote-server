@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import MetricsView from './MetricsView.vue';
 import StatisticsView from './StatisticsView.vue';
+import RequestsView from './RequestMetricsView.vue';
 
 const activeTab = ref('metrics');
 </script>
@@ -18,12 +19,13 @@ const activeTab = ref('metrics');
                         $t('admin.tabs.metrics') }}</a></li>
                     <li :class="{ 'is-active': activeTab == 'statistics' }"><a @click.prevent="activeTab = 'statistics'">{{
                         $t('admin.tabs.statistics') }}</a></li>
-                    <li :class="{ 'is-active': activeTab == 'bar' }"><a @click.prevent="activeTab = 'bar'">{{
-                        $t('admin.tabs.bar') }}</a></li>
+                    <li :class="{ 'is-active': activeTab == 'requests' }"><a @click.prevent="activeTab = 'requests'">{{
+                        $t('admin.tabs.requests') }}</a></li>
                 </ul>
             </div>
             <MetricsView v-if="activeTab == 'metrics'"></MetricsView>
             <StatisticsView v-if="activeTab == 'statistics'"></StatisticsView>
+            <RequestsView v-if="activeTab == 'requests'"></RequestsView>
         </div>
     </div>
 </template>
