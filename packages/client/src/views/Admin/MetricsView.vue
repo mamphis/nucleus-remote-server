@@ -74,7 +74,7 @@ setInterval(() => {
 </script>
 
 <template>
-    <TimeChart :options="{ stepSize: 0.1, showTime: true }" :time-series="history" />
+    <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history" />
     <table class="table is-striped">
         <thead>
             <tr>
