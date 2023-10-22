@@ -10,9 +10,9 @@ import { $t } from '@/lib/locale/locale';
 const metricsResponse = await request.$get<ApiQueryMetrics>('admin/sqlMetrics');
 const metrics = metricsResponse.assertNotError().toRef();
 
-type AdditianlSortKey = 'load';
+type AdditionalSortKey = 'load';
 
-const sortOrder = ref<SortOrder<AdditianlSortKey>>([undefined, 'desc']);
+const sortOrder = ref<SortOrder<AdditionalSortKey>>([undefined, 'desc']);
 
 const queries = computed(() => {
     const stmts = metrics.value.queryMetrics.statementMetrics.map((s) => ({ ...s, load: s.avgDuration * s.hitCount }));
@@ -53,7 +53,7 @@ const history = computed(() => {
     ];
 });
 
-const changeSortOrder = (sortKey: SortKey<AdditianlSortKey>) => {
+const changeSortOrder = (sortKey: SortKey<AdditionalSortKey>) => {
     if (sortOrder.value[0] === sortKey) {
         if (sortOrder.value[1] === 'asc') {
             sortOrder.value = [undefined, 'desc'];

@@ -12,11 +12,9 @@ import { handlePrismaClientKnownRequestError } from '../lib/locale/prismaError';
 import { getIpFromRequest } from '../lib/util';
 import { MetricCounter } from '../lib/metricCounter';
 
-const routeMetricCounter = new MetricCounter<string>();
-const statusMetricCounter = new MetricCounter<number>();
+const routeMetricCounter = new MetricCounter<string, number>();
 
 export const getRouteMetrics = routeMetricCounter.getMetrics.bind(routeMetricCounter);
-export const getStatusMetrics = statusMetricCounter.getMetrics.bind(statusMetricCounter);
 
 export class Server {
     private app: Application;
@@ -41,8 +39,7 @@ export class Server {
             next();
             res.on('finish', () => {
                 Logger.debug(`Request from ${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, `${new Date().getTime() - start}ms`);
-                routeMetricCounter.addMetric(`${req.method} ${req.originalUrl}`, new Date().getTime() - start);
-                statusMetricCounter.addMetric(res.statusCode, new Date().getTime() - start);
+                routeMetricCounter.addMetric(`${req.method} ${req.originalUrl}`, new Date().getTime() - start, res.statusCode);
             });
             res.on('error', (err) => {
                 Logger.error(`Request from ${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, err);

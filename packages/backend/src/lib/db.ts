@@ -10,7 +10,7 @@ const db = new PrismaClient({
     ]
 });
 
-const metrics = new MetricCounter<string>((key) => key.startsWith('INSERT INTO') && key.includes('Metrics"'));
+const metrics = new MetricCounter<string, never>((key) => key.startsWith('INSERT INTO') && (key.includes('Metrics"') || key.includes('StatusCode"')));
 export const getQueryMetrics = metrics.getMetrics.bind(metrics);
 
 db.$on('query', (e) => {

@@ -1,7 +1,7 @@
 import { schedule } from 'node-cron';
 import db, { getQueryMetrics } from "./db";
 import { Logger } from "./logger";
-import { getRouteMetrics, getStatusMetrics } from '../server/server';
+import { getRouteMetrics } from '../server/server';
 
 const removeDanglingTasks = async () => {
     const tasksBefore = await db.task.count();
@@ -91,7 +91,9 @@ const saveMetrics = async () => {
             return {
                 query,
                 bucketTime,
-                ...metrics,
+                hitCount: metrics.hitCount,
+                avgDuration: metrics.avgDuration,
+                maxDuration: metrics.maxDuration,
             }
         })
     });
@@ -100,29 +102,42 @@ const saveMetrics = async () => {
 
     const routeMetrics = getRouteMetrics();
     await db.requestMetrics.createMany({
-        data: [...routeMetrics.entries()].map(([requestPath, metrics]) => {
+        data: [...routeMetrics.entries()].map(([route, metrics]) => {
             return {
-                requestPath,
+                requestPath: route,
                 bucketTime,
-                ...metrics,
+                hitCount: metrics.hitCount,
+                avgDuration: metrics.avgDuration,
+                maxDuration: metrics.maxDuration,
             }
         })
+    }).then(async () => {
+        // Insert Status Codes
+        await Promise.all([...routeMetrics.entries()].map(async ([route, metrics]) => {
+            // get requestMetric
+            const requestMetric = await db.requestMetrics.findFirstOrThrow({
+                where: {
+                    requestPath: route,
+                    bucketTime,
+                }
+            });
+
+            for (const statusCode in metrics.args) {
+                if (metrics.args[statusCode]) {
+                    const { hitCount } = metrics.args[statusCode]!;
+                    await db.statusCode.create({
+                        data: {
+                            requestMetricsBucketId: requestMetric.bucketId,
+                            statusCode: Number(statusCode),
+                            hitCount,
+                        }
+                    });
+                }
+            }
+        }));
     });
 
     Logger.debug(`Task "saveRequestMetrics" has run. Saved ${routeMetrics.size} request metrics.`);
-
-    const statusMetrics = getStatusMetrics();
-    await db.statusCodeMetrics.createMany({
-        data: [...statusMetrics.entries()].map(([statusCode, metrics]) => {
-            return {
-                statusCode,
-                bucketTime,
-                ...metrics,
-            }
-        })
-    });
-
-    Logger.debug(`Task "saveStatusCodeMetrics" has run. Saved ${statusMetrics.size} status code metrics.`);
 }
 
 const init = () => {

@@ -6,7 +6,6 @@ export default function (db: PrismaClient) {
     const router = Router();
 
     router.get('/sqlMetrics', auth('special:admin'), async (req, res: AuthResponse, next) => {
-
         const statementMetrics = await db.queryMetrics.groupBy({
             by: 'query',
             _sum: { hitCount: true },
@@ -69,6 +68,31 @@ export default function (db: PrismaClient) {
             notificationCount,
             configurationCount,
         });
+    });
+
+    router.get('/requestMetrics', auth('special:admin'), async (req, res, next) => {
+        const requestMetrics = await db.requestMetrics.groupBy({
+            by: 'requestPath',
+            _sum: { hitCount: true },
+            _avg: { avgDuration: true },
+            _max: { maxDuration: true },
+            where: {
+                bucketTime: {
+                    gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                }
+            }
+        });
+
+        const metrics = {
+            requestMetrics: requestMetrics.map((metric) => ({
+                requestPath: metric.requestPath,
+                hitCount: metric._sum.hitCount,
+                avgDuration: metric._avg.avgDuration,
+                maxDuration: metric._max.maxDuration,
+            })),
+        };
+
+        res.json(metrics);
     });
 
     return router;

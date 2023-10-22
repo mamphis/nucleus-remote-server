@@ -231,13 +231,16 @@ model RequestMetrics {
   hitCount    Int
   avgDuration Int
   maxDuration Int
+
+  statusCodes StatusCode[]
 }
 
-model StatusCodeMetrics {
-  bucketId    String   @id() @default(uuid())
-  bucketTime  DateTime @default(now())
-  statusCode  Int
-  hitCount    Int
-  avgDuration Int
-  maxDuration Int
+model StatusCode {
+  statusCode Int
+  hitCount   Int
+
+  requestMetrics         RequestMetrics @relation(fields: [requestMetricsBucketId], references: [bucketId])
+  requestMetricsBucketId String
+
+  @@id([requestMetricsBucketId, statusCode])
 }
