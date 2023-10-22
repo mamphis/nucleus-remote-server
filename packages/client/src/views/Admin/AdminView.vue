@@ -3,8 +3,13 @@ import { ref } from 'vue';
 import MetricsView from './MetricsView.vue';
 import StatisticsView from './StatisticsView.vue';
 import RequestsView from './RequestMetricsView.vue';
+const defaultTab = location.hash == '' ? 'metrics' : location.hash.substring(1);
+const activeTab = ref(defaultTab);
 
-const activeTab = ref('metrics');
+const setActiveTab = (tab: string) => {
+    activeTab.value = tab;
+    location.hash = tab;
+};
 </script>
 
 <template>
@@ -15,11 +20,12 @@ const activeTab = ref('metrics');
         <div class="column is-full">
             <div class="tabs">
                 <ul>
-                    <li :class="{ 'is-active': activeTab == 'metrics' }"><a @click.prevent="activeTab = 'metrics'">{{
+                    <li :class="{ 'is-active': activeTab == 'metrics' }"><a @click.prevent="setActiveTab('metrics')">{{
                         $t('admin.tabs.metrics') }}</a></li>
-                    <li :class="{ 'is-active': activeTab == 'statistics' }"><a @click.prevent="activeTab = 'statistics'">{{
-                        $t('admin.tabs.statistics') }}</a></li>
-                    <li :class="{ 'is-active': activeTab == 'requests' }"><a @click.prevent="activeTab = 'requests'">{{
+                    <li :class="{ 'is-active': activeTab == 'statistics' }"><a
+                            @click.prevent="setActiveTab('statistics')">{{
+                                $t('admin.tabs.statistics') }}</a></li>
+                    <li :class="{ 'is-active': activeTab == 'requests' }"><a @click.prevent="setActiveTab('requests')">{{
                         $t('admin.tabs.requests') }}</a></li>
                 </ul>
             </div>

@@ -14,6 +14,9 @@ import { ref } from 'vue';
 import InstalledApps from './features/InstalledApps.vue';
 import LocalDrives from './features/LocalDrives.vue';
 
+const defaultTab = location.hash == '' ? 'dashboard' : location.hash.substring(1);
+const activeTab = ref(defaultTab);
+
 const { sendNotification } = eventStore();
 
 const { clientId } = router.currentRoute.value.params;
@@ -76,7 +79,10 @@ const reloadLogs = async () => {
     logs.value = (await request.$get<ApiClientLog[]>(`clients/${clientId}/logs`)).assertNotError();
 }
 
-const selected = ref('dashboard');
+const setActiveTab = (tab: string) => {
+    activeTab.value = tab;
+    location.hash = tab;
+};
 </script>
 
 <template>
@@ -89,11 +95,11 @@ const selected = ref('dashboard');
 
                 <ul class="menu-list">
                     <li>
-                        <a :class="{ 'is-active': selected == 'dashboard' }" @click.prevent="selected = 'dashboard'">{{
+                        <a :class="{ 'is-active': activeTab == 'dashboard' }" @click.prevent="setActiveTab('dashboard')">{{
                             $t('editClient.nav.dashboard') }}</a>
                     </li>
                     <li>
-                        <a :class="{ 'is-active': selected == 'logs' }" @click.prevent="selected = 'logs'">{{
+                        <a :class="{ 'is-active': activeTab == 'logs' }" @click.prevent="setActiveTab('logs')">{{
                             $t('editClient.nav.logs') }}</a>
                     </li>
                 </ul>
@@ -104,19 +110,19 @@ const selected = ref('dashboard');
                 <ul class="menu-list">
                     <li>
                         <a v-if="features.find(f => f.id == 'f-1.0.8-installed_apps')?.enabled ?? false"
-                            :class="{ 'is-active': selected == 'f-1.0.8-installed_apps' }"
-                            @click.prevent="selected = 'f-1.0.8-installed_apps'">{{ $t('editClient.nav.installedApps') }}</a>
+                            :class="{ 'is-active': activeTab == 'f-1.0.8-installed_apps' }"
+                            @click.prevent="setActiveTab('f-1.0.8-installed_apps')">{{ $t('editClient.nav.installedApps') }}</a>
                     </li>
                     <li>
                         <a v-if="features.find(f => f.id == 'f-1.0.12-drive_monitor')?.enabled ?? false"
-                            :class="{ 'is-active': selected == 'f-1.0.12-drive_monitor' }"
-                            @click.prevent="selected = 'f-1.0.12-drive_monitor'">{{ $t('editClient.nav.driveMonitor') }}</a>
+                            :class="{ 'is-active': activeTab == 'f-1.0.12-drive_monitor' }"
+                            @click.prevent="setActiveTab('f-1.0.12-drive_monitor')">{{ $t('editClient.nav.driveMonitor') }}</a>
                     </li>
                 </ul>
             </aside>
         </div>
         <div class="column content-container">
-            <form v-if="selected == 'dashboard'" @submit.prevent="updateClient()"
+            <form v-if="activeTab == 'dashboard'" @submit.prevent="updateClient()"
                 class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
                 <div class="column is-full">
                     <h1 class="title">{{ $t('editClient.editClient') }}</h1>
@@ -206,7 +212,7 @@ const selected = ref('dashboard');
                 </div>
             </form>
 
-            <div v-if="selected == 'logs'" class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
+            <div v-if="activeTab == 'logs'" class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
                 <div class="column is-full is-flex is-justify-content-space-between">
                     <h1 class="title">{{ $t('editClient.logs') }}</h1>
                     <span><a @click.prevent="reloadLogs()" class="button">{{ $t('button.reload') }}</a></span>
@@ -231,11 +237,11 @@ const selected = ref('dashboard');
                 </div>
             </div>
             <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100"
-                v-if="selected == 'f-1.0.8-installed_apps'">
+                v-if="activeTab == 'f-1.0.8-installed_apps'">
                 <InstalledApps />
             </div>
             <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100"
-                v-if="selected == 'f-1.0.12-drive_monitor'">
+                v-if="activeTab == 'f-1.0.12-drive_monitor'">
                 <LocalDrives />
             </div>
         </div>
