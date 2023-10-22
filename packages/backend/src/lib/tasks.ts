@@ -82,6 +82,7 @@ const cleanupUnusedKeys = async () => {
 }
 
 const saveMetrics = async () => {
+    const bucketTime = new Date(new Date().setMilliseconds(0));
     // Get the metrics
     const queryMetrics = getQueryMetrics();
     // Save the metrics
@@ -89,6 +90,7 @@ const saveMetrics = async () => {
         data: [...queryMetrics.entries()].map(([query, metrics]) => {
             return {
                 query,
+                bucketTime,
                 ...metrics,
             }
         })
@@ -101,6 +103,7 @@ const saveMetrics = async () => {
         data: [...routeMetrics.entries()].map(([requestPath, metrics]) => {
             return {
                 requestPath,
+                bucketTime,
                 ...metrics,
             }
         })
@@ -113,6 +116,7 @@ const saveMetrics = async () => {
         data: [...statusMetrics.entries()].map(([statusCode, metrics]) => {
             return {
                 statusCode,
+                bucketTime,
                 ...metrics,
             }
         })
