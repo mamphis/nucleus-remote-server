@@ -16,9 +16,12 @@ const histogram = histogramResponse.assertNotError().toRef();
 type AdditionalSortKey = 'load';
 
 const sortOrder = ref<SortOrder<RequestMetrics, AdditionalSortKey>>([undefined, 'desc']);
+const searchValue = ref('');
 
 const queries = computed(() => {
-    const stmts = metrics.value.requestMetrics.map((s) => ({ ...s, load: s.avgDuration * s.hitCount }));
+    const stmts = metrics.value.requestMetrics
+        .map((s) => ({ ...s, load: s.avgDuration * s.hitCount }))
+        .filter((s) => s.requestPath.toLowerCase().includes(searchValue.value.toLowerCase()));
 
     const [sortKey, sortDirection] = sortOrder.value;
     if (sortKey) {
@@ -118,6 +121,9 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
     <div class="is-half-height">
         <TimeChart :options="{ stepSize: 1, showTime: true, stacked: true }" :time-series="history"
             @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
+    </div>
+    <div class="field mt-2">
+        <input type="text" class="input" :placeholder="$t('admin.metrics.searchPlaceholder')" v-model="searchValue">
     </div>
     <table class="table is-striped is-fullwidth">
         <thead>

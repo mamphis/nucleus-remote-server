@@ -6,6 +6,7 @@ const translations: Record<string, string> = {
     'admin.metrics.maxDuration': 'Maximum Duration',
     'admin.metrics.query': 'Query',
     'admin.metrics.requestPath': 'Request Path',
+    'admin.metrics.searchPlaceholder': 'Search...',
     'admin.statistics.clientCount': 'Client Count',
     'admin.statistics.configurationCount': 'Configuration Count',
     'admin.statistics.groupCount': 'Group Count',

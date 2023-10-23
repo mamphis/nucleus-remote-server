@@ -16,9 +16,12 @@ const histogram = histogramResponse.assertNotError().toRef();
 type AdditionalSortKey = 'load';
 
 const sortOrder = ref<SortOrder<StatementMetrics, AdditionalSortKey>>([undefined, 'desc']);
+const searchValue = ref('');
 
 const queries = computed(() => {
-    const stmts = metrics.value.statementMetrics.map((s) => ({ ...s, load: s.avgDuration * s.hitCount }));
+    const stmts = metrics.value.statementMetrics
+        .map((s) => ({ ...s, load: s.avgDuration * s.hitCount }))
+        .filter((s) => s.query.toLowerCase().includes(searchValue.value.toLowerCase()));
 
     const [sortKey, sortDirection] = sortOrder.value;
     if (sortKey) {
@@ -106,6 +109,9 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
         <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history"
             @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
     </div>
+    <div class="field mt-2">
+        <input type="text" class="input" :placeholder="$t('admin.metrics.searchPlaceholder')" v-model="searchValue">
+    </div>
     <table class="table is-striped">
         <thead>
             <tr>
@@ -128,11 +134,21 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
         </thead>
         <tbody>
             <tr v-for="query in queries" :key="query.query">
-                <td><div class="query" :title="query.query">{{ query.query }}</div></td>
-                <td><div>{{ query.hitCount }}</div></td>
-                <td><div>{{ query.avgDuration.toFixed(2) }}</div></td>
-                <td><div>{{ query.maxDuration.toFixed(2) }}</div></td>
-                <td><div>{{ query.load.toFixed(2) }}</div></td>
+                <td>
+                    <div class="query" :title="query.query">{{ query.query }}</div>
+                </td>
+                <td>
+                    <div>{{ query.hitCount }}</div>
+                </td>
+                <td>
+                    <div>{{ query.avgDuration.toFixed(2) }}</div>
+                </td>
+                <td>
+                    <div>{{ query.maxDuration.toFixed(2) }}</div>
+                </td>
+                <td>
+                    <div>{{ query.load.toFixed(2) }}</div>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -155,6 +171,7 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
+
     &.query {
         cursor: pointer;
     }
