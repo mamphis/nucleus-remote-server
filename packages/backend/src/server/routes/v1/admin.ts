@@ -137,19 +137,57 @@ export default function (db: PrismaClient) {
             }
         });
 
-        const histogram = data.map((metric) => ({
-            bucketTime: metric.bucketTime,
-            hitCount: metric.hitCount,
-            avgDuration: metric.avgDuration,
-            maxDuration: metric.maxDuration,
-            statusCodes: metric.statusCodes.map((statusCode) => ({
-                statusCode: statusCode.statusCode,
-                hitCount: statusCode.hitCount,
-            })),
-        }));
+        type Status = {
+            hitCount: number,
+            statusCode: number,
+        }
+        type Metrics = {
+            avgDuration: number,
+            maxDuration: number,
+            hitCount: number,
+            bucketTime: string,
+            statusCodes: Status[]
+        }
+
+        const histogram = data.reduce((acc, metric) => {
+            const { avgDuration, maxDuration, hitCount, bucketTime, statusCodes } = metric;
+            const bucketTimeStr = bucketTime.toISOString();
+
+            acc[bucketTimeStr] = acc[bucketTimeStr] || {
+                avgDuration: avgDuration,
+                maxDuration: 0,
+                hitCount: 0,
+                bucketTime: bucketTimeStr,
+                statusCodes: [],
+            };
+            
+            
+            acc[bucketTimeStr].avgDuration = (avgDuration + acc[bucketTimeStr].avgDuration) / 2;
+            acc[bucketTimeStr].maxDuration += maxDuration;
+            acc[bucketTimeStr].hitCount += hitCount;
+            acc[bucketTimeStr].statusCodes = acc[bucketTimeStr].statusCodes.concat(statusCodes.map((statusCode) => {
+                const { hitCount, statusCode: code } = statusCode;
+                return {
+                    hitCount,
+                    statusCode: code,
+                };
+            })).reduce((acc, statusCode) => {
+                const { hitCount, statusCode: code } = statusCode;
+                const index = acc.findIndex(s => s.statusCode === code);
+                if (index === -1) {
+                    acc.push(statusCode);
+                } else {
+                    acc[index].hitCount += hitCount;
+                }
+
+                return acc;
+            }, [] as Status[]);
+
+            return acc;
+        }, {} as Record<string, Metrics>);
 
         res.json({
-            histogram,
+            histogram: Object.values(histogram),
         })
     });
 

@@ -14,21 +14,22 @@ const colors: string[] = [
     'rgb(52, 220, 192)',
     'rgb(54, 162, 235)',
     'rgb(255, 159, 64)',
-    'rgb(153, 102, 255)',
+    'rgb(200, 102, 200)',
 ]
-Chart.register(zoomPlugin, Title, Tooltip, Legend, Filler, customColors(colors), LineElement, PointElement, CategoryScale, LinearScale);
+Chart.register(zoomPlugin, Title, Tooltip, Legend, Filler, customColors(colors), LineElement, PointElement, CategoryScale, LinearScale, );
 
 const emits = defineEmits<{
     (event: 'zoom', minDate: Date, maxDate: Date): void,
 }>();
 
 const props = defineProps<{
-    timeSeries: Array<{ data: TimeSeriesPoint[], label: string }>,
+    timeSeries: Array<{ data: TimeSeriesPoint[], label: string, stack?: string, fill?: string }>,
     color?: string,
     options?: {
         min?: number,
         showTime?: boolean,
         stepSize?: number,
+        stacked?: boolean,
     },
 }>()
 
@@ -40,7 +41,8 @@ const chartOptions = {
             min: props.options?.min ?? 0,
             ticks: {
                 stepSize: props.options?.stepSize ?? 1,
-            }
+            },
+            stacked: props.options?.stacked ?? false,
         },
         x: {
             ticks: {
@@ -112,11 +114,17 @@ const chartOptions = {
                 },
             }
         },
+        filler: {
+            propagate: true,
+        }
     }
 } as any;
+
 const sortedTimeSeries = computed(() => props.timeSeries.map(timeSeries => ({
     label: timeSeries.label,
-    data: timeSeries.data.sort((a, b) => a.date.localeCompare(b.date))
+    data: timeSeries.data.sort((a, b) => a.date.localeCompare(b.date)),
+    stack: timeSeries.stack,
+    fill: timeSeries.fill,
 })));
 
 // get all timestamps and parse them as label
@@ -128,7 +136,8 @@ const data = computed(() => ({
     datasets: sortedTimeSeries.value.map(timeSeries => ({
         label: timeSeries.label,
         data: timeSeries.data.map(point => point.value),
-        fill: true,
+        stack: timeSeries.stack,
+        fill: timeSeries.fill ?? 'origin',
         tension: 0.2,
         pointRadius: 2,
     }))

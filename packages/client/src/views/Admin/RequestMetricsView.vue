@@ -40,20 +40,30 @@ const queries = computed(() => {
 
 const history = computed(() => {
     const hist = histogram.value.histogram;
-    const hitSeries: TimeSeriesPoint[] = [];
+    // const hitSeries: TimeSeriesPoint[] = [];
     const avgSeries: TimeSeriesPoint[] = [];
     const maxSeries: TimeSeriesPoint[] = [];
+    const statusSeries: TimeSeriesPoint[][] = [];
+    const statusCodes = new Set<number>(hist.flatMap((h) => h.statusCodes.map((s) => s.statusCode)));
+
     hist.forEach((value) => {
-        hitSeries.push({ date: value.bucketTime, value: value.hitCount });
+        // hitSeries.push({ date: value.bucketTime, value: value.hitCount });
         avgSeries.push({ date: value.bucketTime, value: value.avgDuration });
         maxSeries.push({ date: value.bucketTime, value: value.maxDuration });
+        for (const statusCode of statusCodes) {
+            statusSeries[statusCode] = statusSeries[statusCode] ?? [];
+            statusSeries[statusCode].push({ date: value.bucketTime, value: value.statusCodes.find((s) => s.statusCode === statusCode)?.hitCount ?? 0 });
+        }
     });
 
-    return [
-        { data: hitSeries, label: $t('admin.metrics.executions') },
-        { data: avgSeries, label: $t('admin.metrics.avgDuration') },
-        { data: maxSeries, label: $t('admin.metrics.maxDuration') },
+    const data = [
+        ...statusSeries.map((s, i) => ({ data: s, label: `HTTP ${i}`, stack: 'exec', fill: 'stack', })),
+        // { data: hitSeries, label: $t('admin.metrics.executions'), stack: 'hits', },
+        { data: avgSeries, label: $t('admin.metrics.avgDuration'), stack: 'avg', },
+        { data: maxSeries, label: $t('admin.metrics.maxDuration'), stack: 'max', },
     ];
+
+    return data.filter(Boolean);
 });
 
 const changeSortOrder = (sortKey: SortKey<RequestMetrics, AdditionalSortKey>) => {
@@ -106,7 +116,7 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
 
 <template>
     <div class="is-half-height">
-        <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history"
+        <TimeChart :options="{ stepSize: 1, showTime: true, stacked: true }" :time-series="history"
             @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
     </div>
     <table class="table is-striped is-fullwidth">
