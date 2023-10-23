@@ -8,10 +8,8 @@ import SortOrderComp from './SortOrder.vue';
 import { debounce } from '@/lib/debounce';
 import type { TimeSeriesPoint } from '@/types/dashboard';
 
-const metricsResponse = await request.$get<ApiRequestMetrics>('admin/requestMetrics');
-const metrics = metricsResponse.assertNotError().toRef();
-const histogramResponse = await request.$get<ApiRequestHistogram>('admin/requestHistogram');
-const histogram = histogramResponse.assertNotError().toRef();
+const metrics = ref<ApiRequestMetrics>({ requestMetrics: [] });
+const histogram = ref<ApiRequestHistogram>({ histogram: [] });
 
 type AdditionalSortKey = 'load';
 
@@ -93,7 +91,6 @@ onUnmounted(() => {
     clearInterval(updateInterval);
 });
 
-
 const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
     const min = minDate?.toISOString();
     const max = maxDate?.toISOString();
@@ -114,6 +111,8 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
         histogram.value = response.assertNotError();
     });
 }, 500);
+
+debounceUpdate();
 
 </script>
 

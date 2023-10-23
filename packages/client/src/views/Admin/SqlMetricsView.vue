@@ -8,10 +8,8 @@ import type { ApiHistogram, ApiStatementMetrics, SortKey, SortOrder, StatementMe
 import { computed, ref, onUnmounted } from 'vue';
 import SortOrderComp from './SortOrder.vue';
 
-const metricsResponse = await request.$get<ApiStatementMetrics>('admin/sqlMetrics');
-const metrics = metricsResponse.assertNotError().toRef();
-const histogramResponse = await request.$get<ApiHistogram>('admin/sqlHistogram');
-const histogram = histogramResponse.assertNotError().toRef();
+const metrics = ref<ApiStatementMetrics>({ statementMetrics: [] });
+const histogram = ref<ApiHistogram>({ histogram: [] });
 
 type AdditionalSortKey = 'load';
 
@@ -104,6 +102,7 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
 
 const selectedSqlQuery = ref('');
 
+debounceUpdate();
 </script>
 
 <template>
