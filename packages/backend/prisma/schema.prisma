@@ -239,7 +239,7 @@ model StatusCode {
   statusCode Int
   hitCount   Int
 
-  requestMetrics         RequestMetrics @relation(fields: [requestMetricsBucketId], references: [bucketId])
+  requestMetrics         RequestMetrics @relation(fields: [requestMetricsBucketId], references: [bucketId], onDelete: Cascade)
   requestMetricsBucketId String
 
   @@id([requestMetricsBucketId, statusCode])

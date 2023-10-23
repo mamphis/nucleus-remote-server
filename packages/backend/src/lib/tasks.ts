@@ -66,7 +66,7 @@ const saveHistoricData = async () => {
     Logger.info(`Task "saveHistoricData" has run. Saved ${activeClients.length} active clients and ${totalClients.length} total clients.`);
 }
 
-const cleanupUnusedKeys = async () => {
+const removeUnusedKeys = async () => {
     const { count } = await db.key.deleteMany({
         where: {
             clients: {
@@ -140,15 +140,39 @@ const saveMetrics = async () => {
     Logger.debug(`Task "saveRequestMetrics" has run. Saved ${routeMetrics.size} request metrics.`);
 }
 
+const removeOldMetrics = async () => {
+    const { count: countQueryMetrics } = await db.queryMetrics.deleteMany({
+        where: {
+            bucketTime: {
+                lt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+            }
+        }
+    });
+
+    Logger.info(`Task "removeOldMetrics" has run. Removed ${countQueryMetrics} old query metrics.`);
+
+    const { count: countRequestMetrics } = await db.requestMetrics.deleteMany({
+        where: {
+            bucketTime: {
+                lt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+            }
+        },
+    });
+
+    Logger.info(`Task "removeOldMetrics" has run. Removed ${countRequestMetrics} old request metrics + status codes.`);
+};
+
 const init = () => {
     // Run every second day at 03:00 in the morning
     schedule("0 3 * * */2", removeDanglingTasks, { name: 'removeDanglingTasks', runOnInit: true });
     // Run every day at 23:55 in the evening
     schedule('55 23 * * *', saveHistoricData, { name: 'saveHistoricData' });
-    // Run every second day at 03:00 in the morning
-    schedule("0 3 * * */2", cleanupUnusedKeys, { name: 'cleanupUnusedKeys', runOnInit: true });
+    // Run every second day at 04:00 in the morning
+    schedule("0 4 * * */2", removeUnusedKeys, { name: 'cleanupUnusedKeys', runOnInit: true });
     // Run every 30 seconds
     schedule("*/30 * * * * *", saveMetrics, { name: 'saveQueryMetrics' });
+    // Run every second day at 05:00 in the morning
+    schedule("0 5 * * */2", removeOldMetrics, { name: 'removeOldMetrics', runOnInit: true });
 }
 
 process.on('beforeExit', () => {
