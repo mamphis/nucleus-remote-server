@@ -191,6 +191,7 @@ const translations: Record<string, string> = {
     'tasks.executeFile': 'Datei Ausführen',
     'tenants.newTenant': 'Neuer Mandant',
     'tenants.tenants': 'Mandanten',
+    'timechart.title.date': 'Datum: ',
     'users.newUser': 'Neuer Benutzer',
     'users.users': 'Benutzer',
     'verify.createPassword': 'Passwort erstellen',

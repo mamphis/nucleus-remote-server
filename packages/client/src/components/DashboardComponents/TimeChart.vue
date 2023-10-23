@@ -5,8 +5,9 @@ import { Line } from 'vue-chartjs';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { computed } from 'vue';
 import customColors from './CustomColors';
-import type { Scale } from 'chart.js';
+import type { Scale, TooltipItem } from 'chart.js';
 import type { CoreScaleOptions } from 'chart.js';
+import { $t } from '@/lib/locale/locale';
 
 const colors: string[] = [
     'rgb(255, 99, 132)',
@@ -43,12 +44,19 @@ const chartOptions = {
         x: {
             ticks: {
                 callback: function (value: number) {
-                    const label = (this as unknown as Scale<CoreScaleOptions>).getLabelForValue(value) as unknown as Date;
-                    
+                    const thisLabel = (this as unknown as Scale<CoreScaleOptions>).getLabelForValue(value) as unknown as Date;
+
                     if (props.options?.showTime) {
-                        return label.toLocaleTimeString();
+                        if (value > 0) {
+                            const labelBefore = (this as unknown as Scale<CoreScaleOptions>).getLabelForValue(value - 1) as unknown as Date;
+                            // Check if labelBefore is on a different day than thisLabel
+                            if (labelBefore.getDate() !== thisLabel.getDate()) {
+                                return thisLabel.toLocaleDateString() + ' ' + thisLabel.toLocaleTimeString();
+                            }
+                        }
+                        return thisLabel.toLocaleTimeString();
                     } else {
-                        return label.toLocaleDateString();
+                        return thisLabel.toLocaleDateString();
                     }
                 }
             }
@@ -86,10 +94,23 @@ const chartOptions = {
                 drag: {
                     enabled: true,
                     modifierKey: 'ctrl',
+                    backgroundColor: 'rgba(127,127,127,0.3)',
                 },
                 mode: 'x',
             }
-        }
+        },
+        tooltip: {
+            callbacks: {
+                title: function (context: TooltipItem<'line'>[]) {
+                    let label = $t('timechart.title.date');
+                    if (context[0].label !== null) {
+                        const date = new Date(context[0].label);
+                        label += date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                    }
+                    return label;
+                },
+            }
+        },
     }
 } as any;
 const sortedTimeSeries = computed(() => props.timeSeries.map(timeSeries => ({
