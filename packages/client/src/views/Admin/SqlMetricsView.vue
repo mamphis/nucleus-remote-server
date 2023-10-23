@@ -102,9 +102,18 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
     });
 }, 500);
 
+const selectedSqlQuery = ref('');
+
 </script>
 
 <template>
+    <div class="modal" :class="{ 'is-active': selectedSqlQuery !== '' }">
+        <div class="modal-background" @click.prevent="selectedSqlQuery = ''"></div>
+        <div class="modal-content">
+            <pre>{{ selectedSqlQuery }}</pre>
+        </div>
+        <button class="modal-close is-large" aria-label="close" @click.prevent="selectedSqlQuery = ''"></button>
+    </div>
     <div class="is-half-height">
         <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history"
             @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
@@ -135,7 +144,9 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
         <tbody>
             <tr v-for="query in queries" :key="query.query">
                 <td>
-                    <div class="query" :title="query.query">{{ query.query }}</div>
+                    <div class="query" :title="query.query" @click.prevent="selectedSqlQuery = query.query">
+                        {{ query.query }}
+                    </div>
                 </td>
                 <td>
                     <div>{{ query.hitCount }}</div>
@@ -179,5 +190,12 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
 
 .is-half-height {
     height: 50vh;
+}
+
+.modal-content>pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 </style>
