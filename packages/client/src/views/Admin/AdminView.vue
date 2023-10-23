@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import MetricsView from './MetricsView.vue';
+import SqlMetricsView from './SqlMetricsView.vue';
 import StatisticsView from './StatisticsView.vue';
 import RequestsView from './RequestMetricsView.vue';
 const defaultTab = location.hash == '' ? 'metrics' : location.hash.substring(1);
@@ -13,7 +13,7 @@ const setActiveTab = (tab: string) => {
 </script>
 
 <template>
-    <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
+    <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100" style="width: 100%;">
         <div class="column is-full">
             <h1 class="title">{{ $t('admin.admin') }}</h1>
         </div>
@@ -29,9 +29,11 @@ const setActiveTab = (tab: string) => {
                         $t('admin.tabs.requests') }}</a></li>
                 </ul>
             </div>
-            <MetricsView v-if="activeTab == 'metrics'"></MetricsView>
-            <StatisticsView v-if="activeTab == 'statistics'"></StatisticsView>
-            <RequestsView v-if="activeTab == 'requests'"></RequestsView>
+            <div class="is-flex is-flex-direction-column">
+                <SqlMetricsView v-if="activeTab == 'metrics'"></SqlMetricsView>
+                <StatisticsView v-if="activeTab == 'statistics'"></StatisticsView>
+                <RequestsView v-if="activeTab == 'requests'"></RequestsView>
+            </div>
         </div>
     </div>
 </template>

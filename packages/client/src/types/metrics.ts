@@ -8,8 +8,15 @@ export type StatementMetrics = Metrics & {
     query: string;
 };
 
-export type Histogram = Metrics & {
+export type SqlHistogram = Metrics & {
     bucketTime: string
+}
+
+export type RequestHistogram = SqlHistogram & {
+    statusCodes: {
+        statusCode: number;
+        hitCount: number;
+    }[];
 }
 
 export type RequestMetrics = Metrics & {
@@ -21,13 +28,15 @@ export type ApiStatementMetrics = {
 }
 
 export type ApiHistogram = {
-    histogram: Histogram[];
+    histogram: SqlHistogram[];
 }
 
 export type ApiRequestMetrics = {
     requestMetrics: RequestMetrics[];
 }
-
+export type ApiRequestHistogram = {
+    histogram: RequestHistogram[];
+}
 export type ApiStatistics = {
     clientCount: number;
     userCount: number;

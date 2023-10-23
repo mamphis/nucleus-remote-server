@@ -34,6 +34,7 @@ const props = defineProps<{
 
 const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
         y: {
             min: props.options?.min ?? 0,

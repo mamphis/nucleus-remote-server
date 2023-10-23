@@ -39,25 +39,39 @@ export default function (db: PrismaClient) {
     });
 
     router.get('/sqlHistogram', auth('special:admin'), async (req, res, next) => {
-        const histogram = await db.queryMetrics.groupBy({
-            by: 'bucketTime',
-            _sum: { hitCount: true },
-            _avg: { avgDuration: true },
-            _max: { maxDuration: true },
+        const data = await db.requestMetrics.findMany({
+            select: {
+                avgDuration: true,
+                maxDuration: true,
+                hitCount: true,
+                bucketTime: true,
+                statusCodes: {
+                    select: {
+                        statusCode: true,
+                        hitCount: true,
+                    }
+                }
+            },
             where: {
                 bucketTime: {
-                    gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
                 }
             }
-        });
+        });   
+
+        const histogram = data.map((metric) => ({
+            bucketTime: metric.bucketTime,
+            hitCount: metric.hitCount,
+            avgDuration: metric.avgDuration,
+            maxDuration: metric.maxDuration,
+            statusCodes: metric.statusCodes.map((statusCode) => ({
+                statusCode: statusCode.statusCode,
+                hitCount: statusCode.hitCount,
+            })),
+        }));
 
         res.json({
-            histogram: histogram.map((metric) => ({
-                bucketTime: metric.bucketTime,
-                hitCount: metric._sum.hitCount,
-                avgDuration: metric._avg.avgDuration,
-                maxDuration: metric._max.maxDuration,
-            })),
+            histogram,
         })
     });
 
@@ -82,6 +96,15 @@ export default function (db: PrismaClient) {
     });
 
     router.get('/requestMetrics', auth('special:admin'), async (req, res, next) => {
+        const { min, max } = req.query;
+        let filter = {};
+        if (min && max) {
+            filter = {
+                gte: new Date(min),
+                lte: new Date(max),
+            }
+        }
+
         const requestMetrics = await db.requestMetrics.groupBy({
             by: 'requestPath',
             _sum: { hitCount: true },
@@ -89,7 +112,8 @@ export default function (db: PrismaClient) {
             _max: { maxDuration: true },
             where: {
                 bucketTime: {
-                    gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    ...filter,
                 }
             }
         });
@@ -104,6 +128,31 @@ export default function (db: PrismaClient) {
         };
 
         res.json(metrics);
+    });
+
+    router.get('/requestHistogram', auth('special:admin'), async (req, res, next) => {
+        const histogram = await db.requestMetrics.groupBy({
+            by: 'bucketTime',
+            _sum: { hitCount: true },
+            _avg: { avgDuration: true },
+            _max: { maxDuration: true },
+            where: {
+                bucketTime: {
+                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                }
+            }
+        });
+
+        
+
+        res.json({
+            histogram: histogram.map((metric) => ({
+                bucketTime: metric.bucketTime,
+                hitCount: metric._sum.hitCount,
+                avgDuration: metric._avg.avgDuration,
+                maxDuration: metric._max.maxDuration,
+            })),
+        })
     });
 
     return router;

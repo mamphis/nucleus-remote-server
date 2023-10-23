@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import TimeChart from '@/components/DashboardComponents/TimeChart.vue';
+import { debounce } from '@/lib/debounce';
 import { $t } from '@/lib/locale/locale';
 import request from '@/lib/request';
 import type { TimeSeriesPoint } from '@/types/dashboard';
-import type { ApiStatementMetrics, ApiHistogram, SortKey, SortOrder, StatementMetrics } from '@/types/metrics';
-import { computed, ref } from 'vue';
+import type { ApiHistogram, ApiStatementMetrics, SortKey, SortOrder, StatementMetrics } from '@/types/metrics';
+import { computed, ref, onUnmounted } from 'vue';
 import SortOrderComp from './SortOrder.vue';
-import { debounce } from '@/lib/debounce';
 
 const metricsResponse = await request.$get<ApiStatementMetrics>('admin/sqlMetrics');
 const metrics = metricsResponse.assertNotError().toRef();
@@ -70,9 +70,14 @@ const changeSortOrder = (sortKey: SortKey<StatementMetrics, AdditionalSortKey>) 
 
 let lastMin: Date | undefined;
 let lastMax: Date | undefined;
-setInterval(() => {
+const updateInterval = setInterval(() => {
     debounceUpdate(lastMin, lastMax)
 }, 30000);
+
+onUnmounted(() => {
+    console.log('clearing interval');
+    clearInterval(updateInterval);
+});
 
 const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
     const min = minDate?.toISOString();
@@ -97,8 +102,10 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
 </script>
 
 <template>
-    <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history"
-        @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
+    <div class="is-half-height">
+        <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history"
+            @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
+    </div>
     <table class="table is-striped">
         <thead>
             <tr>
@@ -121,11 +128,11 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
         </thead>
         <tbody>
             <tr v-for="query in queries" :key="query.query">
-                <td>{{ query.query }}</td>
-                <td>{{ query.hitCount }}</td>
-                <td>{{ query.avgDuration.toFixed(2) }}</td>
-                <td>{{ query.maxDuration.toFixed(2) }}</td>
-                <td>{{ query.load.toFixed(2) }}</td>
+                <td><div class="query" :title="query.query">{{ query.query }}</div></td>
+                <td><div>{{ query.hitCount }}</div></td>
+                <td><div>{{ query.avgDuration.toFixed(2) }}</div></td>
+                <td><div>{{ query.maxDuration.toFixed(2) }}</div></td>
+                <td><div>{{ query.load.toFixed(2) }}</div></td>
             </tr>
         </tbody>
     </table>
@@ -140,5 +147,20 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
     user-select: none;
 
     white-space: nowrap;
+}
+
+.table td>div {
+    max-height: 3em;
+    word-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    &.query {
+        cursor: pointer;
+    }
+}
+
+.is-half-height {
+    height: 50vh;
 }
 </style>

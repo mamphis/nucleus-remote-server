@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import request from '@/lib/request';
-import type { ApiQueryMetrics, ApiRequestMetrics, RequestMetrics, SortKey, SortOrder } from '@/types/metrics';
-import SortOrderComp from './SortOrder.vue';
 import TimeChart from '@/components/DashboardComponents/TimeChart.vue';
-import { ref, computed } from 'vue';
-import type { TimeSeriesPoint } from '@/types/dashboard';
 import { $t } from '@/lib/locale/locale';
+import request from '@/lib/request';
+import type { ApiRequestHistogram, ApiRequestMetrics, RequestMetrics, SortKey, SortOrder } from '@/types/metrics';
+import { computed, onUnmounted, ref } from 'vue';
+import SortOrderComp from './SortOrder.vue';
+import { debounce } from '@/lib/debounce';
+import type { TimeSeriesPoint } from '@/types/dashboard';
 
 const metricsResponse = await request.$get<ApiRequestMetrics>('admin/requestMetrics');
 const metrics = metricsResponse.assertNotError().toRef();
+const histogramResponse = await request.$get<ApiRequestHistogram>('admin/requestHistogram');
+const histogram = histogramResponse.assertNotError().toRef();
 
 type AdditionalSortKey = 'load';
 
@@ -35,6 +38,24 @@ const queries = computed(() => {
     return stmts;
 });
 
+const history = computed(() => {
+    const hist = histogram.value.histogram;
+    const hitSeries: TimeSeriesPoint[] = [];
+    const avgSeries: TimeSeriesPoint[] = [];
+    const maxSeries: TimeSeriesPoint[] = [];
+    hist.forEach((value) => {
+        hitSeries.push({ date: value.bucketTime, value: value.hitCount });
+        avgSeries.push({ date: value.bucketTime, value: value.avgDuration });
+        maxSeries.push({ date: value.bucketTime, value: value.maxDuration });
+    });
+
+    return [
+        { data: hitSeries, label: $t('admin.metrics.executions') },
+        { data: avgSeries, label: $t('admin.metrics.avgDuration') },
+        { data: maxSeries, label: $t('admin.metrics.maxDuration') },
+    ];
+});
+
 const changeSortOrder = (sortKey: SortKey<RequestMetrics, AdditionalSortKey>) => {
     if (sortOrder.value[0] === sortKey) {
         if (sortOrder.value[1] === 'asc') {
@@ -47,16 +68,48 @@ const changeSortOrder = (sortKey: SortKey<RequestMetrics, AdditionalSortKey>) =>
     }
 }
 
-setInterval(() => {
-    request.$get<ApiRequestMetrics>('admin/requestMetrics').then((response) => {
+let lastMin: Date | undefined;
+let lastMax: Date | undefined;
+
+const updateInterval = setInterval(() => {
+    debounceUpdate(lastMin, lastMax)
+}, 30000);
+
+onUnmounted(() => {
+    console.log('clearing interval');
+    clearInterval(updateInterval);
+});
+
+
+const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
+    const min = minDate?.toISOString();
+    const max = maxDate?.toISOString();
+
+    lastMin = minDate;
+    lastMax = maxDate;
+
+    let url = 'admin/requestMetrics';
+    if (min && max) {
+        url += `?min=${min}&max=${max}`;
+    }
+
+    request.$get<ApiRequestMetrics>(url).then((response) => {
         metrics.value = response.assertNotError();
     });
-}, 30000);
+
+    request.$get<ApiRequestHistogram>('admin/requestHistogram').then((response) => {
+        histogram.value = response.assertNotError();
+    });
+}, 500);
 
 </script>
 
 <template>
-    <table class="table is-striped">
+    <div class="is-half-height">
+        <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history"
+            @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
+    </div>
+    <table class="table is-striped is-fullwidth">
         <thead>
             <tr>
                 <th @click="changeSortOrder('requestPath')">{{ $t('admin.metrics.requestPath') }}
@@ -97,5 +150,9 @@ setInterval(() => {
     user-select: none;
 
     white-space: nowrap;
+}
+
+.is-half-height {
+    height: 50vh;
 }
 </style>
