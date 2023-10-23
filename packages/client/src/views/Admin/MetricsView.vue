@@ -3,19 +3,22 @@ import TimeChart from '@/components/DashboardComponents/TimeChart.vue';
 import { $t } from '@/lib/locale/locale';
 import request from '@/lib/request';
 import type { TimeSeriesPoint } from '@/types/dashboard';
-import type { ApiQueryMetrics, SortKey, SortOrder, StatementMetrics } from '@/types/metrics';
+import type { ApiStatementMetrics, ApiHistogram, SortKey, SortOrder, StatementMetrics } from '@/types/metrics';
 import { computed, ref } from 'vue';
 import SortOrderComp from './SortOrder.vue';
+import { debounce } from '@/lib/debounce';
 
-const metricsResponse = await request.$get<ApiQueryMetrics>('admin/sqlMetrics');
+const metricsResponse = await request.$get<ApiStatementMetrics>('admin/sqlMetrics');
 const metrics = metricsResponse.assertNotError().toRef();
+const histogramResponse = await request.$get<ApiHistogram>('admin/sqlHistogram');
+const histogram = histogramResponse.assertNotError().toRef();
 
 type AdditionalSortKey = 'load';
 
 const sortOrder = ref<SortOrder<StatementMetrics, AdditionalSortKey>>([undefined, 'desc']);
 
 const queries = computed(() => {
-    const stmts = metrics.value.queryMetrics.statementMetrics.map((s) => ({ ...s, load: s.avgDuration * s.hitCount }));
+    const stmts = metrics.value.statementMetrics.map((s) => ({ ...s, load: s.avgDuration * s.hitCount }));
 
     const [sortKey, sortDirection] = sortOrder.value;
     if (sortKey) {
@@ -36,11 +39,11 @@ const queries = computed(() => {
 });
 
 const history = computed(() => {
-    const histogram = metrics.value.queryMetrics.histogram;
+    const hist = histogram.value.histogram;
     const hitSeries: TimeSeriesPoint[] = [];
     const avgSeries: TimeSeriesPoint[] = [];
     const maxSeries: TimeSeriesPoint[] = [];
-    histogram.forEach((value) => {
+    hist.forEach((value) => {
         hitSeries.push({ date: value.bucketTime, value: value.hitCount });
         avgSeries.push({ date: value.bucketTime, value: value.avgDuration });
         maxSeries.push({ date: value.bucketTime, value: value.maxDuration });
@@ -65,16 +68,37 @@ const changeSortOrder = (sortKey: SortKey<StatementMetrics, AdditionalSortKey>) 
     }
 }
 
+let lastMin: Date | undefined;
+let lastMax: Date | undefined;
 setInterval(() => {
-    request.$get<ApiQueryMetrics>('admin/sqlMetrics').then((response) => {
+    debounceUpdate(lastMin, lastMax)
+}, 30000);
+
+const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
+    const min = minDate?.toISOString();
+    const max = maxDate?.toISOString();
+
+    lastMin = minDate;
+    lastMax = maxDate;
+
+    let url = 'admin/sqlMetrics';
+    if (min && max) {
+        url += `?min=${min}&max=${max}`;
+    }
+
+    request.$get<ApiStatementMetrics>(url).then((response) => {
         metrics.value = response.assertNotError();
     });
-}, 30000);
+    request.$get<ApiHistogram>('admin/sqlHistogram').then((response) => {
+        histogram.value = response.assertNotError();
+    });
+}, 500);
 
 </script>
 
 <template>
-    <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history" />
+    <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history"
+        @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
     <table class="table is-striped">
         <thead>
             <tr>

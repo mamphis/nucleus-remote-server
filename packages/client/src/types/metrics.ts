@@ -16,11 +16,12 @@ export type RequestMetrics = Metrics & {
     requestPath: string;
 }
 
-export type ApiQueryMetrics = {
-    queryMetrics: {
-        statementMetrics: StatementMetrics[];
-        histogram: Histogram[];
-    },
+export type ApiStatementMetrics = {
+    statementMetrics: StatementMetrics[];
+}
+
+export type ApiHistogram = {
+    histogram: Histogram[];
 }
 
 export type ApiRequestMetrics = {

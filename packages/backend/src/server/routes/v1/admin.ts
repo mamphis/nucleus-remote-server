@@ -6,6 +6,15 @@ export default function (db: PrismaClient) {
     const router = Router();
 
     router.get('/sqlMetrics', auth('special:admin'), async (req, res: AuthResponse, next) => {
+        const { min, max } = req.query;
+        let filter = {};
+        if (min && max) {
+            filter = {
+                gte: new Date(min),
+                lte: new Date(max),
+            }
+        }
+
         const statementMetrics = await db.queryMetrics.groupBy({
             by: 'query',
             _sum: { hitCount: true },
@@ -13,11 +22,23 @@ export default function (db: PrismaClient) {
             _max: { maxDuration: true },
             where: {
                 bucketTime: {
-                    gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    ...filter,
                 }
             }
         });
 
+        res.json({
+            statementMetrics: statementMetrics.map((metric) => ({
+                query: metric.query,
+                hitCount: metric._sum.hitCount,
+                avgDuration: metric._avg.avgDuration,
+                maxDuration: metric._max.maxDuration,
+            })),
+        });
+    });
+
+    router.get('/sqlHistogram', auth('special:admin'), async (req, res, next) => {
         const histogram = await db.queryMetrics.groupBy({
             by: 'bucketTime',
             _sum: { hitCount: true },
@@ -30,24 +51,14 @@ export default function (db: PrismaClient) {
             }
         });
 
-        const queryMetrics = {
-            statementMetrics: statementMetrics.map((metric) => ({
-                query: metric.query,
-                hitCount: metric._sum.hitCount,
-                avgDuration: metric._avg.avgDuration,
-                maxDuration: metric._max.maxDuration,
-            })),
+        res.json({
             histogram: histogram.map((metric) => ({
                 bucketTime: metric.bucketTime,
                 hitCount: metric._sum.hitCount,
                 avgDuration: metric._avg.avgDuration,
                 maxDuration: metric._max.maxDuration,
             })),
-        };
-
-        res.json({
-            queryMetrics,
-        });
+        })
     });
 
     router.get('/statistics', auth('special:admin'), async (req, res, next) => {
