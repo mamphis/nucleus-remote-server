@@ -149,7 +149,7 @@ export default function (db: PrismaClient) {
             statusCodes: Status[]
         }
 
-        const histogram = data.reduce((acc, metric) => {
+        let histogram = data.reduce((acc, metric) => {
             const { avgDuration, maxDuration, hitCount, bucketTime, statusCodes } = metric;
             const bucketTimeStr = bucketTime.toISOString();
 
@@ -160,8 +160,7 @@ export default function (db: PrismaClient) {
                 bucketTime: bucketTimeStr,
                 statusCodes: [],
             };
-            
-            
+
             acc[bucketTimeStr].avgDuration = (avgDuration + acc[bucketTimeStr].avgDuration) / 2;
             acc[bucketTimeStr].maxDuration += maxDuration;
             acc[bucketTimeStr].hitCount += hitCount;

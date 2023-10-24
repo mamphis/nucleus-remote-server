@@ -5,7 +5,7 @@ import { CategoryScale, Chart, Filler, Legend, LineElement, LinearScale, PointEl
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { computed } from 'vue';
 import { Line } from 'vue-chartjs';
-import customColors from './DashboardComponents/CustomColors';
+import customColors from './DashboardComponents/CustomChartFunctions/CustomColors';
 
 const colors: string[] = [
     'rgb(255, 99, 132)',
@@ -97,4 +97,4 @@ const data = computed(() => ({
 
 <template>
     <Line :data="data" :options="chartOptions" />
-</template>
+</template>./DashboardComponents/CustomChartFunctions/CustomColors

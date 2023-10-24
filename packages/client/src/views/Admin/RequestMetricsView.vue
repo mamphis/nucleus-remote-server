@@ -16,6 +16,10 @@ type AdditionalSortKey = 'load';
 const sortOrder = ref<SortOrder<RequestMetrics, AdditionalSortKey>>([undefined, 'desc']);
 const searchValue = ref('');
 
+let lastMin: Date | undefined;
+let lastMax: Date | undefined;
+let lastZoom: number | undefined;
+
 const queries = computed(() => {
     const stmts = metrics.value.requestMetrics
         .map((s) => ({ ...s, load: s.avgDuration * s.hitCount }))
@@ -40,7 +44,7 @@ const queries = computed(() => {
 });
 
 const history = computed(() => {
-    const hist = histogram.value.histogram;
+    let hist = histogram.value.histogram;
     // const hitSeries: TimeSeriesPoint[] = [];
     const avgSeries: TimeSeriesPoint[] = [];
     const maxSeries: TimeSeriesPoint[] = [];
@@ -58,7 +62,7 @@ const history = computed(() => {
     });
 
     const data = [
-        ...statusSeries.map((s, i) => ({ data: s, label: `HTTP ${i}`, stack: 'exec', fill: 'stack', })),
+        ...statusSeries.map((s, i) => ({ data: s, label: `HTTP ${i}`, stack: 'exec', fill: 'stack', })).filter(Boolean),
         // { data: hitSeries, label: $t('admin.metrics.executions'), stack: 'hits', },
         { data: avgSeries, label: $t('admin.metrics.avgDuration'), stack: 'avg', },
         { data: maxSeries, label: $t('admin.metrics.maxDuration'), stack: 'max', },
@@ -79,9 +83,6 @@ const changeSortOrder = (sortKey: SortKey<RequestMetrics, AdditionalSortKey>) =>
     }
 }
 
-let lastMin: Date | undefined;
-let lastMax: Date | undefined;
-
 const updateInterval = setInterval(() => {
     debounceUpdate(lastMin, lastMax)
 }, 30000);
@@ -91,35 +92,37 @@ onUnmounted(() => {
     clearInterval(updateInterval);
 });
 
-const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
+const debounceUpdate = debounce((minDate?: Date, maxDate?: Date, zoomLevel?: number) => {
     const min = minDate?.toISOString();
     const max = maxDate?.toISOString();
 
     lastMin = minDate;
     lastMax = maxDate;
+    lastZoom = zoomLevel ?? lastZoom;
 
-    let url = 'admin/requestMetrics';
+    let metricsUrl = 'admin/requestMetrics';
+    let histogramUrl = 'admin/requestHistogram';
     if (min && max) {
-        url += `?min=${min}&max=${max}`;
+        metricsUrl += `?min=${min}&max=${max}`;
     }
 
-    request.$get<ApiRequestMetrics>(url).then((response) => {
+    request.$get<ApiRequestMetrics>(metricsUrl).then((response) => {
         metrics.value = response.assertNotError();
     });
 
-    request.$get<ApiRequestHistogram>('admin/requestHistogram').then((response) => {
+    request.$get<ApiRequestHistogram>(histogramUrl).then((response) => {
         histogram.value = response.assertNotError();
     });
 }, 500);
 
-debounceUpdate();
+debounceUpdate(undefined, undefined, 1);
 
 </script>
 
 <template>
     <div class="is-half-height">
         <TimeChart :options="{ stepSize: 1, showTime: true, stacked: true }" :time-series="history"
-            @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
+            @zoom="debounceUpdate" />
     </div>
     <div class="field mt-2">
         <input type="text" class="input" :placeholder="$t('admin.metrics.searchPlaceholder')" v-model="searchValue">

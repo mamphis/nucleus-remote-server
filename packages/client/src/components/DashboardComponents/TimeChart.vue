@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { $t } from '@/lib/locale/locale';
 import type { TimeSeriesPoint } from '@/types/dashboard';
-import { CategoryScale, Chart, Legend, LineElement, LinearScale, PointElement, Title, Tooltip, Filler } from 'chart.js';
-import { Line } from 'vue-chartjs';
+import type { TooltipItem } from 'chart.js';
+import { CategoryScale, Chart, Filler, Legend, LineElement, LinearScale, PointElement, TimeSeriesScale, Title, Tooltip, _adapters } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { computed } from 'vue';
-import customColors from './CustomColors';
-import type { Scale, TooltipItem } from 'chart.js';
-import type { CoreScaleOptions } from 'chart.js';
-import { $t } from '@/lib/locale/locale';
+import { Line } from 'vue-chartjs';
+import customColors from './CustomChartFunctions/CustomColors';
+import 'chartjs-adapter-date-fns';
 
 const colors: string[] = [
     'rgb(255, 99, 132)',
@@ -16,10 +16,10 @@ const colors: string[] = [
     'rgb(255, 159, 64)',
     'rgb(200, 102, 200)',
 ]
-Chart.register(zoomPlugin, Title, Tooltip, Legend, Filler, customColors(colors), LineElement, PointElement, CategoryScale, LinearScale, );
+Chart.register(zoomPlugin, Title, Tooltip, Legend, Filler, customColors(colors), LineElement, PointElement, CategoryScale, LinearScale, TimeSeriesScale);
 
 const emits = defineEmits<{
-    (event: 'zoom', minDate: Date, maxDate: Date): void,
+    (event: 'zoom', minDate: Date, maxDate: Date, zoomLevel: number): void,
 }>();
 
 const props = defineProps<{
@@ -45,24 +45,15 @@ const chartOptions = {
             stacked: props.options?.stacked ?? false,
         },
         x: {
-            ticks: {
-                callback: function (value: number) {
-                    const thisLabel = (this as unknown as Scale<CoreScaleOptions>).getLabelForValue(value) as unknown as Date;
-
-                    if (props.options?.showTime) {
-                        if (value > 0) {
-                            const labelBefore = (this as unknown as Scale<CoreScaleOptions>).getLabelForValue(value - 1) as unknown as Date;
-                            // Check if labelBefore is on a different day than thisLabel
-                            if (labelBefore.getDate() !== thisLabel.getDate()) {
-                                return thisLabel.toLocaleDateString() + ' ' + thisLabel.toLocaleTimeString();
-                            }
-                        }
-                        return thisLabel.toLocaleTimeString();
-                    } else {
-                        return thisLabel.toLocaleDateString();
-                    }
-                }
-            }
+            type: 'time',
+            time: {
+                unit: props.options?.showTime ? 'minute' : 'day',
+                displayFormats: {
+                    minute: 'HH:mm:ss',
+                    day: 'dd.MM.yyyy',
+                },
+            },
+            min: new Date(new Date().getTime() - 2 * 60 * 60 * 1000).valueOf(),
         }
     },
     plugins: {
@@ -71,21 +62,22 @@ const chartOptions = {
                 enabled: true,
                 mode: 'x',
                 onPanComplete: ({ chart }: { chart: Chart }) => {
-                    const minDate = chart.scales.x.getLabelForValue(chart.scales.x.min) as unknown as Date;
-                    const maxDate = chart.scales.x.getLabelForValue(chart.scales.x.max) as unknown as Date;
+                    const minDate = new Date(chart.scales.x.min)
+                    const maxDate = new Date(chart.scales.x.max)
 
-                    emits('zoom', minDate, maxDate);
+                    emits('zoom', minDate, maxDate, chart.getZoomLevel());
                 },
             },
             limits: {
-                y: { min: -2, max: 'original' }
+                y: { min: -2, max: 'original' },
+                x: { max: 'original'},
             },
             zoom: {
                 onZoomComplete: ({ chart }: { chart: Chart }) => {
-                    const minDate = chart.scales.x.getLabelForValue(chart.scales.x.min) as unknown as Date;
-                    const maxDate = chart.scales.x.getLabelForValue(chart.scales.x.max) as unknown as Date;
+                    const minDate = new Date(chart.scales.x.min)
+                    const maxDate = new Date(chart.scales.x.max)
 
-                    emits('zoom', minDate, maxDate);
+                    emits('zoom', minDate, maxDate, chart.getZoomLevel());
                 },
                 wheel: {
                     enabled: true,
@@ -106,10 +98,10 @@ const chartOptions = {
             callbacks: {
                 title: function (context: TooltipItem<'line'>[]) {
                     let label = $t('timechart.title.date');
-                    if (context[0].label !== null) {
-                        const date = new Date(context[0].label);
-                        label += date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-                    }
+
+                    const date = new Date(context[0].parsed.x);
+                    label += date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+
                     return label;
                 },
             }
@@ -138,7 +130,6 @@ const data = computed(() => ({
         data: timeSeries.data.map(point => point.value),
         stack: timeSeries.stack,
         fill: timeSeries.fill ?? 'origin',
-        tension: 0.2,
         pointRadius: 2,
     }))
 }));
