@@ -7,7 +7,7 @@ const props = defineProps<{
 }>();
 
 const options = {
-    
+    max: Math.max(...props.historyData.totalClients.map((s) => s.value), ...props.historyData.activeClients.map((s) => s.value)) + 1,
 }
 </script>
 <template>
@@ -16,6 +16,6 @@ const options = {
         <TimeChart :timeSeries="[
             { label: $t('dashboard.activeClients'), data: props.historyData.activeClients },
             { label: $t('dashboard.totalClients'), data: props.historyData.totalClients }
-        ]" :label="$t('dashboard.dailyActiveClients')"  />
+        ]" :label="$t('dashboard.dailyActiveClients')" :options="options" />
     </div>
 </template>

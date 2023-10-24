@@ -9,7 +9,8 @@ import { debounce } from '@/lib/debounce';
 import type { TimeSeriesPoint } from '@/types/dashboard';
 
 const metrics = ref<ApiRequestMetrics>({ requestMetrics: [] });
-const histogram = ref<ApiRequestHistogram>({ histogram: [] });
+const histogramRequest = await request.$get<ApiRequestHistogram>('admin/requestHistogram')
+const histogram = histogramRequest.assertNotError().toRef();
 
 type AdditionalSortKey = 'load';
 
@@ -18,7 +19,6 @@ const searchValue = ref('');
 
 let lastMin: Date | undefined;
 let lastMax: Date | undefined;
-let lastZoom: number | undefined;
 
 const queries = computed(() => {
     const stmts = metrics.value.requestMetrics
@@ -88,20 +88,17 @@ const updateInterval = setInterval(() => {
 }, 30000);
 
 onUnmounted(() => {
-    console.log('clearing interval');
     clearInterval(updateInterval);
 });
 
-const debounceUpdate = debounce((minDate?: Date, maxDate?: Date, zoomLevel?: number) => {
+const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
     const min = minDate?.toISOString();
     const max = maxDate?.toISOString();
 
     lastMin = minDate;
     lastMax = maxDate;
-    lastZoom = zoomLevel ?? lastZoom;
 
     let metricsUrl = 'admin/requestMetrics';
-    let histogramUrl = 'admin/requestHistogram';
     if (min && max) {
         metricsUrl += `?min=${min}&max=${max}`;
     }
@@ -109,19 +106,15 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date, zoomLevel?: num
     request.$get<ApiRequestMetrics>(metricsUrl).then((response) => {
         metrics.value = response.assertNotError();
     });
-
-    request.$get<ApiRequestHistogram>(histogramUrl).then((response) => {
-        histogram.value = response.assertNotError();
-    });
 }, 500);
 
-debounceUpdate(undefined, undefined, 1);
+debounceUpdate();
 
 </script>
 
 <template>
     <div class="is-half-height">
-        <TimeChart :options="{ stepSize: 1, showTime: true, stacked: true }" :time-series="history"
+        <TimeChart :options="{  }" :time-series="history"
             @zoom="debounceUpdate" />
     </div>
     <div class="field mt-2">

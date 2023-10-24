@@ -9,12 +9,16 @@ import { computed, ref, onUnmounted } from 'vue';
 import SortOrderComp from './SortOrder.vue';
 
 const metrics = ref<ApiStatementMetrics>({ statementMetrics: [] });
-const histogram = ref<ApiHistogram>({ histogram: [] });
+const histogramRequest = await request.$get<ApiHistogram>('admin/sqlHistogram')
+const histogram = histogramRequest.assertNotError().toRef();
 
 type AdditionalSortKey = 'load';
 
 const sortOrder = ref<SortOrder<StatementMetrics, AdditionalSortKey>>([undefined, 'desc']);
 const searchValue = ref('');
+
+let lastMin: Date | undefined;
+let lastMax: Date | undefined;
 
 const queries = computed(() => {
     const stmts = metrics.value.statementMetrics
@@ -69,14 +73,11 @@ const changeSortOrder = (sortKey: SortKey<StatementMetrics, AdditionalSortKey>) 
     }
 }
 
-let lastMin: Date | undefined;
-let lastMax: Date | undefined;
 const updateInterval = setInterval(() => {
     debounceUpdate(lastMin, lastMax)
 }, 30000);
 
 onUnmounted(() => {
-    console.log('clearing interval');
     clearInterval(updateInterval);
 });
 
@@ -95,9 +96,6 @@ const debounceUpdate = debounce((minDate?: Date, maxDate?: Date) => {
     request.$get<ApiStatementMetrics>(url).then((response) => {
         metrics.value = response.assertNotError();
     });
-    request.$get<ApiHistogram>('admin/sqlHistogram').then((response) => {
-        histogram.value = response.assertNotError();
-    });
 }, 500);
 
 const selectedSqlQuery = ref('');
@@ -114,7 +112,7 @@ debounceUpdate();
         <button class="modal-close is-large" aria-label="close" @click.prevent="selectedSqlQuery = ''"></button>
     </div>
     <div class="is-half-height">
-        <TimeChart :options="{ stepSize: 1, showTime: true }" :time-series="history"
+        <TimeChart :options="{ }" :time-series="history"
             @zoom="(minDate, maxDate) => debounceUpdate(minDate, maxDate)" />
     </div>
     <div class="field mt-2">
