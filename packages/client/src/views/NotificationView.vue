@@ -24,7 +24,7 @@ const readNotification = async (notification: ApiNotification) => {
         </div>
         <div class="column is-full">
             <div class="field is-grouped">
-                <table class="table is-striped">
+                <table class="table is-striped is-fullwidth">
                     <thead>
                         <tr>
                             <th>{{ $t('field.read') }}</th>
