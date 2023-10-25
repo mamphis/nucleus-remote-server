@@ -23,6 +23,7 @@ model Tenant {
   notification  Notification[]
   featureFlag   FeatureFlag[]
   history       History[]
+  TenantFile    TenantFile[]
 }
 
 model Key {
@@ -106,6 +107,7 @@ model User {
   tenant               Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   permission           Permission[]
   approvedNotification Notification[]
+  TenantFile           TenantFile[]
 }
 
 model Permission {
@@ -243,4 +245,18 @@ model StatusCode {
   requestMetricsBucketId String
 
   @@id([requestMetricsBucketId, statusCode])
+}
+
+model TenantFile {
+  id               String   @id() @default(uuid())
+  filename         String
+  fileSize         Int
+  internalFilename String
+  mimeType         String
+  uploadedBy       User?    @relation(fields: [uploadedByUserId], references: [id], onDelete: SetNull)
+  createdAt        DateTime @default(now())
+
+  tenant           Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId         String
+  uploadedByUserId String?
 }
