@@ -11,6 +11,7 @@ const props = defineProps<{
     color?: string,
     options?: {
         max?: number,
+        min?: number,
     },
 }>();
 
@@ -43,6 +44,7 @@ const options = {
             formatter: (value: number) => { return value.toFixed(2); },
         },
         max: props.options?.max,
+        min: props.options?.min,
     },
     dataLabels: {
         enabled: false,

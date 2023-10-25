@@ -8,6 +8,7 @@ const props = defineProps<{
 
 const options = {
     max: Math.max(...props.historyData.totalClients.map((s) => s.value), ...props.historyData.activeClients.map((s) => s.value)) + 1,
+    min: 0,
 }
 </script>
 <template>
