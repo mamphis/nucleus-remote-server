@@ -2,6 +2,7 @@ import { schedule } from 'node-cron';
 import db, { getQueryMetrics } from "./db";
 import { Logger } from "./logger";
 import { getRouteMetrics } from '../server/server';
+import { isProduction } from './util';
 
 const removeDanglingTasks = async () => {
     const tasksBefore = await db.task.count();
@@ -18,13 +19,16 @@ const removeDanglingTasks = async () => {
     Logger.info(`Task "removeDanglingTasks" has run. Removed ${tasksBefore - tasksAfter} tasks.`);
 }
 
+const ONE_DAY = 1000 * 60 * 60 * 24;
+const DELETE_BEFORE = (isProduction() ? 7 : 1) * ONE_DAY;
+
 const saveHistoricData = async () => {
     // Get all clients which have received a ping in the last 24 hours
     const timestamp = new Date(new Date().setHours(0, 0, 0, 0));
     const activeClients = await db.client.groupBy({
         where: {
             lastPing: {
-                gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+                gte: new Date(Date.now() - ONE_DAY),
             }
         },
         by: ['tenantId'],
@@ -144,7 +148,7 @@ const removeOldMetrics = async () => {
     const { count: countQueryMetrics } = await db.queryMetrics.deleteMany({
         where: {
             bucketTime: {
-                lt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                lt: new Date(new Date().getTime() - DELETE_BEFORE),
             }
         }
     });
@@ -154,7 +158,7 @@ const removeOldMetrics = async () => {
     const { count: countRequestMetrics } = await db.requestMetrics.deleteMany({
         where: {
             bucketTime: {
-                lt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                lt: new Date(new Date().getTime() - DELETE_BEFORE),
             }
         },
     });
