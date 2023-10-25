@@ -169,8 +169,8 @@ const init = () => {
     schedule('55 23 * * *', saveHistoricData, { name: 'saveHistoricData' });
     // Run every second day at 04:00 in the morning
     schedule("0 4 * * */2", removeUnusedKeys, { name: 'cleanupUnusedKeys', runOnInit: true });
-    // Run every 30 seconds
-    schedule("*/30 * * * * *", saveMetrics, { name: 'saveQueryMetrics' });
+    // Run every minute
+    schedule("* * * * *", saveMetrics, { name: 'saveMetrics' });
     // Run every second day at 05:00 in the morning
     schedule("0 5 * * */2", removeOldMetrics, { name: 'removeOldMetrics', runOnInit: true });
 }
