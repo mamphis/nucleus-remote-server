@@ -45,14 +45,14 @@ const queries = computed(() => {
 
 const history = computed(() => {
     let hist = histogram.value.histogram;
-    // const hitSeries: TimeSeriesPoint[] = [];
+    const hitSeries: TimeSeriesPoint[] = [];
     const avgSeries: TimeSeriesPoint[] = [];
     const maxSeries: TimeSeriesPoint[] = [];
     const statusSeries: TimeSeriesPoint[][] = [];
     const statusCodes = new Set<number>(hist.flatMap((h) => h.statusCodes.map((s) => s.statusCode)));
 
     hist.forEach((value) => {
-        // hitSeries.push({ date: value.bucketTime, value: value.hitCount });
+        hitSeries.push({ date: value.bucketTime, value: value.hitCount });
         avgSeries.push({ date: value.bucketTime, value: value.avgDuration });
         maxSeries.push({ date: value.bucketTime, value: value.maxDuration });
         for (const statusCode of statusCodes) {
@@ -63,7 +63,7 @@ const history = computed(() => {
 
     const data = [
         ...statusSeries.map((s, i) => ({ data: s, label: `HTTP ${i}`, stack: 'exec', fill: 'stack', })).filter(Boolean),
-        // { data: hitSeries, label: $t('admin.metrics.executions'), stack: 'hits', },
+        { data: hitSeries, label: $t('admin.metrics.executions'), stack: 'hits', },
         { data: avgSeries, label: $t('admin.metrics.avgDuration'), stack: 'avg', },
         { data: maxSeries, label: $t('admin.metrics.maxDuration'), stack: 'max', },
     ];

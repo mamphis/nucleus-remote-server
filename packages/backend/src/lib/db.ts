@@ -15,7 +15,10 @@ const metrics = new MetricCounter<string, never>((key) =>
     (key.startsWith('INSERT INTO') && (key.includes('Metrics"') || key.includes('StatusCode"')))
     // Ignore every Select StatusCode query
     || (key.startsWith('SELECT') && (key.includes('StatusCode"') || key.includes('Metrics"')))
+    // Ignore every COMMIT, SELECT 1, BEGIN query
+    || key === 'COMMIT' || key === 'SELECT 1' || key === 'BEGIN'
 );
+
 export const getQueryMetrics = metrics.getMetrics.bind(metrics);
 
 db.$on('query', (e) => {
