@@ -10,6 +10,7 @@ import router from './router'
 import piniaStoragePlugin from './stores/storagePlugin'
 import { $t } from './lib/locale/locale'
 import VueApexCharts from "vue3-apexcharts";
+import { registerMimeTypes } from './lib/mimetypeIcons';
 
 
 const app = createApp(App)
@@ -20,6 +21,7 @@ pinia.use(piniaStoragePlugin);
 app.use(pinia);
 app.use(router);
 app.use(VueApexCharts);
+registerMimeTypes(app);
 
 app.config.globalProperties.$t = $t;
 
