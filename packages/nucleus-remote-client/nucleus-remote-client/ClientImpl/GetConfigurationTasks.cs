@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace nucleus_remote_client.Client
+namespace nucleus_remote_client.ClientImpl
 {
     internal class GetConfigurationTasks : IClient
     {

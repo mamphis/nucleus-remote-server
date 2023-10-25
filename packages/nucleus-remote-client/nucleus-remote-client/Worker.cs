@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Options;
-using nucleus_remote_client.Client;
+using nucleus_remote_client.ClientImpl;
 using nucleus_remote_client.Lib;
 using nucleus_remote_client.Tasks;
 using System.Diagnostics;
@@ -53,10 +53,13 @@ namespace nucleus_remote_client
                 Interval = TimeSpan.FromMinutes(30).TotalMilliseconds,
             };
 
-            async void Elapsed(object? sender, EventArgs _)
+            void Elapsed(object? sender, EventArgs _)
             {
-                await Try(new SendLocalDrives());
-                await Try(new SendInstalledPrograms());
+                Task.Run(async () =>
+                {
+                    await Try(new SendLocalDrives());
+                    await Try(new SendInstalledPrograms());
+                });
                 StartUpdater();
             }
 
@@ -77,7 +80,7 @@ namespace nucleus_remote_client
 
         private async Task Setup()
         {
-            await SetupUpgrade();
+            //await SetupUpgrade();
             SetupTimer();
             SetupEvents();
         }
@@ -95,6 +98,7 @@ namespace nucleus_remote_client
                 if (_logger.IsEnabled(LogLevel.Information))
                 {
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                    _logger.LogInformation("IsUserinteractive {0}", Environment.UserInteractive);
                 }
 
                 await Try(executer);

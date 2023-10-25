@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace nucleus_remote_client.Client.Models
+namespace nucleus_remote_client.ClientImpl.Models
 {
     enum LocalDriveConnectionEventType
     {

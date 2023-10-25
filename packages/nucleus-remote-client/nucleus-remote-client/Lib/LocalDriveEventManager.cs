@@ -1,4 +1,4 @@
-﻿using nucleus_remote_client.Client.Models;
+﻿using nucleus_remote_client.ClientImpl.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace nucleus_remote_client.Lib
     internal class LocalDriveEventManager
     {
 
-        internal event EventHandler<LocalDriveConnectionEventArgs> OnLocalDrivesChanged;
+        internal event EventHandler<LocalDriveConnectionEventArgs>? OnLocalDrivesChanged;
 
         [SupportedOSPlatformGuard("windows")]
         private readonly bool _isWindows = OperatingSystem.IsWindows();
@@ -37,7 +37,6 @@ namespace nucleus_remote_client.Lib
             };
             watcher.Query = query;
             watcher.Start();
-            watcher.WaitForNextEvent();
         }
 
 

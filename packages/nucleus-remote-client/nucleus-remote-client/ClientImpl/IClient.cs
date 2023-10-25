@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using nucleus_remote_client.Lib;
 
-namespace nucleus_remote_client.Client
+namespace nucleus_remote_client.ClientImpl
 {
     internal interface IClient
     {

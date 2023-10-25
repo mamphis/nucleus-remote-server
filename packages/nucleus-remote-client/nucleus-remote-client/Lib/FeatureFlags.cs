@@ -1,4 +1,4 @@
-﻿using nucleus_remote_client.Client;
+﻿using nucleus_remote_client.ClientImpl;
 using nucleus_remote_client.Tasks;
 using System;
 using System.Collections.Generic;

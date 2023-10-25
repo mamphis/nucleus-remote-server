@@ -4,9 +4,9 @@ using System.Runtime.Versioning;
 using System.Management;
 using System.IO;
 using IWshRuntimeLibrary;
-using nucleus_remote_client.Client.Models;
+using nucleus_remote_client.ClientImpl.Models;
 
-namespace nucleus_remote_client.Client
+namespace nucleus_remote_client.ClientImpl
 {
     internal class SendLocalDrives : IClient
     {

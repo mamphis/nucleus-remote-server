@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using nucleus_remote_client.Client;
+using nucleus_remote_client.ClientImpl;
 using nucleus_remote_client.Lib;
 
 namespace nucleus_remote_client.Tasks

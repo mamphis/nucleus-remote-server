@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using nucleus_remote_client.Client.Models;
+using nucleus_remote_client.ClientImpl.Models;
 using nucleus_remote_client.Lib;
 using nucleus_remote_client.Tasks;
 using System.Net.Http.Json;
@@ -7,7 +7,7 @@ using System.Runtime.Versioning;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace nucleus_remote_client.Client
+namespace nucleus_remote_client.ClientImpl
 {
     internal class SendInstalledPrograms : IClient
     {
