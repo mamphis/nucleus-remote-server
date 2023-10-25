@@ -138,7 +138,7 @@ const deleteConfiguration = async () => {
                     <div class="panel-heading is-flex is-align-items-center is-justify-content-space-between">
                         {{ $t('field.tasks') }}
                         <div class="control">
-                            <a class="button is-info is-small" @click="$router.push(`/new-task/${configuration.id}`)">
+                            <a class="button is-info is-small" @click="$router.push(`/tasks/new/${configuration.id}`)">
                                 {{ $t('editConfiguration.newTask') }}
                             </a>
                         </div>

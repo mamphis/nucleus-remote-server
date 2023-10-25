@@ -15,7 +15,7 @@ const users = await request.$get<ApiUser[]>('tenant-users');
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
                 <button class="button" v-if="hasPermission(user, 'create:tenant-user')"
-                    @click="$router.push('/new-tenant-user')">
+                    @click="$router.push('/tenant-users/new')">
                     {{ $t('users.newUser') }}</button>
             </div>
         </div>

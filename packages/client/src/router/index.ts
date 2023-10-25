@@ -32,6 +32,7 @@ import VerifyView from '@/views/VerifyView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
+    linkActiveClass: 'is-active',
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
@@ -77,180 +78,215 @@ const router = createRouter({
             }
         },
         {
-            path: '/users',
-            name: 'Users',
-            component: UsersView,
-            meta: {
-                authorized: true,
-                permissions: [':user']
-            }
-        },
-        {
-            path: '/new-user',
-            name: 'NewUser',
-            component: NewUserView,
-            meta: {
-                authorized: true,
-                permissions: ['create:user']
-            }
-        },
-        {
-            path: '/users/:userId',
-            name: 'EditUser',
-            component: EditUserView,
-            meta: {
-                authorized: true,
-                permissions: ['read:user']
-            }
-        },
-        {
             path: '/verify/:onetimePassword',
             name: 'Verify',
             component: VerifyView,
         },
         {
+            path: '/users',
+            children: [
+                {
+                    path: '',
+                    name: 'Users',
+                    component: UsersView,
+                    meta: {
+                        authorized: true,
+                        permissions: [':user']
+                    }
+                },
+                {
+                    path: 'new',
+                    name: 'NewUser',
+                    component: NewUserView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['create:user']
+                    }
+                },
+                {
+                    path: ':userId',
+                    name: 'EditUser',
+                    component: EditUserView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:user']
+                    }
+                },
+            ],
+        },
+        {
             path: '/tenants',
-            name: 'Tenants',
-            component: TenantsView,
-            meta: {
-                authorized: true,
-                permissions: [':tenant']
-            }
-        },
-        {
-            path: '/new-tenant',
-            name: 'NewTenant',
-            component: NewTenantView,
-            meta: {
-                authorized: true,
-                permissions: ['create:tenant']
-            }
-        },
-        {
-            path: '/tenants/:tenantId',
-            name: 'EditTenant',
-            component: EditTenantView,
-            meta: {
-                authorized: true,
-                permissions: ['read:tenant']
-            }
+            children: [
+                {
+                    path: '',
+                    name: 'Tenants',
+                    component: TenantsView,
+                    meta: {
+                        authorized: true,
+                        permissions: [':tenant']
+                    }
+                },
+                {
+                    path: 'new',
+                    name: 'NewTenant',
+                    component: NewTenantView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['create:tenant']
+                    }
+                },
+                {
+                    path: ':tenantId',
+                    name: 'EditTenant',
+                    component: EditTenantView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:tenant']
+                    }
+                },
+            ],
         },
         {
             path: '/tenant-users',
-            name: 'TenantUsers',
-            component: TenantUsersView,
-            meta: {
-                authorized: true,
-                permissions: [':tenant-user']
-            }
-        },
-        {
-            path: '/new-tenant-user',
-            name: 'NewTenantUser',
-            component: NewTenantUserView,
-            meta: {
-                authorized: true,
-                permissions: ['create:tenant-user']
-            }
-        },
-        {
-            path: '/tenant-users/:userId',
-            name: 'EditTenantUser',
-            component: EditTenantUserView,
-            meta: {
-                authorized: true,
-                permissions: ['read:tenant-user']
-            }
+            children: [
+                {
+                    path: '',
+                    name: 'TenantUsers',
+                    component: TenantUsersView,
+                    meta: {
+                        authorized: true,
+                        permissions: [':tenant-user']
+                    }
+                },
+                {
+                    path: 'new',
+                    name: 'NewTenantUser',
+                    component: NewTenantUserView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['create:tenant-user']
+                    }
+                },
+                {
+                    path: ':userId',
+                    name: 'EditTenantUser',
+                    component: EditTenantUserView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:tenant-user']
+                    }
+                },
+            ],
         },
         {
             path: '/groups',
-            name: 'Groups',
-            component: GroupsView,
-            meta: {
-                authorized: true,
-                permissions: [':group']
-            }
-        },
-        {
-            path: '/new-group',
-            name: 'NewGroup',
-            component: NewGroupView,
-            meta: {
-                authorized: true,
-                permissions: ['create:group']
-            }
-        },
-        {
-            path: '/groups/:groupId',
-            name: 'EditGroup',
-            component: EditGroupView,
-            meta: {
-                authorized: true,
-                permissions: ['read:group']
-            }
+            children: [
+                {
+                    path: '',
+                    name: 'Groups',
+                    component: GroupsView,
+                    meta: {
+                        authorized: true,
+                        permissions: [':group']
+                    }
+                },
+                {
+                    path: 'new',
+                    name: 'NewGroup',
+                    component: NewGroupView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['create:group']
+                    }
+                },
+                {
+                    path: ':groupId',
+                    name: 'EditGroup',
+                    component: EditGroupView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:group']
+                    }
+                },
+            ],
         },
         {
             path: '/configurations',
-            name: 'Configurations',
-            component: ConfigurationsView,
-            meta: {
-                authorized: true,
-                permissions: [':configuration']
-            }
-        },
-        {
-            path: '/new-configuration',
-            name: 'NewConfiguration',
-            component: NewConfigurationView,
-            meta: {
-                authorized: true,
-                permissions: ['create:configuration']
-            }
-        },
-        {
-            path: '/configurations/:configurationId',
-            name: 'EditConfiguration',
-            component: EditConfigurationView,
-            meta: {
-                authorized: true,
-                permissions: ['read:configuration']
-            }
+            children: [
+                {
+                    path: '',
+                    name: 'Configurations',
+                    component: ConfigurationsView,
+                    meta: {
+                        authorized: true,
+                        permissions: [':configuration']
+                    }
+                },
+                {
+                    path: 'new',
+                    name: 'NewConfiguration',
+                    component: NewConfigurationView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['create:configuration']
+                    }
+                },
+                {
+                    path: ':configurationId',
+                    name: 'EditConfiguration',
+                    component: EditConfigurationView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:configuration']
+                    }
+                },
+            ],
         },
         {
             path: '/clients',
-            name: 'Clients',
-            component: ClientsView,
-            meta: {
-                authorized: true,
-                permissions: ['read:client']
-            }
+            children: [
+                {
+                    path: '',
+                    name: 'Clients',
+                    component: ClientsView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:client']
+                    }
+                },
+                {
+                    path: ':clientId',
+                    name: 'EditClient',
+                    component: EditClientView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:client', 'read:task']
+                    }
+                },
+            ],
         },
         {
-            path: '/clients/:clientId',
-            name: 'EditClient',
-            component: EditClientView,
-            meta: {
-                authorized: true,
-                permissions: ['read:client', 'read:task']
-            }
-        },
-        {
-            path: '/new-task/:configurationId',
-            name: 'NewTask',
-            component: NewTaskView,
-            meta: {
-                authorized: true,
-                permissions: ['create:task'],
-            }
-        },
-        {
-            path: '/tasks/:taskId',
-            name: 'EditTask',
-            component: EditTaskView,
-            meta: {
-                authorized: true,
-                permissions: ['read:task'],
-            }
+            path: '/tasks',
+            children: [
+                {
+                    path: 'new/:configurationId',
+                    name: 'NewTask',
+                    component: NewTaskView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['create:task'],
+                    }
+                },
+                {
+                    path: ':taskId',
+                    name: 'EditTask',
+                    component: EditTaskView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:task'],
+                    },
+                },
+            ]
         },
         {
             path: '/admin',

@@ -15,7 +15,7 @@ const groups = await request.$get<ApiGroup[]>('groups');
                 <h1 class="title">{{ $t('groups.groups') }}</h1>
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
-                <button class="button" v-if="hasPermission(user, 'create:group')" @click="$router.push('/new-group')">
+                <button class="button" v-if="hasPermission(user, 'create:group')" @click="$router.push('/groups/new')">
                     {{ $t('groups.newGroup') }}</button>
             </div>
         </div>

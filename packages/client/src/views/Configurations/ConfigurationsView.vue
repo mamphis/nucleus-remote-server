@@ -6,7 +6,8 @@ import request, { isErrorResponse } from '../../lib/request';
 
 
 const { user } = userStore();
-const configurations = await request.$get<ApiConfiguration[]>('configurations');
+const configurationsResponse = await request.$get<ApiConfiguration[]>('configurations');
+const configurations = configurationsResponse.assertNotError().toRef();
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
@@ -16,7 +17,7 @@ const configurations = await request.$get<ApiConfiguration[]>('configurations');
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
                 <button class="button" v-if="hasPermission(user, 'create:configuration')"
-                    @click="$router.push('/new-configuration')">
+                    @click="$router.push('/configurations/new')">
                     {{ $t('configurations.newConfiguration') }}</button>
             </div>
         </div>

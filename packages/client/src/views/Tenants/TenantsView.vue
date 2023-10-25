@@ -14,7 +14,7 @@ const tenants = await request.$get<ApiTenant[]>('tenants');
                 <h1 class="title">{{ $t('tenants.tenants') }}</h1>
             </div>
             <div class="column is-one-quarter is-offset-one-quarter is-flex is-justify-content-end">
-                <button class="button" v-if="hasPermission(user, 'create:tenant')" @click="$router.push('/new-tenant')">
+                <button class="button" v-if="hasPermission(user, 'create:tenant')" @click="$router.push('/tenants/new')">
                     {{ $t('tenants.newTenant') }}</button>
             </div>
         </div>

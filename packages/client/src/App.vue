@@ -134,8 +134,12 @@ nav>a:last-child {
     margin-right: 0;
 }
 
-nav a.router-link-active {
-    font-weight: 600;
+nav a.navbar-item {
+    border-bottom: 2px solid transparent;
+}
+
+nav a.navbar-item.is-active {
+    border-bottom-color: currentColor;
 }
 
 nav a.nav-end {
