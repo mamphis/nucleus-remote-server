@@ -1,7 +1,10 @@
-﻿using System;
+﻿using nucleus_remote_client.ClientImpl;
+using nucleus_remote_client.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,41 +20,63 @@ namespace nucleus_remote_client.Lib
             Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
 
             var ServiceBinPath = GetEntryLocation();
-            Console.Write("Please enter your password: ");
-            var Password = ReadSecret();
             string[] args = new string[]
             {
                 "create",
-                serviceName,
+                "\"" + serviceName + "\"",
                 "type=own",
-                // "type=interact",
+                "type=interact",
                 "start=auto",
-                "binpath=" + ServiceBinPath,
-                "displayname=" + serviceName,
-                "obj=" + Environment.UserDomainName + "\\" + Environment.UserName,
-                "password=" + Password,
+                "binpath=\"" + ServiceBinPath + "\"",
+                "displayname=\"" + serviceName + "\"",
+                "obj=LocalSystem",
             };
 
             Console.WriteLine(args.Aggregate((a, b) => a + " " + b));
 
-            var psi = new ProcessStartInfo("sc.exe", args)
+            var psi = new ProcessStartInfo(ServiceBinPath, args)
             {
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
+                CreateNoWindow = true,
             };
-            var proc = Process.Start(psi);
+
+            psi.RedirectStandardOutput = true;
+            psi.RedirectStandardError = true;
+            psi.UseShellExecute = false;
+
+            var proc = new Process
+            {
+                StartInfo = psi,
+                EnableRaisingEvents = true
+            };
+
+            string outputData = "";
+            string errorData = "";
+
+            proc.OutputDataReceived += (sender, args) => outputData += args.Data + "\n";
+            proc.ErrorDataReceived += (sender, args) => errorData += args.Data + "\n";
+
+            proc.Exited += async (sender, args) =>
+            {
+                var exitCode = proc.ExitCode;
+                await Console.Out.WriteLineAsync(outputData);
+                await Console.Error.WriteLineAsync(errorData);
+            };
+
+            proc.Start();
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
 
             if (proc == null)
             {
                 Console.WriteLine("Failed to start process");
-                Environment.Exit(1);
+                return;
             }
 
-            proc.WaitForExit();
+            Console.WriteLine("Process started: " + proc.Id);
 
-            Console.WriteLine(proc.StandardOutput.ReadToEnd());
-            Environment.Exit(0);
+            proc.WaitForExit();
         }
+
         internal static void Uninstall(string serviceName)
         {
 
@@ -60,7 +85,7 @@ namespace nucleus_remote_client.Lib
             string[] args = new string[]
             {
                 "delete",
-                serviceName,
+                "\"" + serviceName + "\"",
             };
 
             Console.WriteLine(args.Aggregate((a, b) => a + " " + b));
@@ -89,7 +114,7 @@ namespace nucleus_remote_client.Lib
             lsa.AddPrivileges(Environment.UserDomainName + "\\" + Environment.UserName, "SeServiceLogonRight");
         }
 
-        private static string GetEntryLocation()
+        internal static string GetEntryLocation()
         {
             var path = Assembly.GetCallingAssembly().Location;
             if (path.EndsWith(".exe"))

@@ -15,7 +15,7 @@ async Task CheckAssemblyFileVersion()
     var servicePath = Path.GetFullPath(SERVICE_NAME + ".exe");
     FileVersionInfo fvo = FileVersionInfo.GetVersionInfo(servicePath);
 
-    HttpClient client = new HttpClient();
+    HttpClient client = new();
     string newestVersion = await client.GetStringAsync(UpdaterSettings.Default.UpdateBaseUrl + "version");
 
     if (new Version(newestVersion) > new Version(fvo.FileVersion))
@@ -48,7 +48,7 @@ async Task PrepareUpdate()
 {
     Console.WriteLine("Preparing the update");
 
-    HttpClient client = new HttpClient();
+    HttpClient client = new();
     byte[] versionZip = await client.GetByteArrayAsync(UpdaterSettings.Default.UpdateBaseUrl + "file");
     File.WriteAllBytes(UPDATE_FILENAME, versionZip);
 
@@ -73,7 +73,7 @@ void ApplyUpdate()
         Console.WriteLine($"  > Updating file {relativeFilename}");
         try
         {
-            var localFilename = relativeFilename.Substring(UPDATE_DIRNAME.Length + 1);
+            var localFilename = relativeFilename[(UPDATE_DIRNAME.Length + 1)..];
             if (File.Exists(localFilename))
             {
                 File.Move(localFilename, Path.Combine(BACKUP_DIRNAME, localFilename));
@@ -122,7 +122,7 @@ void Rollback()
     Console.WriteLine("Applying the update.");
     foreach (var relativeFilename in Directory.GetFiles(BACKUP_DIRNAME, "*.*", new EnumerationOptions() { RecurseSubdirectories = true }))
     {
-        var localFilename = relativeFilename.Substring(BACKUP_DIRNAME.Length + 1);
+        var localFilename = relativeFilename[(BACKUP_DIRNAME.Length + 1)..];
         if (File.Exists(localFilename))
         {
             File.Delete(localFilename);

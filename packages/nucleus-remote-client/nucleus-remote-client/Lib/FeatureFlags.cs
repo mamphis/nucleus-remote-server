@@ -12,7 +12,7 @@ namespace nucleus_remote_client.Lib
 {
     internal class FeatureFlags
     {
-        private static Cache<string, bool> cache = new Cache<string, bool>();
+        private static readonly Cache<string, bool> cache = new();
 
         private static async Task GetFeatureFlags(HostSettings hostSettings)
         {

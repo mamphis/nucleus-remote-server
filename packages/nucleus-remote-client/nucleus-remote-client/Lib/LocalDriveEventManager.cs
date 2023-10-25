@@ -20,8 +20,8 @@ namespace nucleus_remote_client.Lib
         [SupportedOSPlatform("windows")]
         private void SetupWindowsEvents()
         {
-            ManagementEventWatcher watcher = new ManagementEventWatcher();
-            WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_VolumeChangeEvent WHERE EventType = 2 OR EventType = 3");
+            ManagementEventWatcher watcher = new();
+            WqlEventQuery query = new("SELECT * FROM Win32_VolumeChangeEvent WHERE EventType = 2 OR EventType = 3");
             watcher.EventArrived += (sender, e) =>
             {
                 var driveLetter = e.NewEvent.Properties["DriveName"].Value.ToString();
