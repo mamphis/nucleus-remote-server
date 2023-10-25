@@ -39,8 +39,8 @@ export class Server {
             next();
             res.on('finish', () => {
                 Logger.debug(`Request from ${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, `${new Date().getTime() - start}ms`);
-                // remove the query string from the url
-                const url = req.baseUrl + req.route.path;
+
+                const url = req.baseUrl + (req.route.path !== '/' ? req.route.path : '');
                 routeMetricCounter.addMetric(`${req.method} ${url}`, new Date().getTime() - start, res.statusCode);
             });
             res.on('error', (err) => {
