@@ -1,0 +1,13 @@
+// preferr dark mode
+@use '*/bulma/bulma.sass' with ($black: hsl(0, 0%, 100%),
+    $black-bis: hsl(0, 0%, 98%),
+    $black-ter: hsl(0, 0%, 96%),
+    $grey-darker: hsl(0, 0%, 93%),
+    $grey-dark: hsl(0, 0%, 86%),
+    $grey: hsl(0, 0%, 71%),
+    $grey-light: hsl(0, 0%, 52%),
+    $grey-lighter: hsl(0, 0%, 35%),
+    $grey-lightest: hsl(0, 0%, 27%),
+    $white-ter: hsl(0, 0%, 20%),
+    $white-bis: hsl(0, 0%, 14%),
+    $white: hsl(0, 0%, 10%));

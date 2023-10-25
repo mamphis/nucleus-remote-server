@@ -147,9 +147,9 @@ model Notification {
   unread     Boolean              @default(true)
   createdAt  DateTime             @default(now())
   message    String
-  approvedBy User?                @relation(fields: [approvedByUserId], references: [id])
+  approvedBy User?                @relation(fields: [approvedByUserId], references: [id], onDelete: SetNull)
 
-  tenant           Tenant  @relation(fields: [tenantId], references: [id])
+  tenant           Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   tenantId         String
   approvedByUserId String?
 }
@@ -157,7 +157,7 @@ model Notification {
 model FeatureFlag {
   id       String
   name     String
-  tenant   Tenant  @relation(fields: [tenantId], references: [id])
+  tenant   Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   enabled  Boolean
   tenantId String
 
@@ -173,7 +173,7 @@ model InstalledApps {
   installDate DateTime
   lastUpdate  DateTime @default(now()) @updatedAt()
 
-  client Client @relation(fields: [clientId], references: [id])
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@id([clientId, name])
 }
@@ -187,7 +187,7 @@ model LocalDrive {
   driveSize        BigInt
   driveFreeSpace   BigInt
 
-  client            Client              @relation(fields: [clientId], references: [id])
+  client            Client              @relation(fields: [clientId], references: [id], onDelete: Cascade)
   localDriveHistory LocalDriveHistory[]
 
   @@id([clientId, driveLetter])
@@ -200,7 +200,7 @@ model LocalDriveHistory {
   driveSize      BigInt
   driveFreeSpace BigInt
 
-  localDrive LocalDrive @relation(fields: [clientId, driveLetter], references: [clientId, driveLetter])
+  localDrive LocalDrive @relation(fields: [clientId, driveLetter], references: [clientId, driveLetter], onDelete: Cascade)
 
   @@id([clientId, driveLetter, timestamp])
 }

@@ -14,7 +14,7 @@ const metrics = new MetricCounter<string, never>((key) =>
     // Ignore every INSERT query that is a metrics query 
     (key.startsWith('INSERT INTO') && (key.includes('Metrics"') || key.includes('StatusCode"')))
     // Ignore every Select StatusCode query
-    || (key.startsWith('SELECT') && key.includes('StatusCode"'))
+    || (key.startsWith('SELECT') && (key.includes('StatusCode"') || key.includes('Metrics"')))
 );
 export const getQueryMetrics = metrics.getMetrics.bind(metrics);
 

@@ -28,24 +28,30 @@ export default function (db: PrismaClient) {
             if (!client) {
                 return next(NotFound($t(req, 'error.404.noClientFound', clientId)));
             }
+            // Delete all uninstalled apps
+            await db.installedApps.deleteMany({
+                where: {
+                    clientId,
+                    name: {
+                        notIn: installedApps.map((app) => app.name),
+                    }
+                }
+            });
 
-            for (const app of installedApps) {
-                await db.installedApps.upsert({
-                    where: {
-                        clientId_name: {
-                            clientId,
-                            name: app.name,
-                        },
-                    },
-                    create: {
-                        ...app,
+            // Add all installed apps
+            await db.installedApps.createMany({
+                skipDuplicates: true,
+                data: installedApps.map((app) => {
+                    return {
                         clientId,
-                    },
-                    update: {
-                        ...app,
-                    },
-                });
-            }
+                        name: app.name,
+                        version: app.version,
+                        registryKey: app.registryKey,
+                        publisher: app.publisher,
+                        installDate: app.installDate,
+                    }
+                })
+            });
 
             res.status(204).end();
         } catch (e: unknown) {

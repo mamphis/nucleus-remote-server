@@ -87,6 +87,14 @@ const updateInterval = setInterval(() => {
     debounceUpdate(lastMin, lastMax)
 }, 30000);
 
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        debounceUpdate(lastMin, lastMax);
+    } else {
+        clearInterval(updateInterval);
+    }
+});
+
 onUnmounted(() => {
     clearInterval(updateInterval);
 });
