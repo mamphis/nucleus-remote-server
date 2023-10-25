@@ -3,6 +3,7 @@ using nucleus_remote_client.Client;
 using nucleus_remote_client.Lib;
 using nucleus_remote_client.Tasks;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Timers;
 
@@ -19,7 +20,7 @@ namespace nucleus_remote_client
             _hostSettings = hostSettings.Value;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        private async Task SetupUpgrade()
         {
             if (_hostSettings.PrivateKey == null)
             {
@@ -27,7 +28,7 @@ namespace nucleus_remote_client
                 var client = ClientHelper.GetHttpClient(_hostSettings);
                 try
                 {
-                    var appSettingsContent = await client.GetStringAsync($"c2/{_hostSettings.Id}/upgrade", stoppingToken);
+                    var appSettingsContent = await client.GetStringAsync($"c2/{_hostSettings.Id}/upgrade");
 
                     File.WriteAllText("appsettings.json", appSettingsContent);
                     // Restart this application
@@ -41,6 +42,10 @@ namespace nucleus_remote_client
                     Environment.Exit(0);
                 }
             }
+        }
+
+        private void SetupTimer()
+        {
 
             var timer = new System.Timers.Timer
             {
@@ -50,18 +55,36 @@ namespace nucleus_remote_client
 
             async void Elapsed(object? sender, EventArgs _)
             {
-                if (!stoppingToken.IsCancellationRequested)
-                {
-                    await Try(new SendLocalDrives());
-                    await Try(new SendInstalledPrograms());
-                    StartUpdater();
-                }
+                await Try(new SendLocalDrives());
+                await Try(new SendInstalledPrograms());
+                StartUpdater();
             }
 
             timer.Elapsed += Elapsed;
             timer.Start();
 
             Elapsed(null, EventArgs.Empty);
+        }
+
+        private void SetupEvents()
+        {
+            var localDriveEventManager = new LocalDriveEventManager();
+            localDriveEventManager.OnLocalDrivesChanged += async (sender, args) =>
+            {
+                await Try(new SendLocalDrives());
+            };
+        }
+
+        private async Task Setup()
+        {
+            await SetupUpgrade();
+            SetupTimer();
+            SetupEvents();
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            await Setup();
 
             var pinger = new SendPing();
             var executer = new GetConfigurationTasks();

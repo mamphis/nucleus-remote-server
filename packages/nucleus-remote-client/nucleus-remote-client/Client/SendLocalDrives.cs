@@ -1,10 +1,16 @@
 ﻿using nucleus_remote_client.Lib;
 using System.Net.Http.Json;
+using System.Runtime.Versioning;
+using System.Management;
+using System.IO;
+using IWshRuntimeLibrary;
+using nucleus_remote_client.Client.Models;
 
 namespace nucleus_remote_client.Client
 {
     internal class SendLocalDrives : IClient
     {
+
         public async Task<HttpResponseMessage?> ExecuteAsync(HostSettings hostSettings)
         {
             if (!await FeatureFlags.IsFeatureEnabled(hostSettings, "f-1.0.12-drive_monitor"))
