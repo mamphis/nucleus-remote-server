@@ -136,6 +136,7 @@ const translations: Record<string, string> = {
     'navbar.admin': 'Admin',
     'navbar.client': 'Client',
     'navbar.configuration': 'Konfigurationen',
+    'navbar.file': 'Datei',
     'navbar.group': 'Gruppen',
     'navbar.home': 'Startseite',
     'navbar.login': 'Einloggen',

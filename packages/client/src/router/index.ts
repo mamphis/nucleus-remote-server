@@ -7,6 +7,7 @@ import ConfigurationsView from '@/views/Configurations/ConfigurationsView.vue';
 import EditConfigurationView from '@/views/Configurations/EditConfigurationView.vue';
 import NewConfigurationView from '@/views/Configurations/NewConfigurationView.vue';
 import EditProfileView from '@/views/EditProfileView.vue';
+import FileListView from '@/views/Files/FileListView.vue';
 import EditGroupView from '@/views/Groups/EditGroupView.vue';
 import GroupsView from '@/views/Groups/GroupsView.vue';
 import NewGroupView from '@/views/Groups/NewGroupView.vue';
@@ -259,7 +260,21 @@ const router = createRouter({
                 authorized: true,
                 permissions: ['special:admin']
             }
-        }
+        },
+        {
+            path: '/files',
+            children: [
+                {
+                    path: '',
+                    name: 'Files',
+                    component: FileListView,
+                    meta: {
+                        authorized: true,
+                        permissions: ['read:file']
+                    }
+                },
+            ]
+        },
     ]
 });
 

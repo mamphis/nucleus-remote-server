@@ -16,6 +16,7 @@ const hasGroup = computed(() => hasPermission(user.value, ':group'));
 const hasTenant = computed(() => hasPermission(user.value, ':tenant'));
 const hasTenantUser = computed(() => hasPermission(user.value, ':tenant-user'));
 const hasUser = computed(() => hasPermission(user.value, ':user'));
+const hasFile = computed(() => hasPermission(user.value, ':file'));
 const hasAdmin = computed(() => hasPermission(user.value, 'special:admin'));
 
 const { unreadNotifications } = storeToRefs(notificationStore());
@@ -48,6 +49,7 @@ router.beforeEach((to, from, next) => {
                     </RouterLink>
                     <RouterLink class="navbar-item" to="/tenants" v-if="hasTenant">{{ $t('navbar.tenant') }}</RouterLink>
                     <RouterLink class="navbar-item" to="/users" v-if="hasUser">{{ $t('navbar.user') }}</RouterLink>
+                    <RouterLink class="navbar-item" to="/files" v-if="hasFile">{{ $t('navbar.file') }}</RouterLink>
                     <RouterLink class="navbar-item" to="/admin" v-if="hasAdmin">{{ $t('navbar.admin') }}</RouterLink>
                 </div>
                 <div class="navbar-end">
