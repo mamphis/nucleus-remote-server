@@ -1,13 +1,37 @@
+/** SCSS DARK THEME PRIMARY COLORS */
+$primary-100: #e1e1e3;
+$primary-200: #e4e4e6;
+$primary-300: #e8e8e9;
+$primary-400: #ebebec;
+$primary-500: #eeeeef;
+$primary-600: #f2f2f2;
+/** SCSS DARK THEME SURFACE COLORS */
+$surface-100: #2e2d2d;
+$surface-200: #424141;
+$surface-300: #575656;
+$surface-400: #6d6c6c;
+$surface-500: #848383;
+$surface-600: #9b9a9a;
+/** SCSS DARK THEME MIXED SURFACE COLORS */
+$surface-mixed-100: #3b3b60;
+$surface-mixed-200: #4f4e70;
+$surface-mixed-300: #636281;
+$surface-mixed-400: #787792;
+$surface-mixed-500: #8e8ca4;
+$surface-mixed-600: #a3a2b5;
+/** EXAMPLES */
+
+
 // preferr dark mode
-@use '*/bulma/bulma.sass' with ($black: hsl(0, 0%, 100%),
-    $black-bis: hsl(0, 0%, 98%),
-    $black-ter: hsl(0, 0%, 96%),
-    $grey-darker: hsl(0, 0%, 93%),
-    $grey-dark: hsl(0, 0%, 86%),
-    $grey: hsl(0, 0%, 71%),
-    $grey-light: hsl(0, 0%, 52%),
-    $grey-lighter: hsl(0, 0%, 35%),
-    $grey-lightest: hsl(0, 0%, 27%),
-    $white-ter: hsl(0, 0%, 20%),
-    $white-bis: hsl(0, 0%, 14%),
-    $white: hsl(0, 0%, 10%));
+@use '*/bulma/bulma.sass' with ($black: $primary-600,
+    $black-bis: $primary-500,
+    $black-ter: $primary-400,
+    $grey-darker: $primary-300,
+    $grey-dark: $primary-200,
+    $grey: $primary-100,
+    $grey-light: $surface-600,
+    $grey-lighter: $surface-500,
+    $grey-lightest: $surface-400,
+    $white-ter: $surface-300,
+    $white-bis: $surface-200,
+    $white: $surface-100);

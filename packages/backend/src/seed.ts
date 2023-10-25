@@ -50,6 +50,7 @@ const seedAdmin = async (db: PrismaClient, admin: User) => {
         await addPermission('configuration'),
         await addPermission('task'),
         await addPermission('feature'),
+        await addPermission('file'),
 
         await db.permission.upsert({ where: { scope: 'special:admin' }, create: { scope: 'special:admin' }, update: { scope: 'special:admin' } }),
     ]);

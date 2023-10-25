@@ -83,6 +83,7 @@ const permissions = [
     'group',
     'configuration',
     'task',
+    'file',
 ];
 </script>
 

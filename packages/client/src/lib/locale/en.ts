@@ -163,6 +163,7 @@ const translations: Record<string, string> = {
     'permission.configuration': 'Configuration',
     'permission.create': 'Create',
     'permission.delete': 'Delete',
+    'permission.file': 'File',
     'permission.group': 'Group',
     'permission.read': 'Read',
     'permission.special': 'Special',
