@@ -5,14 +5,15 @@ using System.IO.Compression;
 const string UPDATE_FILENAME = "update.zip";
 const string UPDATE_DIRNAME = "update";
 const string BACKUP_DIRNAME = "backup";
-const string SERVICE_NAME = "nucleus-remote-client";
+const string EXECUTABLE_NAME = "nucleus-remote-client";
+const string SERVICE_NAME = "nucleus-remote-agent";
 const int MAX_START_TRIES = 10;
 
 int startTries = 0;
 async Task CheckAssemblyFileVersion()
 {
     await Console.Out.WriteLineAsync("Checking for update.");
-    var servicePath = Path.GetFullPath(SERVICE_NAME + ".exe");
+    var servicePath = Path.GetFullPath(EXECUTABLE_NAME + ".exe");
     FileVersionInfo fvo = FileVersionInfo.GetVersionInfo(servicePath);
 
     HttpClient client = new();
@@ -60,8 +61,13 @@ async Task PrepareUpdate()
 void StopExecutable()
 {
     Console.WriteLine("Stopping the client.");
-    var proc = Process.GetProcesses().FirstOrDefault(p => p.ProcessName == SERVICE_NAME);
-    proc?.Kill();
+    var procs = Process.GetProcesses().Where(p => p.ProcessName == EXECUTABLE_NAME);
+    foreach(var proc in procs)
+    {
+        proc.Kill();
+        proc.WaitForExit();
+    }
+
     Thread.Sleep(5000);
 }
 
@@ -100,13 +106,20 @@ void StartExecutable()
     Console.WriteLine($"Starting the client. ({startTries}/{MAX_START_TRIES})");
     try
     {
-        var servicePath = Path.GetFullPath(SERVICE_NAME + ".exe");
+        var servicePath = Path.GetFullPath(EXECUTABLE_NAME + ".exe");
         Process proc = Process.Start(servicePath);
         Thread.Sleep(5000);
 
         if (proc.HasExited)
         {
-            throw new Exception($"Failed to start process: " + proc.ExitCode);
+            throw new Exception($"Failed to start executable: " + proc.ExitCode);
+        }
+
+        var scProc = Process.Start("sc.exe", new string[] { "start", SERVICE_NAME});
+        scProc.WaitForExit();
+        if (scProc.ExitCode != 0)
+        {
+            throw new Exception($"Failed to start service: " + proc.ExitCode);
         }
     }
     catch (Exception e)
