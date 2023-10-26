@@ -88,73 +88,90 @@ const deleteTask = async () => {
             </div>
         </div>
         <div class="column is-full columns">
-            <form @submit.prevent="updateTask()" class="column is-half">
-                <div class="field">
-                    <label class="label">{{ $t('field.name') }}</label>
-                    <div class="control">
-                        <input :class="{ 'is-danger': !!errors.name }" class="input" type="text" placeholder="Name"
-                            v-model="name" required>
+            <form @submit.prevent="updateTask()" class="column is-full">
+                <div class="columns is-multiline">
+                    <div class="column is-half">
+                        <div class="field">
+                            <label class="label">{{ $t('field.name') }}</label>
+                            <div class="control">
+                                <input :class="{ 'is-danger': !!errors.name }" class="input is-expanded" type="text"
+                                    placeholder="Name" v-model="name" required>
+                            </div>
+                            <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field">
+                                    <label class="label" for="">{{ $t('field.type') }}</label>
+                                    <span class="select">
+                                        <select v-model="type" disabled>
+                                            <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label
+                                            }}
+                                            </option>
+                                        </select>
+                                    </span>
+                                </div>
+                                <div class="field">
+                                    <label class="label" for="">{{ $t('field.output') }}</label>
+                                    <span class="select">
+                                        <select v-model="output">
+                                            <option v-for="(option) in outputTypes" :value="option" :key="option">
+                                                {{ $t('task.outputType.' + option) }}
+                                            </option>
+                                        </select>
+                                    </span>
+                                    <p v-if="!!errors.output" class="help is-danger">{{ errors.output }}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
-                </div>
-                <div class="field">
-                    <label class="label" for="">{{ $t('field.type') }}</label>
-                    <span class="select">
-                        <select v-model="type" disabled>
-                            <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label }}</option>
-                        </select>
-                    </span>
-                </div>
+                    <div class="column is-half">
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox" for="">
+                                    <input class="checkbox" type="checkbox" v-model="active" />
+                                    {{ $t('field.active') }}
+                                </label>
+                            </div>
+                            <p v-if="!!errors.active" class="help is-danger">{{ errors.active }}</p>
+                        </div>
 
-                <div class="field">
-                    <div class="field">
-                        <label class="checkbox" for="">
-                            <input class="checkbox" type="checkbox" v-model="active" />
-                            {{ $t('field.active') }}
-                        </label>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox" for="">
+                                    <input class="checkbox" type="checkbox" v-model="runOnce" />
+                                    {{ $t('field.runOnce') }}
+                                </label>
+                            </div>
+                            <p v-if="!!errors.runOnce" class="help is-danger">{{ errors.runOnce }}</p>
+                        </div>
                     </div>
-                    <p v-if="!!errors.active" class="help is-danger">{{ errors.active }}</p>
-                </div>
 
-                <div class="field">
-                    <div class="field">
-                        <label class="checkbox" for="">
-                            <input class="checkbox" type="checkbox" v-model="runOnce" />
-                            {{ $t('field.runOnce') }}
-                        </label>
-                    </div>
-                    <p v-if="!!errors.runOnce" class="help is-danger">{{ errors.runOnce }}</p>
-                </div>
 
-                <div class="field">
-                    <label class="label" for="">{{ $t('field.output') }}</label>
-                    <span class="select">
-                        <select v-model="output">
-                            <option v-for="(option) in outputTypes" :value="option" :key="option">
-                                {{ $t('task.outputType.' + option) }}
-                            </option>
-                        </select>
-                    </span>
-                    <p v-if="!!errors.output" class="help is-danger">{{ errors.output }}</p>
-                </div>
 
-                <component :is="typeMap[type].component" v-model="content"></component>
-                <div class="field">
-                    <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
-                </div>
-                <div class="field is-grouped">
-                    <div class="control">
-                        <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:task')">{{
-                            $t('button.submit') }}</button>
+                    <div class="column is-full">
+                        <component :is="typeMap[type].component" v-model="content"></component>
                     </div>
-                    <div class="control">
-                        <button type="reset" class="button is-link is-light" @click="$router.back()">{{ $t('button.cancel')
-                        }}</button>
+
+                    <div class="field column is-full">
+                        <p v-if="!!errors.general" class="help is-danger">{{ errors.general }}</p>
                     </div>
-                    <div class="control">
-                        <button type="button" class="button is-danger is-light" @click="deleteTask()"
-                            v-if="hasPermission(undefined, 'delete:task') && false /** TODO #10 */">{{ $t('button.delete')
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button type="submit" class="button is-link" v-if="hasPermission(undefined, 'update:task')">{{
+                                $t('button.submit') }}</button>
+                        </div>
+                        <div class="control">
+                            <button type="reset" class="button is-link is-light" @click="$router.back()">{{
+                                $t('button.cancel')
                             }}</button>
+                        </div>
+                        <div class="control">
+                            <button type="button" class="button is-danger is-light" @click="deleteTask()"
+                                v-if="hasPermission(undefined, 'delete:task') && false /** TODO #10 */">{{
+                                    $t('button.delete')
+                                }}</button>
+                        </div>
                     </div>
                 </div>
             </form>
