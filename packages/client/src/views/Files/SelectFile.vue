@@ -45,19 +45,19 @@ watch(id, (value) => {
             <input class="input" v-model="id" />
         </div>
         <div class="control">
-            <button type="button" class="button control" @click="modalShown = true">{{ $t('files.choose') }}</button>
+            <button type="button" class="button control" @click.prevent="modalShown = true">{{ $t('files.choose') }}</button>
         </div>
     </div>
     <div class="modal" :class="{ 'is-active': modalShown }">
         <div class="modal-background"></div>
         <div class="modal-content">
             <div class="files">
-                <div class="file" v-for="file in files" :key="file.id" @click="selectFile(file)">
+                <div class="file" v-for="file in files" :key="file.id" @click.prevent="selectFile(file)">
                     <img :src="file.path" :alt="file.name">
                 </div>
             </div>
         </div>
-        <button class="modal-close is-large" @click="modalShown = false" aria-label="close"></button>
+        <button class="modal-close is-large" @click.prevent="modalShown = false" aria-label="close"></button>
     </div>
 </template>
 

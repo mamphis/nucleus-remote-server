@@ -14,13 +14,16 @@ const content = ref({
 
 const props = defineProps<{
     modelValue: string
-}>()
+}>();
+
 const emits = defineEmits<{
     (event: 'update:modelValue', value: string): void
-}>()
+}>();
+
 if (props.modelValue) {
     content.value = JSON.parse(props.modelValue);
 }
+
 watch(content, (newValue) => {
     emits('update:modelValue', JSON.stringify(newValue));
 }, { deep: true });
@@ -30,6 +33,7 @@ type File = {
     name: string;
     path: string;
 };
+
 const files = ref<Array<File>>([]);
 
 (async () => {
