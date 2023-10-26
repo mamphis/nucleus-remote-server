@@ -1,4 +1,4 @@
-const translations: Record<string, string> = {
+const translations = {
     'admin.admin': 'Admin',
     'admin.metrics.avgDuration': 'Average Duration',
     'admin.metrics.executions': 'Executions',
@@ -202,7 +202,7 @@ const translations: Record<string, string> = {
     'users.newUser': 'New User',
     'users.users': 'Users',
     'verify.createPassword': 'Create Password',
-}
+} as const;
 
 export default translations;
 export type ValidKeys = keyof typeof translations;

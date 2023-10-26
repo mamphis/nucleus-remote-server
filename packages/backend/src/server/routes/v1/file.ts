@@ -6,7 +6,9 @@ import multer from 'multer';
 import { AuthResponse, auth, clientAuth } from "../../../lib/auth";
 import { isProduction, randomString } from "../../../lib/util";
 import { join } from "path";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, unlink, writeFile } from "fs/promises";
+import { existsSync } from "fs";
+import { Logger } from "../../../lib/logger";
 
 const download = async (db: PrismaClient, req: Request, res: Response, next: NextFunction) => {
     const file = await db.tenantFile.findFirst({
@@ -107,6 +109,24 @@ export default function (db: PrismaClient) {
         }
 
         return res.json(file);
+    });
+
+    router.delete('/:id', auth('delete:file'), async (req, res: AuthResponse, next) => {
+        const deletedFile = await db.tenantFile.delete({
+            where: { tenantId: res.locals.user.tenantId, id: req.params.id },
+        });
+
+        const dir = join(process.env.DATA_DIR ?? '.', isProduction() ? '.' : 'dev', res.locals.user.tenantId);
+        const path = join(dir, deletedFile.internalFilename);
+
+        if (existsSync(path)) {
+            await unlink(path)
+        } else {
+            Logger.warn(`File ${path} does not exist.`);
+            return next(NotFound());
+        }
+
+        res.status(204).end();
     });
 
     router.get('/:id/download', auth('read:file'), download.bind(null, db));

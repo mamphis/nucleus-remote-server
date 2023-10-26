@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     (event: 'close'): void,
+    (event: 'delete', file: ApiFile): void,
 }>();
 
 const file = computed(() => props.file);
@@ -36,6 +37,15 @@ const close = () => {
     url.value = '';
     emit('close');
 };
+
+const deleteFile = () => {
+    if (!file.value) {
+        return;
+    }
+
+    emit('delete', file.value);
+    close();
+};
 </script>
 
 <template>
@@ -54,7 +64,8 @@ const close = () => {
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button class="button" @click.prevent="close()">Cancel</button>
+                <button class="button" @click.prevent="close()">{{ $t('button.cancel') }}</button>
+                <button class="button is-danger is-light" @click.prevent="deleteFile()">{{ $t('button.delete') }}</button>
             </footer>
         </div>
     </div>

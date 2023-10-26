@@ -76,11 +76,20 @@ async function onDrop(e: DragEvent) {
 
 const selectedFile = ref<ApiFile | undefined>(undefined);
 
+async function deleteFile(file: ApiFile) {
+    const response = await request.$delete(`files/${file.id}`);
+    if (isErrorResponse(response)) {
+        return;
+    }
+
+    files.value = await request.$get<ApiFile[]>('files').then((res) => res.assertNotError());
+}
+
 </script>
 
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
-        <FileDisplay :file="selectedFile" @close="selectedFile = undefined" />
+        <FileDisplay :file="selectedFile" @close="selectedFile = undefined" @delete="deleteFile"/>
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
                 <h1 class="title">{{ $t('files.files') }}</h1>
