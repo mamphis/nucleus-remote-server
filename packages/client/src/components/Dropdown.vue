@@ -2,7 +2,7 @@
     <div class="dropdown" v-if="options">
 
         <!-- Dropdown Input -->
-        <input class="dropdown-input input" :class="$props.inputClass" @keypress="keyMonitor" :name="name"
+        <input class="dropdown-input input" :class="$props.inputClass" @keydown="keyMonitor" :name="name"
             @focus="showOptions(true)" @input="showOptions(false)" @blur="exit()" v-model="searchFilter"
             :disabled="disabled" :placeholder="placeholder" autocomplete="off" />
 
@@ -149,7 +149,9 @@ watch(filteredOptions, (options) => {
 </script>
   
   
-<style lang="css" scoped>
+<style lang="scss" scoped>
+@use '@/assets/variables' as var;
+
 .dropdown {
     position: relative;
     display: block;
@@ -160,17 +162,19 @@ watch(filteredOptions, (options) => {
     cursor: pointer;
     display: block;
     min-width: 250px;
+    color: var.$primary-400;
 }
 
 .dropdown-input:hover {
-    background: #f8f8fa;
+    background: var.$surface-200;
 }
 
 .dropdown-content {
     position: absolute;
-    background-color: #fff;
+    color: var.$primary-400;
+    background-color: var.$surface-200;
     min-width: 248px;
-    border: 1px solid #e7ecf5;
+    border: 1px solid var.$primary-400;
     box-shadow: 0px -8px 34px 0px rgba(0, 0, 0, 0.05);
     overflow: auto;
     z-index: 1;
@@ -179,7 +183,8 @@ watch(filteredOptions, (options) => {
 }
 
 .dropdown-content .dropdown-item {
-    color: black;
+    color: var.$primary-400;
+    background-color: var.$surface-200;
     padding: 8px;
     text-decoration: none;
     display: block;
@@ -188,7 +193,8 @@ watch(filteredOptions, (options) => {
 
 .dropdown-item:hover,
 .dropdown-item.preselected {
-    background-color: #e7ecf5;
+    color: var.$primary-400;
+    background-color: var.$surface-400;
 }
 
 .dropdown:hover .dropdowncontent {
