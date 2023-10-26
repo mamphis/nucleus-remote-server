@@ -9,6 +9,8 @@ const translations: Record<string, string> = {
     'admin.metrics.searchPlaceholder': 'Suchen...',
     'admin.statistics.clientCount': 'Anzahl der Clients',
     'admin.statistics.configurationCount': 'Anzahl der Konfigurationen',
+    'admin.statistics.fileCount': 'Anzahl der Dateien',
+    'admin.statistics.fileSize': 'Gesamtgröße der Dateien',
     'admin.statistics.groupCount': 'Anzahl der Gruppen',
     'admin.statistics.notificationCount': 'Anzahl der Benachrichtigungen',
     'admin.statistics.taskCount': 'Anzahl der Aufgaben',

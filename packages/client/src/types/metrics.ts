@@ -37,14 +37,22 @@ export type ApiRequestMetrics = {
 export type ApiRequestHistogram = {
     histogram: RequestHistogram[];
 }
+
+export type StatisticValue = number | {
+    formatterName: string;
+    value: number;
+}
+
 export type ApiStatistics = {
-    clientCount: number;
-    userCount: number;
-    tenantCount: number;
-    groupCount: number;
-    taskCount: number;
-    notificationCount: number;
-    configurationCount: number;
+    clientCount: StatisticValue;
+    userCount: StatisticValue;
+    tenantCount: StatisticValue;
+    groupCount: StatisticValue;
+    taskCount: StatisticValue;
+    notificationCount: StatisticValue;
+    configurationCount: StatisticValue;
+    fileCount: StatisticValue;
+    fileSize: StatisticValue;
 }
 
 type SortDirection = 'asc' | 'desc';

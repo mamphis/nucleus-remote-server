@@ -69,6 +69,8 @@ export default function (db: PrismaClient) {
         const taskCount = await db.task.count();
         const notificationCount = await db.notification.count();
         const configurationCount = await db.configuration.count();
+        const fileCount = await db.tenantFile.count();
+        const fileSize = await db.tenantFile.aggregate({ _sum: { fileSize: true } });
 
         res.json({
             clientCount,
@@ -78,6 +80,11 @@ export default function (db: PrismaClient) {
             taskCount,
             notificationCount,
             configurationCount,
+            fileCount,
+            fileSize: {
+                formatterName: 'humanizeFileSize',
+                value: fileSize._sum.fileSize,
+            },
         });
     });
 

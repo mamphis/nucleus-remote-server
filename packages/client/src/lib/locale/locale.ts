@@ -18,7 +18,7 @@ function formatString(term: string, args: any[]): string {
     }, term);
 }
 
-export function $t(key: ValidKeys, ...args: any[]): string {
+export function $t(key: ValidKeys | string, ...args: any[]): string {
     const language = navigator.language.split('-')[0] ?? fallbackLanguage;
 
     if (language in languages) {

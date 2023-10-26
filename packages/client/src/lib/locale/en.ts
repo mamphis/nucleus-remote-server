@@ -9,6 +9,8 @@ const translations = {
     'admin.metrics.searchPlaceholder': 'Search...',
     'admin.statistics.clientCount': 'Client Count',
     'admin.statistics.configurationCount': 'Configuration Count',
+    'admin.statistics.fileCount': 'File Count',
+    'admin.statistics.fileSize': 'Total File Size',
     'admin.statistics.groupCount': 'Group Count',
     'admin.statistics.notificationCount': 'Notification Count',
     'admin.statistics.taskCount': 'Task Count',

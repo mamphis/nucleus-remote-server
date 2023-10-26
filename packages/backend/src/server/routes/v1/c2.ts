@@ -9,6 +9,7 @@ import { createNotification } from "../../../lib/notification";
 import clientInstalledApps from "./features/clientInstalledApps";
 import clientLocalDrives from "./features/clientLocalDrives";
 import { Logger } from "../../../lib/logger";
+import { c2 as files } from './file';
 
 export default function (db: PrismaClient) {
     const router = Router();
@@ -214,5 +215,8 @@ export default function (db: PrismaClient) {
     router.use('/:clientId/installedApps', clientInstalledApps(db));
 
     router.use('/:clientId/localDrives', clientLocalDrives(db));
+
+    router.use('/:clientId/files', files(db));
+    
     return router;
 }

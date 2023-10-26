@@ -9,10 +9,17 @@ import { join } from "path";
 import { mkdir, unlink, writeFile } from "fs/promises";
 import { existsSync } from "fs";
 import { Logger } from "../../../lib/logger";
+import { $t } from "../../../lib/locale/locale";
 
 const download = async (db: PrismaClient, req: Request, res: Response, next: NextFunction) => {
+    const tenantId = res.locals.user?.tenantId ?? res.locals.client?.tenantId;
+
+    if (!tenantId || typeof tenantId !== 'string') {
+        return next(BadRequest($t(req, 'error.400.invalidTenant')));
+    }
+
     const file = await db.tenantFile.findFirst({
-        where: { tenantId: res.locals.user.tenantId, id: req.params.id },
+        where: { tenantId, id: req.params.id },
         select: {
             internalFilename: true,
             filename: true,
@@ -23,7 +30,7 @@ const download = async (db: PrismaClient, req: Request, res: Response, next: Nex
         return next(NotFound());
     }
 
-    const dir = join(process.env.DATA_DIR ?? '.', isProduction() ? '.' : 'dev', res.locals.user.tenantId);
+    const dir = join(process.env.DATA_DIR ?? '.', isProduction() ? '.' : 'dev', tenantId);
     const path = join(dir, file.internalFilename);
 
     res.download(path, file.filename);
@@ -137,8 +144,9 @@ export default function (db: PrismaClient) {
 
 
 export const c2 = (db: PrismaClient) => {
-    const router = Router();
+    const router = Router({ mergeParams: true });
 
-    router.get('/:id/download', clientAuth, download.bind(null, db));
+    router.get('/:id/download', clientAuth(), download.bind(null, db));
+
     return router;
 };
