@@ -81,8 +81,12 @@ async function request<T>(raw: boolean, method: RequestMethod, apiRoute: string,
     }
 
     if (!['GET', 'DELETE'].includes(method) && body) {
-        requestInit.headers = Object.assign(requestInit.headers ?? {}, { 'content-type': 'application/json' });
-        requestInit.body = JSON.stringify(body);
+        if (body instanceof FormData) {
+            requestInit.body = body;
+        } else {
+            requestInit.body = JSON.stringify(body);
+            requestInit.headers = Object.assign(requestInit.headers ?? {}, { 'content-type': 'application/json' });
+        }
     }
 
     const response = await fetch(new URL(normalizeApiRoute(apiRoute), baseApiUrl), requestInit);
@@ -148,7 +152,7 @@ async function request<T>(raw: boolean, method: RequestMethod, apiRoute: string,
 
 export default {
     $get: <T>(apiRoute: string) => request<T>(false, 'GET', apiRoute),
-    $post: <T>(apiRoute: string, body: any) => request<T>(false, 'POST', apiRoute, body),
+    $post: <T>(apiRoute: string, body: FormData | any) => request<T>(false, 'POST', apiRoute, body),
     $patch: <T>(apiRoute: string, body: any) => request<T>(false, 'PATCH', apiRoute, body),
     $put: <T>(apiRoute: string, body: any) => request<T>(false, 'PUT', apiRoute, body),
     $delete: (apiRoute: string) => request<undefined>(false, 'DELETE', apiRoute),

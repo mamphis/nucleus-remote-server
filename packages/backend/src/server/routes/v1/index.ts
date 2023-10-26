@@ -7,6 +7,7 @@ import c2 from "./c2";
 import clients from './client';
 import configurations from './configuration';
 import dashboard from "./dashboard";
+import files from './file';
 import groups from './group';
 import login from './login';
 import misc from "./misc";
@@ -37,6 +38,7 @@ router.use('/notifications', notification(db));
 router.use('/c2', c2(db));
 router.use('/dashboard', dashboard(db));
 router.use('/admin', admin(db));
+router.use('/files', files(db));
 
 router.use((req, _res, next) => {
     next(NotFound($t(req, 'error.404.invalidApiRoute', 'v1', req.baseUrl)));

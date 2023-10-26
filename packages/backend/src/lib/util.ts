@@ -2,13 +2,11 @@ import { generateKeyPair, randomBytes } from "crypto";
 import { Request } from "express";
 
 class Utils {
-    randomString(length: number) {
-        const alphabet =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-            "abcdefghijklmnopqrstuvwxyz" +
-            "1234567890" +
-            "!#+.-_";
-
+    randomString(length: number, alphabet =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+        "abcdefghijklmnopqrstuvwxyz" +
+        "1234567890" +
+        "!#+.-_") {
         return [...randomBytes(length)].map(n => alphabet.at(n % alphabet.length)).join('');
     }
 

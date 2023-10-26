@@ -1,4 +1,5 @@
 import fileRegular from '@/components/mimetypes/file-regular.vue';
+import fileCodeRegular from '@/components/mimetypes/file-code-regular.vue';
 import filePdfRegular from '@/components/mimetypes/file-pdf-regular.vue';
 import fileZipperRegular from '@/components/mimetypes/file-zipper-regular.vue';
 import fileImageRegular from '@/components/mimetypes/file-image-regular.vue';
@@ -13,6 +14,9 @@ const defaultMimeType = 'file-regular';
 const mimeTypeIconMap = new Map<string, string>([
     ['application/pdf', 'file-pdf-regular'],
     ['application/zip', 'file-zipper-regular'],
+    ['application/x-zip-compressed', 'file-zipper-regular'],
+    ['application/json', 'file-code-regular'],
+    ['application/xml', 'file-code-regular'],
     ['image', 'file-image-regular'],
     ['video', 'file-video-regular'],
     ['audio', 'file-audio-regular'],
@@ -22,6 +26,7 @@ const mimeTypeIconMap = new Map<string, string>([
 
 export const registerMimeTypes = (app: App): void => {
     app.component('file-regular', fileRegular);
+    app.component('file-code-regular', fileCodeRegular);
     app.component('file-pdf-regular', filePdfRegular);
     app.component('file-zipper-regular', fileZipperRegular);
     app.component('file-image-regular', fileImageRegular);
