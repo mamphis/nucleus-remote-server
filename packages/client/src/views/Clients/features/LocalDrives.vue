@@ -3,11 +3,16 @@ import request from '@/lib/request';
 import router from '@/router';
 import LocalDrive from '@/components/LocalDrive.vue';
 import type { ApiLocalDriveResponse } from '@/types/localDrive';
+import { computed } from 'vue';
 
 const { clientId } = router.currentRoute.value.params;
 const localDriveResponse = await request.$get<ApiLocalDriveResponse>(`clients/${clientId}/localDrives`);
-const localDrives = localDriveResponse.assertNotError().toRef();
+const drives = localDriveResponse.assertNotError().toRef();
 
+const localDrives = computed(() => ({
+    drives: drives.value.drives.sort((a, b) => a.driveLetter.localeCompare(b.driveLetter)),
+    history: drives.value.history,
+}));
 
 </script>
 
