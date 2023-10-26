@@ -129,6 +129,7 @@ const translations: Record<string, string> = {
     'field.userCount': 'Anzahl der Benutzer',
     'field.username': 'Benutzername',
     'field.version': 'Version',
+    'files.choose': 'Dateien auswählen',
     'files.dropFilesHere': 'Bitte Dateien hier ablegen',
     'files.files': 'Dateien',
     'groups.groups': 'Gruppen',

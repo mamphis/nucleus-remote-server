@@ -129,6 +129,7 @@ const translations = {
     'field.userCount': 'No. of Users',
     'field.username': 'Username',
     'field.version': 'Version',
+    'files.choose': 'Choose File',
     'files.dropFilesHere': 'Drop files here',
     'files.files': 'Files',
     'groups.groups': 'Groups',

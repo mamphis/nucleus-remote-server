@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Images from '@/components/Images.vue';
+import SelectFile from '@/views/Files/SelectFile.vue';
 import SpecialFolderPicker from '@/components/SpecialFolderPicker.vue';
 import request from '@/lib/request';
 import type { ApiFile } from '@/types/file';
@@ -25,30 +25,28 @@ watch(content, (newValue) => {
     emits('update:modelValue', JSON.stringify(newValue));
 }, { deep: true });
 
-type Image = {
+type File = {
     id: string;
     name: string;
     path: string;
 };
-const images = ref<Array<Image>>([]);
+const files = ref<Array<File>>([]);
 
 (async () => {
-    const files = await request.$get<ApiFile[]>('files').then(val => val.assertNotError());
-    console.log(files);
-    images.value = await Promise.all(files.map(async f => ({
+    const filesResponse = await request.$get<ApiFile[]>('files').then(val => val.assertNotError());
+    console.log(filesResponse);
+    files.value = await Promise.all(filesResponse.map(async f => ({
         id: `serverfile:${f.id}`,
         name: f.filename,
         path: URL.createObjectURL(await request.$raw('GET', `files/${f.id}/download`).then(val => val.blob())),
     })));
-
-    console.log(images.value);
 })();
 </script>
 
 <template>
     <div class="field">
         <label class="label" for="">{{ $t('downloadFileTask.remoteUrl') }}</label>
-        <Images v-model="content.RemoteUrl" :images="images" />
+        <SelectFile v-model="content.RemoteUrl" :files="files" />
         <!-- <input class="input" v-model="content.RemoteUrl" required /> -->
     </div>
     <div class="field">
