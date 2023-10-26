@@ -40,9 +40,7 @@ namespace nucleus_remote_client.Tasks
                 }
             }
 
-            HttpClient client = new();
-
-            var data = await client.GetByteArrayAsync(RemoteUrl);
+            var data = await DownloadFileHelper.DownloadData(hostSettings, RemoteUrl);
             await File.WriteAllBytesAsync(path, data);
         }
     }

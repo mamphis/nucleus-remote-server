@@ -40,7 +40,7 @@ namespace nucleus_remote_client.Agent
             var timer = new System.Timers.Timer
             {
                 AutoReset = true,
-                Interval = TimeSpan.FromMinutes(30).TotalMilliseconds,
+                Interval = TimeSpan.FromMinutes(5).TotalMilliseconds,
             };
 
             void Elapsed(object? sender, EventArgs _)

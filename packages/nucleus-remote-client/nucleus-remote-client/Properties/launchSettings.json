@@ -2,7 +2,7 @@
   "profiles": {
     "nucleus_remote_client": {
       "commandName": "Project",
-      "commandLineArgs": "install",
+      "commandLineArgs": "run",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       },

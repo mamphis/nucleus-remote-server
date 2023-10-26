@@ -37,11 +37,10 @@ namespace nucleus_remote_client.Lib
             var psi = new ProcessStartInfo(ServiceBinPath, args)
             {
                 CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
             };
-
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
-            psi.UseShellExecute = false;
 
             var proc = new Process
             {
@@ -123,32 +122,6 @@ namespace nucleus_remote_client.Lib
             }
 
             return Path.ChangeExtension(path, ".exe");
-        }
-
-        private static string ReadSecret()
-        {
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            string text = "";
-            while (keyInfo.Key != ConsoleKey.Enter)
-            {
-                if (keyInfo.Key == ConsoleKey.Backspace && text.Length > 0)
-                {
-                    text = text[..^1];
-                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
-                    Console.Write(' ');
-                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
-                }
-                else if (keyInfo.Key != ConsoleKey.Backspace)
-                {
-                    text += keyInfo.KeyChar;
-                    Console.Write('*');
-                }
-
-                keyInfo = Console.ReadKey(true);
-            }
-
-            Console.WriteLine();
-            return text;
         }
     }
 }
