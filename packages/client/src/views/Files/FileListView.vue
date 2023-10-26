@@ -5,6 +5,7 @@ import { formatDate, humanizeFileSize } from '@/lib/utils';
 import { getMimeTypeIcon } from '@/lib/mimetypeIcons';
 import { onUnmounted } from 'vue';
 import request, { isErrorResponse } from '@/lib/request';
+import FileDisplay from './FileDisplay.vue';
 
 const FILESIZE_LIMIT = 5 * 1024 * 1024; // 5 MB
 
@@ -72,10 +73,14 @@ async function onDrop(e: DragEvent) {
 
     files.value = await request.$get<ApiFile[]>('files').then((res) => res.assertNotError());
 }
+
+const selectedFile = ref<ApiFile | undefined>(undefined);
+
 </script>
 
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
+        <FileDisplay :file="selectedFile" @close="selectedFile = undefined" />
         <div class="column is-full columns is-align-items-center">
             <div class="column is-half">
                 <h1 class="title">{{ $t('files.files') }}</h1>
@@ -97,8 +102,7 @@ async function onDrop(e: DragEvent) {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="file in files" :key="file.id" class="is-clickable"
-                        @click="$router.push(`/files/${file.id}`)">
+                    <tr v-for="file in files" :key="file.id" class="is-clickable" @click="selectedFile = file">
                         <td>
                             <component class="mime-type" :is="getMimeTypeIcon(file.mimeType)"></component>
                         </td>
