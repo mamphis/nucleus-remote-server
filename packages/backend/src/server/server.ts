@@ -38,13 +38,17 @@ export class Server {
             const start = new Date().getTime();
             next();
             res.on('finish', () => {
-                Logger.debug(`Request from ${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, `${new Date().getTime() - start}ms`);
-
-                const url = req.baseUrl + (req.route.path !== '/' ? req.route.path : '');
+                let url = req.baseUrl + (req.route.path !== '/' ? req.route.path : '');
+                
+                for (const key in req.params) {
+                    url = url.replace(req.params[key], `:${key}`);
+                }
+                
                 routeMetricCounter.addMetric(`${req.method} ${url}`, new Date().getTime() - start, res.statusCode);
+                Logger.debug(`${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} (${url}) => ${res.statusCode}`, `${new Date().getTime() - start}ms`);
             });
             res.on('error', (err) => {
-                Logger.error(`Request from ${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, err);
+                Logger.error(`${getIpFromRequest(req)} to ${req.method} ${req.originalUrl} => ${res.statusCode}`, err);
             });
         });
 
