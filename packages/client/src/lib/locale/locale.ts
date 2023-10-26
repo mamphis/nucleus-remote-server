@@ -5,7 +5,7 @@ import fr from "./fr";
 
 const fallbackLanguage = 'en';
 
-const languages: { [lang: string]: { [key in ValidKeys]?: string } } = {
+const languages: { [lang: string]: { [key in ValidKeys | string]?: string } } = {
     en,
     de,
     it,
