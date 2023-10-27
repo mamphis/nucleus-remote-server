@@ -22,7 +22,7 @@ export default function (db: PrismaClient) {
             _max: { maxDuration: true },
             where: {
                 bucketTime: {
-                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 3),
                     ...filter,
                 }
             }
@@ -46,7 +46,7 @@ export default function (db: PrismaClient) {
             _max: { maxDuration: true },
             where: {
                 bucketTime: {
-                    gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 3),
                 }
             }
         });
@@ -105,7 +105,7 @@ export default function (db: PrismaClient) {
             _max: { maxDuration: true },
             where: {
                 bucketTime: {
-                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 3),
                     ...filter,
                 }
             }
@@ -139,7 +139,7 @@ export default function (db: PrismaClient) {
             },
             where: {
                 bucketTime: {
-                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+                    gt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 3),
                 }
             }
         });
