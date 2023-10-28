@@ -39,9 +39,13 @@ export function humanizeDate(date: Date | string | number): string {
     return timeFromNow();
 }
 
-export function humanizeFileSize(bytes: number): string {
+export function humanizeFileSize(bytes?: number): string {
     const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
     let i = 0;
+    if (!bytes) {
+        return '0 B';
+    }
+
     while (bytes >= 1024) {
         bytes /= 1024;
         ++i;

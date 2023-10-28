@@ -89,6 +89,7 @@ const onXAxisChanged = (_: any, b: { xaxis: { min: number, max: number } }) => {
 
 <style scoped>
 .height {
-    height: 100%;
+    height: 99%;
+    width: 99%;
 }
 </style>
