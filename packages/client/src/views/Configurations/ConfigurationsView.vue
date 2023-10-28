@@ -3,6 +3,7 @@ import { hasPermission } from '@/lib/permission';
 import userStore from '@/stores/user';
 import type { ApiConfiguration } from '@/types/configuration';
 import request, { isErrorResponse } from '../../lib/request';
+import AdvancedTable from '@/components/AdvancedTable.vue';
 
 
 const { user } = userStore();
@@ -22,23 +23,11 @@ const configurations = configurationsResponse.assertNotError().toRef();
             </div>
         </div>
         <div class="column is-full">
-            <table class="table is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>{{ $t('field.name') }}</th>
-                        <th>{{ $t('field.groupCount') }}</th>
-                        <th>{{ $t('field.taskCount') }}</th>
-                    </tr>
-                </thead>
-                <tbody v-if="!isErrorResponse(configurations)">
-                    <tr v-for="configuration in configurations" :key="configuration.id" class="is-clickable"
-                        @click="$router.push(`/configurations/${configuration.id}`)">
-                        <td>{{ configuration.name }}</td>
-                        <td>{{ configuration.group.length }}</td>
-                        <td>{{ configuration.task.length }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <AdvancedTable :data="configurations" :columns="[
+                { key: 'name', label: $t('field.name'), sortable: true, searchable: true },
+                { key: 'group.[number].length', label: $t('field.groupCount'), sortable: true, searchable: true },
+                { key: 'task.[number].length', label: $t('field.taskCount'), sortable: true, searchable: true },
+            ]" :options="{ search: true, click: true }" @click="(configuration) => $router.push(`/configurations/${configuration.id}`)" />
         </div>
     </div>
 </template>

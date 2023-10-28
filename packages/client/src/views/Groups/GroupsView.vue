@@ -3,10 +3,12 @@ import { hasPermission } from '@/lib/permission';
 import userStore from '@/stores/user';
 import type { ApiGroup } from '@/types/group';
 import request, { isErrorResponse } from '../../lib/request';
+import AdvancedTable from '@/components/AdvancedTable.vue';
 
 
 const { user } = userStore();
-const groups = await request.$get<ApiGroup[]>('groups');
+const groupResponse = await request.$get<ApiGroup[]>('groups');
+const groups = groupResponse.assertNotError().toRef();
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
@@ -20,25 +22,12 @@ const groups = await request.$get<ApiGroup[]>('groups');
             </div>
         </div>
         <div class="column is-full">
-            <table class="table is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>{{ $t('field.name') }}</th>
-                        <th>{{ $t('field.defaultGroup') }}</th>
-                        <th>{{ $t('field.clientCount') }}</th>
-                        <th>{{ $t('field.configurationCount') }}</th>
-                    </tr>
-                </thead>
-                <tbody v-if="!isErrorResponse(groups)">
-                    <tr v-for="group in groups" :key="group.id" class="is-clickable"
-                        @click="$router.push(`/groups/${group.id}`)">
-                        <td>{{ group.name }}</td>
-                        <td><input type="checkbox" :checked="group.isDefault" disabled></td>
-                        <td>{{ group.client.length }}</td>
-                        <td>{{ group.configuration.length }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <AdvancedTable :data="groups" :columns="[
+                { key: 'name', label: $t('field.name'), sortable: true, searchable: true },
+                { key: 'isDefault', label: $t('field.defaultGroup'), sortable: true, searchable: true },
+                { key: 'client.[number].length', label: $t('field.clientCount'), sortable: true, searchable: true },
+                { key: 'configuration.[number].length', label: $t('field.configurationCount'), sortable: true, searchable: true },
+            ]" :options="{ search: true, click: true }" @click="(group) => $router.push(`/groups/${group.id}`)" />
         </div>
     </div>
 </template>

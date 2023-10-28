@@ -3,9 +3,11 @@ import { hasPermission } from '@/lib/permission';
 import userStore from '@/stores/user';
 import type { ApiTenant } from '@/types/tenant';
 import request, { isErrorResponse } from '../../lib/request';
+import AdvancedTable from '@/components/AdvancedTable.vue';
 
 const { user } = userStore();
-const tenants = await request.$get<ApiTenant[]>('tenants');
+const tenantResponse = await request.$get<ApiTenant[]>('tenants');
+const tenants = tenantResponse.assertNotError().toRef();
 </script>
 <template>
     <div class="columns is-flex-grow-1 is-multiline is-align-content-flex-start is-h-100">
@@ -19,25 +21,12 @@ const tenants = await request.$get<ApiTenant[]>('tenants');
             </div>
         </div>
         <div class="column is-full">
-            <table class="table is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>{{ $t('field.name') }}</th>
-                        <th>{{ $t('field.userCount') }}</th>
-                        <th>{{ $t('field.maxClients') }}</th>
-                        <th>{{ $t('field.currentClients') }}</th>
-                    </tr>
-                </thead>
-                <tbody v-if="!isErrorResponse(tenants)">
-                    <tr v-for="tenant in tenants" :key="tenant.id" class="is-clickable"
-                        @click="$router.push(`/tenants/${tenant.id}`)">
-                        <td>{{ tenant.name }}</td>
-                        <td>{{ tenant.user.length }}</td>
-                        <td>{{ tenant.maxClients }}</td>
-                        <td>{{ tenant.client.filter(c => c.active).length }} / {{ tenant.client.length }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <AdvancedTable :data="tenants" :columns="[
+                { key: 'name', label: $t('field.name'), sortable: true, searchable: true },
+                { key: 'user.[number].length', label: $t('field.userCount'), sortable: true, searchable: true },
+                { key: 'maxClients', label: $t('field.maxClients'), sortable: true, searchable: true },
+                { key: 'client.[number].length', label: $t('field.currentClients'), sortable: true, searchable: true, data: (tenant: ApiTenant) => `${tenant.client.filter(c => c.active).length} / ${tenant.client.length}` },
+            ]" :options="{ search: true, click: true }" @click="(tenant) => $router.push(`/tenants/${tenant.id}`)" />
         </div>
     </div>
 </template>
