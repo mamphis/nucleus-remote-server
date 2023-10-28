@@ -2,11 +2,12 @@
 import TimeChart from '@/components/DashboardComponents/TimeChart.vue';
 import { $t } from '@/lib/locale/locale';
 import request from '@/lib/request';
-import type { ApiRequestHistogram, ApiRequestMetrics, RequestMetrics, SortKey, SortOrder } from '@/types/metrics';
+import type { ApiRequestHistogram, ApiRequestMetrics, RequestMetrics } from '@/types/metrics';
 import { computed, onUnmounted, ref } from 'vue';
-import SortOrderComp from './SortOrder.vue';
+import SortOrderComp from '@/components/SortOrder.vue';
 import { debounce } from '@/lib/debounce';
 import type { TimeSeriesPoint } from '@/types/dashboard';
+import type { SortKey, SortOrder } from '@/types/utils';
 
 const metrics = ref<ApiRequestMetrics>({ requestMetrics: [] });
 const histogramRequest = await request.$get<ApiRequestHistogram>('admin/requestHistogram')
@@ -132,19 +133,19 @@ debounceUpdate();
         <thead>
             <tr>
                 <th @click="changeSortOrder('requestPath')">{{ $t('admin.metrics.requestPath') }}
-                    <SortOrderComp :metric="'requestPath'" :sort-order="sortOrder" />
+                    <SortOrderComp :sortKey="'requestPath'" :sort-order="sortOrder" />
                 </th>
                 <th @click="changeSortOrder('hitCount')">{{ $t('admin.metrics.executions') }}
-                    <SortOrderComp :metric="'hitCount'" :sort-order="sortOrder" />
+                    <SortOrderComp :sortKey="'hitCount'" :sort-order="sortOrder" />
                 </th>
                 <th @click="changeSortOrder('avgDuration')">{{ $t('admin.metrics.avgDuration') }}
-                    <SortOrderComp :metric="'avgDuration'" :sort-order="sortOrder" />
+                    <SortOrderComp :sortKey="'avgDuration'" :sort-order="sortOrder" />
                 </th>
                 <th @click="changeSortOrder('maxDuration')">{{ $t('admin.metrics.maxDuration') }}
-                    <SortOrderComp :metric="'maxDuration'" :sort-order="sortOrder" />
+                    <SortOrderComp :sortKey="'maxDuration'" :sort-order="sortOrder" />
                 </th>
                 <th @click="changeSortOrder('load')">{{ $t('admin.metrics.load') }}
-                    <SortOrderComp :metric="'load'" :sort-order="sortOrder" />
+                    <SortOrderComp :sortKey="'load'" :sort-order="sortOrder" />
                 </th>
             </tr>
         </thead>

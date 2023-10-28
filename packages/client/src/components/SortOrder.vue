@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { SortKey, SortOrder } from '@/types/metrics';
+import type { SortKey, SortOrder } from '@/types/utils';
 
-const { sortOrder, metric } = defineProps<{
+const { sortOrder, sortKey } = defineProps<{
     sortOrder: SortOrder<any, any>,
-    metric: SortKey<any, any>,
+    sortKey: SortKey<any, any>,
 }>();
 
 </script>
 
 <template>
-    <span v-if="sortOrder[0] === metric">
+    <span v-if="sortOrder[0] === sortKey">
         <span v-if="sortOrder[1] === 'asc'">▲▽</span>
         <span v-if="sortOrder[1] === 'desc'">△▼</span>
     </span>

@@ -19,6 +19,7 @@ const translations = {
     'admin.tabs.metrics': 'Metrics',
     'admin.tabs.requests': 'Requests',
     'admin.tabs.statistics': 'Statistics',
+    'advancedTable.searchPlaceholder': 'Search...',
     'button.cancel': 'Cancel',
     'button.changePassword': 'Change Password',
     'button.clear': 'Clear',

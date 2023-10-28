@@ -19,6 +19,7 @@ const translations: Record<string, string> = {
     'admin.tabs.metrics': 'Metriken',
     'admin.tabs.requests': 'Anfragen',
     'admin.tabs.statistics': 'Statistiken',
+    'advancedTable.searchPlaceholder': 'Suchen...',
     'button.cancel': 'Abbrechen',
     'button.changePassword': 'Passwort ändern',
     'button.clear': 'Löschen',
