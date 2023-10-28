@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdvancedTable from '@/components/AdvancedTable.vue';
 import { hasPermission } from '@/lib/permission';
 import request, { isErrorResponse } from '@/lib/request';
 import { formatDate, humanizeDate } from '@/lib/utils';
@@ -50,29 +51,14 @@ const downloadConfigurationFile = async () => {
             </div>
         </div>
         <div class="column is-full">
-            <table class="table is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>{{ $t('field.active') }}</th>
-                        <th>{{ $t('field.username') }}</th>
-                        <th>{{ $t('field.hostname') }}</th>
-                        <th>{{ $t('field.osVersion') }}</th>
-                        <th>{{ $t('field.appVersion') }}</th>
-                        <th>{{ $t('field.lastPing') }}</th>
-                    </tr>
-                </thead>
-                <tbody v-if="!isErrorResponse(clients)">
-                    <tr v-for="client in clients" :key="client.id" class="is-clickable"
-                        @click="$router.push(`/clients/${client.id}`)">
-                        <td><input type="checkbox" :checked="client.active" disabled></td>
-                        <td>{{ client.username }}</td>
-                        <td>{{ client.hostname }}</td>
-                        <td>{{ client.os }}</td>
-                        <td>{{ client.appVersion }}</td>
-                        <td>{{ formatDate(client.lastPing) }} ({{ humanizeDate(client.lastPing) }})</td>
-                    </tr>
-                </tbody>
-            </table>
+            <AdvancedTable :data="clients" :columns="[
+                { key: 'active', label: $t('field.active'), sortable: true, searchable: true },
+                { key: 'username', label: $t('field.username'), sortable: true, searchable: true },
+                { key: 'hostname', label: $t('field.hostname'), sortable: true, searchable: true },
+                { key: 'os', label: $t('field.osVersion'), sortable: true, searchable: true },
+                { key: 'appVersion', label: $t('field.appVersion'), sortable: true, searchable: true },
+                { key: 'lastPing', label: $t('field.lastPing'), sortable: true, searchable: true, data: (client: ApiClient) => `${formatDate(client.lastPing)} (${humanizeDate(client.lastPing)})` },
+            ]" :options="{ search: true, click: true }" @click="(client) => $router.push(`/clients/${client.id}`)" />
         </div>
     </div>
 </template>
