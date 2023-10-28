@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="Model extends {[key: string]: string|number|boolean|Model}, TableData extends Array<Model>">
+<script setup lang="ts" generic="Model extends {[key: string]: string|number|boolean|Array<any>|Model}, TableData extends Array<Model>">
 import type { SortKey, SortOrder } from '@/types/utils';
 import SortOrderComp from '@/components/SortOrder.vue';
 import { computed, ref } from 'vue';
@@ -19,13 +19,15 @@ type Paths<T, D extends number = 3> = [D] extends [never] ? never : T extends ob
         : never
     }[keyof T] : "";
 
-type ColumnKey = Paths<Model>;
+type ColumnKey = Paths<TableData[number]>;
 type ColumnDefinition = {
     key: ColumnKey;
     label: string;
     sortable?: boolean;
     searchable?: boolean;
+    data?: (model: Model) => any;
 };
+
 type Cell = { data: any, column: ColumnDefinition };
 type Data = { data: Cell[], model: Model };
 
@@ -75,8 +77,10 @@ const data = computed(() => {
                 }
             }
 
+            const data = column.data ? column.data(row) : value;
+
             rowData.push({
-                data: value,
+                data,
                 column,
             });
         }
@@ -165,7 +169,8 @@ const changeSortOrder = (sortKey: any) => {
                     'is-clickable': options?.click,
                 }">
                     <td v-for="(td, index) in tr.data" :key="index">
-                        {{ td.data }}
+                        <input type="checkbox" :checked="td.data" v-if="typeof td.data === 'boolean'" disabled>
+                        <span v-else>{{ td.data }}</span>
                     </td>
                 </tr>
             </tbody>
