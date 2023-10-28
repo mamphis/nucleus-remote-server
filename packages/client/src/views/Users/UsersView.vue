@@ -6,7 +6,8 @@ import request, { isErrorResponse } from '../../lib/request';
 import AdvancedTable from '@/components/AdvancedTable.vue';
 
 const { user } = userStore();
-const userResponse = await request.$get<ApiUser[]>('users');
+type ExtendendUser = ApiUser & { verified: boolean };
+const userResponse = await request.$get<ExtendendUser[]>('users');
 const users = userResponse.assertNotError().toRef();
 </script>
 <template>
@@ -24,6 +25,7 @@ const users = userResponse.assertNotError().toRef();
             <AdvancedTable :data="users" :columns="[
                 { key: 'username', label: $t('field.username'), sortable: true, searchable: true },
                 { key: 'email', label: $t('field.eMail'), sortable: true, searchable: true },
+                { key: 'verified', label: $t('field.verified'), sortable: true },
                 { key: 'tenant.name', label: $t('field.tenant'), sortable: true, searchable: true },
                 { key: 'permission.[number].length', label: $t('field.permissionCount'), sortable: true },
             ]" :options="{ click: true, sort: true, search: true }"

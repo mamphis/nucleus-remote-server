@@ -129,6 +129,7 @@ const translations = {
     'field.type': 'Type',
     'field.userCount': 'No. of Users',
     'field.username': 'Username',
+    'field.verified': 'Verified',
     'field.version': 'Version',
     'files.choose': 'Choose File',
     'files.dropFilesHere': 'Drop files here',

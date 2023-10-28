@@ -13,15 +13,17 @@ export default function (db: PrismaClient) {
     const router = Router();
 
     router.get('/', auth('read:user'), async (req, res: AuthResponse, next) => {
-        res.json(await db.user.findMany({
+        const users = await db.user.findMany({
             select: {
                 id: true,
                 username: true,
                 permission: true,
                 tenant: true,
                 email: true,
+                onetimePassword: true,
             }
-        }));
+        });
+        res.json(users.map(user => ({ ...user, verified: !user.onetimePassword, onetimePassword: undefined })));
     });
 
     router.get('/me', auth(), async (req, res: AuthResponse, next) => {
