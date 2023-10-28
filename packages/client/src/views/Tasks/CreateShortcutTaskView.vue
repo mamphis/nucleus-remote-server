@@ -32,31 +32,31 @@ watch(content, (newValue) => {
 
 <template>
     <div class="field">
-        <label class="label" for="">{{ $t('createShortcutTask.linkDirectory') }}</label>
+        <label class="label">{{ $t('createShortcutTask.linkDirectory') }}</label>
         <SpecialFolderPicker v-model="content.LinkDirectory" />
     </div>
     <div class="field">
-        <label class="label" for="">{{ $t('createShortcutTask.linkName') }}</label>
+        <label class="label">{{ $t('createShortcutTask.linkName') }}</label>
         <input class="input" v-model="content.LinkName" required />
     </div>
     <div class="field">
-        <label class="label" for="">{{ $t('createShortcutTask.targetPath') }}</label>
+        <label class="label">{{ $t('createShortcutTask.targetPath') }}</label>
         <input class="input" v-model="content.TargetPath" required />
     </div>
     <div class="field">
-        <label class="label" for="">{{ $t('createShortcutTask.arguments') }}</label>
+        <label class="label">{{ $t('createShortcutTask.arguments') }}</label>
         <input class="input" v-model="content.Arguments" />
     </div>
     <div class="field">
-        <label class="label" for="">{{ $t('createShortcutTask.workingDir') }}</label>
+        <label class="label">{{ $t('createShortcutTask.workingDir') }}</label>
         <input class="input" v-model="content.WorkingDirectory" />
     </div>
     <div class="field">
-        <label class="label" for="">{{ $t('createShortcutTask.iconLocation') }}</label>
+        <label class="label">{{ $t('createShortcutTask.iconLocation') }}</label>
         <Icons v-model="content.IconLocation" />
     </div>
     <div class="field">
-        <label class="checkbox" for="">
+        <label class="checkbox">
             <input class="checkbox" type="checkbox" v-model="content.OverrideExisting" />
             {{ $t('createShortcutTask.override') }}
         </label>

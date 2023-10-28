@@ -41,7 +41,7 @@ const createIssue = async () => {
         </div>
         <form @submit.prevent="createIssue();" class="column is-full">
             <div class="field">
-                <label class="label" for="">{{ $t('field.content') }}</label>
+                <label class="label">{{ $t('field.content') }}</label>
                 <div class="control">
                     <textarea class="textarea has-fixed-size" rows="10" v-model="content"></textarea>
                 </div>

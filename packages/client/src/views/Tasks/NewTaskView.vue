@@ -69,7 +69,7 @@ const createNewTask = async () => {
                     <p v-if="!!errors.name" class="help is-danger">{{ errors.name }}</p>
                 </div>
                 <div class="field">
-                    <label class="label" for="">{{ $t('field.type') }}</label>
+                    <label class="label">{{ $t('field.type') }}</label>
                     <span class="select">
                         <select v-model="type">
                             <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label }}</option>
@@ -78,7 +78,7 @@ const createNewTask = async () => {
                     <p v-if="!!errors.type" class="help is-danger">{{ errors.type }}</p>
                 </div>
                 <div class="field">
-                    <label class="label" for="">{{ $t('field.output') }}</label>
+                    <label class="label">{{ $t('field.output') }}</label>
                     <span class="select">
                         <select v-model="output">
                             <option v-for="(option) in outputTypes" :value="option" :key="option">{{ $t('task.outputType.' +

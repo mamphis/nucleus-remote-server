@@ -40,7 +40,6 @@ onUnmounted(() => {
 });
 
 async function onDrop(e: DragEvent) {
-    console.log(e.dataTransfer?.files);
     isDropping.value = false;
 
     for (const file of e.dataTransfer?.files ?? []) {

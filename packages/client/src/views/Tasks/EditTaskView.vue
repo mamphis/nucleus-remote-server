@@ -102,7 +102,7 @@ const deleteTask = async () => {
                         <div class="field is-horizontal">
                             <div class="field-body">
                                 <div class="field">
-                                    <label class="label" for="">{{ $t('field.type') }}</label>
+                                    <label class="label">{{ $t('field.type') }}</label>
                                     <span class="select">
                                         <select v-model="type" disabled>
                                             <option v-for="(option, key) in typeMap" :value="key" :key="key">{{ option.label
@@ -112,7 +112,7 @@ const deleteTask = async () => {
                                     </span>
                                 </div>
                                 <div class="field">
-                                    <label class="label" for="">{{ $t('field.output') }}</label>
+                                    <label class="label">{{ $t('field.output') }}</label>
                                     <span class="select">
                                         <select v-model="output">
                                             <option v-for="(option) in outputTypes" :value="option" :key="option">
@@ -128,7 +128,7 @@ const deleteTask = async () => {
                     <div class="column is-half">
                         <div class="field">
                             <div class="control">
-                                <label class="checkbox" for="">
+                                <label class="checkbox">
                                     <input class="checkbox" type="checkbox" v-model="active" />
                                     {{ $t('field.active') }}
                                 </label>
@@ -138,7 +138,7 @@ const deleteTask = async () => {
 
                         <div class="field">
                             <div class="control">
-                                <label class="checkbox" for="">
+                                <label class="checkbox">
                                     <input class="checkbox" type="checkbox" v-model="runOnce" />
                                     {{ $t('field.runOnce') }}
                                 </label>

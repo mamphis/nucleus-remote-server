@@ -81,11 +81,11 @@ const changePassword = async () => {
         </div>
         <form @submit.prevent="updateUser();" class="column is-full" v-if="!isErrorResponse(user)">
             <div class="field">
-                <label class="label" for="">{{ $t('field.username') }}</label>
+                <label class="label">{{ $t('field.username') }}</label>
                 <input type="text" class="input" v-model="user.username" disabled>
             </div>
             <div class="field">
-                <label class="label" for="">{{ $t('field.eMail') }}</label>
+                <label class="label">{{ $t('field.eMail') }}</label>
                 <input type="email" class="input" v-model="user.email" required :placeholder="$t('field.eMail')">
             </div>
 

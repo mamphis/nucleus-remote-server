@@ -38,7 +38,6 @@ const files = ref<Array<File>>([]);
 
 (async () => {
     const filesResponse = await request.$get<ApiFile[]>('files').then(val => val.assertNotError());
-    console.log(filesResponse);
     files.value = await Promise.all(filesResponse.map(async f => ({
         id: `serverfile:${f.id}`,
         name: f.filename,
@@ -49,22 +48,22 @@ const files = ref<Array<File>>([]);
 
 <template>
     <div class="field">
-        <label class="label" for="">{{ $t('downloadFileTask.remoteUrl') }}</label>
+        <label class="label">{{ $t('downloadFileTask.remoteUrl') }}</label>
         <SelectFile v-model="content.RemoteUrl" :files="files" />
         <!-- <input class="input" v-model="content.RemoteUrl" required /> -->
     </div>
     <div class="field">
-        <label class="label" for="">{{ $t('downloadFileTask.destination') }}</label>
+        <label class="label">{{ $t('downloadFileTask.destination') }}</label>
         <SpecialFolderPicker v-model="content.Destination" />
     </div>
     <div class="field">
-        <label class="checkbox" for="">
+        <label class="checkbox">
             <input class="checkbox" type="checkbox" v-model="content.Override" />
             {{ $t('downloadFileTask.override') }}
         </label>
     </div>
     <div class="field">
-        <label class="checkbox" for="">
+        <label class="checkbox">
             <input class="checkbox" type="checkbox" v-model="content.IgnoreIfExists" />
             {{ $t('downloadFileTask.ignoreIfExists') }}
         </label>

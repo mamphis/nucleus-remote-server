@@ -26,17 +26,17 @@ watch(content, (newValue) => {
 
 <template>
     <div class="field">
-        <label class="label" for="">{{ $t('deleteTask.path') }}</label>
+        <label class="label">{{ $t('deleteTask.path') }}</label>
         <SpecialFolderPicker v-model="content.Path" required />
     </div>
     <div class="field">
-        <label class="checkbox" for="">
+        <label class="checkbox">
             <input class="checkbox" type="checkbox" v-model="content.Recursive" />
             {{ $t('deleteTask.recursive') }}
         </label>
     </div>
     <div class="field">
-        <label class="checkbox" for="">
+        <label class="checkbox">
             <input class="checkbox" type="checkbox" v-model="content.IgnoreIfMissing" />
             {{ $t('deleteTask.ignoreIfMissing') }}
         </label>

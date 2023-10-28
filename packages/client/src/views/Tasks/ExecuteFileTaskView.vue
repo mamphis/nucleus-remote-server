@@ -27,21 +27,21 @@ watch(content, (newValue) => {
 
 <template>
     <div class="field">
-        <label class="label" for="">{{ $t('executeFileTask.file') }}</label>
+        <label class="label">{{ $t('executeFileTask.file') }}</label>
         <SpecialFolderPicker v-model="content.File" />
     </div>
     <div class="field">
-        <label class="label" for="">{{ $t('executeFileTask.arguments') }}</label>
+        <label class="label">{{ $t('executeFileTask.arguments') }}</label>
         <input class="input" v-model="content.Arguments" />
     </div>
     <div class="field">
-        <label class="checkbox" for="">
+        <label class="checkbox">
             <input class="checkbox" type="checkbox" v-model="content.HideWindow" />
             {{ $t('executeFileTask.hideWindow') }}
         </label>
     </div>
     <div class="field">
-        <label class="checkbox" for="">
+        <label class="checkbox">
             <input class="checkbox" type="checkbox" v-model="content.StartIfProcessIsRunning" />
             {{ $t('executeFileTask.startIfProcessIsRunning') }}
         </label>

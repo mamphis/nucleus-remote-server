@@ -165,7 +165,7 @@ const setActiveTab = (tab: string) => {
 
 
                     <div class="field">
-                        <label class="checkbox" for="" :class="{ 'is-danger': !!errors.active }">
+                        <label class="checkbox" :class="{ 'is-danger': !!errors.active }">
                             <input class="checkbox" type="checkbox" v-model="client.active" />
                             {{ $t('field.active') }}
                         </label>

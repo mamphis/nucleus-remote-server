@@ -94,11 +94,11 @@ const permissions = [
         </div>
         <form @submit.prevent="updateUser(user);" class="column is-full">
             <div class="field">
-                <label class="label" for="">{{ $t('field.username') }}</label>
+                <label class="label">{{ $t('field.username') }}</label>
                 <input type="text" class="input" v-model="user.username" disabled>
             </div>
             <div class="field">
-                <label class="label" for="">{{ $t('field.tenant') }}</label>
+                <label class="label">{{ $t('field.tenant') }}</label>
                 <span class="select">
                     <select v-model="user.tenant.id">
                         <option v-for="tenant in tenants" :key="tenant.id" :value="tenant.id">
@@ -108,7 +108,7 @@ const permissions = [
                 </span>
             </div>
             <div class="field">
-                <label class="label" for="">{{ $t('field.eMail') }}</label>
+                <label class="label">{{ $t('field.eMail') }}</label>
                 <input type="email" class="input" v-model="user.email" required :placeholder="$t('field.eMail')">
             </div>
             <div class="field">
