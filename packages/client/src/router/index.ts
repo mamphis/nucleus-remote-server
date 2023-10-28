@@ -28,6 +28,7 @@ import EditUserView from '@/views/Users/EditUserView.vue';
 import NewUserView from '@/views/Users/NewUserView.vue';
 import UsersView from '@/views/Users/UsersView.vue';
 import VerifyView from '@/views/Misc/VerifyView.vue';
+import ContactView from '@/views/Misc/Contact.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -53,6 +54,11 @@ const router = createRouter({
                 logout();
                 return '/';
             },
+        },
+        {
+            path: '/contact',
+            name: 'contact',
+            component: ContactView,
         },
         {
             path: '/profile',

@@ -136,6 +136,7 @@ const translations = {
     'files.files': 'Files',
     'groups.groups': 'Groups',
     'groups.newGroup': 'New Group',
+    'home.requestQuote': 'Request Quote',
     'home.title': 'Nucleus Remote Server',
     'icon.choose': 'Choose icon',
     'issue.createIssue': 'Report an Issue',

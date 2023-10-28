@@ -7,6 +7,7 @@ import db from "../../lib/db";
 import { $t } from "../../lib/locale/locale";
 import mailer from "../../lib/mailer";
 import { githubOperational } from "../../lib/github";
+import { rateLimit } from 'express-rate-limit';
 
 const router = Router();
 
@@ -45,6 +46,15 @@ router.get('/health', async (req, res, next) => {
         mailerOperational,
         githubOperational: githubOperational(),
     });
+});
+
+router.post('/contact', rateLimit({
+    limit: 5,
+    windowMs: 1000 * 60 * 60,
+}), async (req, res, next) => {
+    mailer.sendContactMail(JSON.stringify(req.body), 'nrs-contact@pcsmw.de');
+
+    res.status(204).end();
 });
 
 export default router;

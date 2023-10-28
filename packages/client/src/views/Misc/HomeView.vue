@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Dashboard from '@/components/Dashboard.vue';
+import LandingPage from '@/components/LandingPage.vue';
 import userStore from '@/stores/user';
 import { storeToRefs } from 'pinia';
 
@@ -13,6 +14,7 @@ const { isLoggedIn } = storeToRefs(userStore());
         </div>
         <div class="is-flex-grow-1">
             <Dashboard v-if="isLoggedIn" />
+            <LandingPage v-else />
         </div>
     </div>
 </template>

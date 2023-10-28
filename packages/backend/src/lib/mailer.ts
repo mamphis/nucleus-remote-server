@@ -120,7 +120,7 @@ class Mailer {
     private uiBaseUrl = '';
 
     async init() {
-        const timer  = Logger.timer('mailer-init');
+        const timer = Logger.timer('mailer-init');
         const host = process.env.MAIL_HOST;
         const port = Number(process.env.MAIL_PORT);
         const secure = process.env.MAIL_IS_SECURE?.toLowerCase() === 'true';
@@ -153,7 +153,7 @@ class Mailer {
         timer.stop();
     }
 
-    async sendRegistrationMail(user: Pick<User, 'email' | 'onetimePassword' | 'username'>) {
+    sendRegistrationMail(user: Pick<User, 'email' | 'onetimePassword' | 'username'>) {
         if (!this.transporter) {
             return;
         }
@@ -184,6 +184,19 @@ class Mailer {
             from: process.env.MAIL_FROM ?? 'Registration',
             subject: 'Verify Account',
             html: templateResetLink(mail, onetimePassword, this.uiBaseUrl),
+        });
+    }
+
+    sendContactMail(content: string, recipient: string) {
+        if (!this.transporter) {
+            return;
+        }
+
+        this.transporter.sendMail({
+            to: recipient,
+            from: process.env.MAIL_FROM ?? 'Registration',
+            subject: 'Contact',
+            html: content,
         });
     }
 

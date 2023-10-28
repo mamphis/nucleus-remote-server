@@ -136,6 +136,7 @@ const translations: Record<string, string> = {
     'files.files': 'Dateien',
     'groups.groups': 'Gruppen',
     'groups.newGroup': 'Neue Gruppe erstellen',
+    'home.requestQuote': 'Angebot anfordern',
     'home.title': 'Nucleus Remote Server',
     'icon.choose': 'Symbol wählen',
     'issue.createIssue': 'Problem melden',
