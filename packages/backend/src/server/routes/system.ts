@@ -8,6 +8,7 @@ import { $t } from "../../lib/locale/locale";
 import mailer from "../../lib/mailer";
 import { githubOperational } from "../../lib/github";
 import { rateLimit } from 'express-rate-limit';
+import { z } from "zod";
 
 const router = Router();
 
@@ -52,7 +53,37 @@ router.post('/contact', rateLimit({
     limit: 5,
     windowMs: 1000 * 60 * 60,
 }), async (req, res, next) => {
-    mailer.sendContactMail(JSON.stringify(req.body), 'nrs-contact@pcsmw.de');
+    const schema = z.object({
+        firstname: z.string().min(1),
+        lastname: z.string().min(1),
+        email: z.string().email(),
+        phone: z.string().min(1),
+        company: z.string().min(1),
+        clients: z.number().int().min(1),
+        message: z.string().min(1),
+    });
+
+    try {
+        const data = schema.parse(req.body);
+
+        const text = `
+        <h1>Kontaktanfrage</h1>
+        <p>
+            <b>Vorname:</b> ${data.firstname}<br>
+            <b>Nachname:</b> ${data.lastname}<br>
+            <b>E-Mail:</b> ${data.email}<br>    
+            <b>Telefon:</b> ${data.phone}<br>
+            <b>Firma:</b> ${data.company}<br>
+            <b>Clientanzahl:</b> ${data.clients}<br>
+        </p>
+        <p>
+            <b>Nachricht:</b><br>
+            ${data.message}
+        </p>`;
+        mailer.sendContactMail(text, 'nrs-contact@pcsmw.de');
+    } catch (error) {
+        return next(error);
+    }
 
     res.status(204).end();
 });

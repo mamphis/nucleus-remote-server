@@ -6,13 +6,13 @@ const { baseApiUrl } = settingsStore();
 const url = new URL('/system/contact', baseApiUrl).href;
 
 const data = ref({
-    vorname: '',
-    nachname: '',
+    firstname: '',
+    lastname: '',
     email: '',
-    telefon: '',
-    unternehmen: '',
+    phone: '',
+    company: '',
     clients: 0,
-    nachricht: '',
+    message: '',
 });
 
 const sendContact = () => {
@@ -25,13 +25,13 @@ const sendContact = () => {
     }).then((res) => {
         if (res.ok) {
             data.value = {
-                vorname: '',
-                nachname: '',
+                firstname: '',
+                lastname: '',
                 email: '',
-                telefon: '',
-                unternehmen: '',
+                phone: '',
+                company: '',
                 clients: 0,
-                nachricht: '',
+                message: '',
             }
         }
     });
@@ -50,13 +50,13 @@ const sendContact = () => {
             <form @submit.prevent="sendContact">
                 <div class="field is-grouped">
                     <div class="control is-expanded">
-                        <label class="label" for="vorname">Vorname:</label>
-                        <input class="input" v-model="data.vorname" type="text" id="vorname" name="vorname"
+                        <label class="label" for="firstname">Vorname:</label>
+                        <input class="input" v-model="data.firstname" type="text" id="firstname" name="firstname"
                             placeholder="Ihr Vorname" required>
                     </div>
                     <div class="control is-expanded">
-                        <label class="label" for="nachname">Nachname:</label>
-                        <input class="input" v-model="data.nachname" type="text" id="nachname" name="nachname"
+                        <label class="label" for="lastname">Nachname:</label>
+                        <input class="input" v-model="data.lastname" type="text" id="lastname" name="lastname"
                             placeholder="Ihr Nachname" required>
                     </div>
                 </div>
@@ -68,15 +68,15 @@ const sendContact = () => {
                     </div>
 
                     <div class="control is-expanded">
-                        <label class="label" for="telefon">Telefonnummer:</label>
-                        <input class="input" v-model="data.telefon" type="tel" id="telefon" name="telefon"
+                        <label class="label" for="phone">Telefonnummer:</label>
+                        <input class="input" v-model="data.phone" type="tel" id="phone" name="phone"
                             placeholder="Ihre Telefonnummer" required>
                     </div>
                 </div>
                 <div class="field is-grouped">
                     <div class="control is-expanded">
-                        <label class="label" for="unternehmen">Unternehmen:</label>
-                        <input class="input" v-model="data.unternehmen" type="text" id="unternehmen" name="unternehmen"
+                        <label class="label" for="company">Unternehmen:</label>
+                        <input class="input" v-model="data.company" type="text" id="company" name="company"
                             placeholder="Ihr Unternehmen" required>
                     </div>
                     <div class="control is-expanded">
@@ -87,11 +87,12 @@ const sendContact = () => {
                 </div>
 
                 <div class="field">
-                    <label class="label" for="nachricht">Nachricht:</label>
-                    <textarea class="textarea" v-model="data.nachricht" id="nachricht" name="nachricht"
+                    <label class="label" for="message">Nachricht:</label>
+                    <textarea class="textarea" v-model="data.message" id="message" name="message"
                         placeholder="Ihre Anforderungen und Anmerkungen"></textarea>
                 </div>
                 <input class="button is-primary" type="submit" value="Angebot anfordern">
             </form>
         </div>
-</div></template>
+    </div>
+</template>
