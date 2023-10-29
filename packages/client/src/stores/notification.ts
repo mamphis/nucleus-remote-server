@@ -28,7 +28,7 @@ export const notificationStore = defineStore('notification', () => {
         }
     }
 
-    setInterval(() => { updateUnreadNotifications(); }, 30000);
+    setInterval(() => { updateUnreadNotifications(); }, 5000);
     updateUnreadNotifications();
 
     return {
