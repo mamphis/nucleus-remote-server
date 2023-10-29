@@ -1,5 +1,6 @@
 import { hasPermission } from '@/lib/permission';
 import userStore from '@/stores/user';
+import type { Command } from '@/types/commandPaletteCommand';
 import AdminView from '@/views/Admin/AdminView.vue';
 import ClientsView from '@/views/Clients/ClientsView.vue';
 import EditClientView from '@/views/Clients/EditClientView.vue';
@@ -353,4 +354,23 @@ router.beforeEach((to, from, next) => {
     next(from);
 });
 
-export default router
+export const getCommands = (): Command[] => {
+    const { user, logout } = userStore();
+    const routes = router.getRoutes().map((route) => {
+        if (!user) { return; }
+        console.log(route)
+        if (route.meta?.permissions && hasPermission(user, ...route.meta.permissions as string[]) && !route.path.includes(':')) {
+            return {
+                name: route.name as string,
+                description: route.name as string,
+                action: () => router.push(route.name as string),
+                type: 'navigation'
+            };
+        }
+    });
+
+    return routes.filter(Boolean) as Command[];
+};
+
+
+export default router;

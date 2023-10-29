@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import router from '@/router';
+import router, { getCommands } from '@/router';
 import userStore from '@/stores/user';
+import type { Command } from '@/types/commandPaletteCommand';
 import { storeToRefs } from 'pinia';
 import type { VNodeRef } from 'vue';
 import { computed } from 'vue';
@@ -16,16 +17,6 @@ const close = () => {
     isActive.value = false;
     searchValue.value = '';
 };
-
-type CommandType = 'command' | 'navigation';
-
-type Command = {
-    name: string;
-    description: string;
-    action: () => void;
-    type: CommandType;
-};
-
 
 watchEffect(() => {
     if (searchInput.value) {
@@ -51,7 +42,7 @@ document.onkeydown = (event) => {
     }
 };
 
-const commands: Command[] = [
+const cmd: Command[] = [
     {
         name: 'Open Command Palette',
         description: 'Open Command Palette',
@@ -68,73 +59,10 @@ const commands: Command[] = [
         },
         type: 'command',
     },
-    {
-        name: 'Users',
-        description: 'Open Users',
-        action: () => {
-            router.push('/users');
-        },
-        type: 'navigation',
-    },
-    {
-        name: 'Tenants',
-        description: 'Open Tenants',
-        action: () => {
-            router.push('/tenants');
-        },
-        type: 'navigation',
-    },
-    {
-        name: 'Clients',
-        description: 'Open Clients',
-        action: () => {
-            router.push('/clients');
-        },
-        type: 'navigation',
-    },
-    {
-        name: 'Groups',
-        description: 'Open Groups',
-        action: () => {
-            router.push('/groups');
-        },
-        type: 'navigation',
-    },
-    {
-        name: 'Tenant Users',
-        description: 'Open Tenant Users',
-        action: () => {
-            router.push('/tenant-users');
-        },
-        type: 'navigation',
-    },
-    {
-        name: 'Files',
-        description: 'Open Files',
-        action: () => {
-            router.push('/files');
-        },
-        type: 'navigation',
-    },
-    {
-        name: 'Configurations',
-        description: 'Open Configurations',
-        action: () => {
-            router.push('/configurations');
-        },
-        type: 'navigation',
-    },
-    {
-        name: 'Admin',
-        description: 'Open Admin',
-        action: () => {
-            router.push('/admin');
-        },
-        type: 'navigation',
-    }
+    ...getCommands(),
 ];
 
-const select = (command: Command) => {
+const doAction = (command: Command) => {
     if (command.type === 'navigation') {
         close();
         command.action();
@@ -147,12 +75,22 @@ const select = (command: Command) => {
 };
 
 const availableCommands = computed(() => {
-    if (searchValue.value === '') {
-        return commands;
-    }
+    cmd.sort((a, b) => a.type.localeCompare(b.type));
+    let filteredCommands = cmd.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
 
-    return commands.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
+    return filteredCommands;
 });
+
+const updateFilter = (ev: KeyboardEvent) => {
+    switch (ev.key) {
+        case 'ArrowUp':
+
+            break;
+
+        default:
+            break;
+    }
+}
 
 </script>
 
@@ -171,7 +109,8 @@ const availableCommands = computed(() => {
                                 </a>
                             </div>
                             <div class="control has-icons-right is-expanded">
-                                <input class="input" placeholder="" v-model="searchValue" :ref="(val) => searchInput = val">
+                                <input class="input" placeholder="" v-model="searchValue" @keydown="updateFilter"
+                                    :ref="(val) => searchInput = val">
 
                                 <span class="icon is-right">
                                     <button class="delete" aria-label="close" @click.prevent="close()"></button>
@@ -182,12 +121,12 @@ const availableCommands = computed(() => {
 
                     <div class="panel-block"><span class="is-size-7 has-text-light">Navigation</span></div>
                     <div class="panel-block" v-for="command in availableCommands.filter(c => c.type === 'navigation')"
-                        :key="command.name" @click="select(command)">
+                        :key="command.name" @click="doAction(command)">
                         {{ command.name }}</div>
 
                     <div class="panel-block"><span class="is-size-7 has-text-light">Actions</span></div>
                     <div class="panel-block" v-for="command in availableCommands.filter(c => c.type === 'command')"
-                        :key="command.name" @click="select(command)">
+                        :key="command.name" @click="doAction(command)">
                         {{ command.name }}</div>
                 </div>
             </section>
