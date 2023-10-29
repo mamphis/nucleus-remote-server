@@ -358,7 +358,7 @@ export const getCommands = (): Command[] => {
     const { user, logout } = userStore();
     const routes = router.getRoutes().map((route) => {
         if (!user) { return; }
-        console.log(route)
+
         if (route.meta?.permissions && hasPermission(user, ...route.meta.permissions as string[]) && !route.path.includes(':')) {
             return {
                 name: route.name as string,
