@@ -7,6 +7,7 @@ import { notificationStore } from './stores/notification';
 import userStore from './stores/user';
 import Notification from '@/components/Notification.vue';
 import router from './router';
+import CommandPalette from './components/CommandPalette.vue';
 const burgerActive = ref(false);
 
 const { user, isLoggedIn } = storeToRefs(userStore());
@@ -29,6 +30,7 @@ router.beforeEach((to, from, next) => {
 
 <template>
     <Notification />
+    <CommandPalette />
     <header>
         <nav class="navbar has-shadow">
             <div class="navbar-brand is-flex-grow-1">

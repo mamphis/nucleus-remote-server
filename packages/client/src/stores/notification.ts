@@ -1,5 +1,5 @@
 import request, { isErrorResponse } from "@/lib/request";
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 import { ref } from "vue";
 import { eventStore } from "./eventBus";
 import { $t } from "@/lib/locale/locale";
@@ -12,12 +12,12 @@ type NotificatonStats = {
 
 export const notificationStore = defineStore('notification', () => {
     const event = eventStore();
-    const { isLoggedIn } = userStore();
+    const { isLoggedIn } = storeToRefs(userStore());
     const unreadNotifications = ref(-1);
 
     const updateUnreadNotifications = async () => {
-        if (!isLoggedIn) { return };
-        
+        if (!isLoggedIn.value) { return };
+
         const response = await request.$get<NotificatonStats>(`notifications/stats`);
         if (!isErrorResponse(response)) {
             if (unreadNotifications.value >= 0 && unreadNotifications.value < response.unread) {
@@ -28,7 +28,7 @@ export const notificationStore = defineStore('notification', () => {
         }
     }
 
-    setInterval(() => { updateUnreadNotifications(); }, 30000);
+    setInterval(() => { updateUnreadNotifications(); }, 5000);
     updateUnreadNotifications();
 
     return {
